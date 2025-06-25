@@ -2573,11 +2573,11 @@
         }
         
         // 更新负责人员筛选选项
-        function updateResponsibleFilterOptions() {
+        async function updateResponsibleFilterOptions() {
             const selectElement = document.getElementById('responsible-filter');
             if (!selectElement) return;
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             let optionsHtml = `<option value="">${getText('all-employees')}</option>`;
             optionsHtml += `<option value="unassigned">${getText('unassigned')}</option>`;
             
@@ -2614,23 +2614,23 @@
         }
         
         // 更新所有动态选项
-        function updateAllDynamicOptions() {
+        async function updateAllDynamicOptions() {
             // 安全更新函数（检查元素是否存在）
-            function safeUpdate(updateFn) {
+            async function safeUpdate(updateFn) {
                 try {
-                    updateFn();
+                    await updateFn();
                 } catch (e) {
                     // 忽略不存在的元素错误
                 }
             }
             
-            safeUpdate(() => updateResponsibleEmployeeOptions());
-            safeUpdate(() => updateEditResponsibleEmployeeOptions());
-            safeUpdate(() => updateSalespersonOptions());
-            safeUpdate(() => updateEditSalespersonOptions());
-            safeUpdate(() => updateDeleteSalonOptions());
-            safeUpdate(() => updateDeleteEmployeeOptions());
-            safeUpdate(() => updateResponsibleFilterOptions());
+            await safeUpdate(() => updateResponsibleEmployeeOptions());
+            await safeUpdate(() => updateEditResponsibleEmployeeOptions());
+            await safeUpdate(() => updateSalespersonOptions());
+            await safeUpdate(() => updateEditSalespersonOptions());
+            await safeUpdate(() => updateDeleteSalonOptions());
+            await safeUpdate(() => updateDeleteEmployeeOptions());
+            await safeUpdate(() => updateResponsibleFilterOptions());
         }
         
         // 刷新当前页面内容
@@ -3244,11 +3244,11 @@
         }
         
         // 获取职员姓名
-        function getEmployeeName(employeeId) {
+        async function getEmployeeName(employeeId) {
             if (employeeId === 'unassigned' || employeeId === '' || !employeeId) {
                 return getText('unassigned');
             }
-            const employees = getEmployees();
+            const employees = await getEmployees();
             const employee = employees.find(emp => emp.id == employeeId);
             return employee ? employee.name : getText('unassigned');
         }
@@ -3443,9 +3443,9 @@
         }
         
         // 显示职员列表
-        function displayEmployeeList() {
+        async function displayEmployeeList() {
             const employeeListContainer = document.getElementById('employee-list-content');
-            const employees = getEmployees();
+            const employees = await getEmployees();
             
             if (employees.length === 0) {
                 employeeListContainer.innerHTML = `<div style="text-align: center; color: #cccccc; padding: 40px;"><p>暂无职员信息</p><p style="font-size: 0.9em;">请前往"新增职员"页面添加职员信息</p></div>`;
@@ -3528,11 +3528,11 @@
         }
         
         // 确认删除职员
-        function confirmDeleteEmployee(employeeId) {
-            const employees = getEmployees();
+        async function confirmDeleteEmployee(employeeId) {
+            const employees = await getEmployees();
             const employee = employees.find(e => e.id === employeeId);
             if (employee && confirm(getText('confirm-delete-employee').replace('{name}', employee.name))) {
-                deleteEmployee(employeeId);
+                await deleteEmployee(employeeId);
                 displayEmployeeList(); // 刷新列表
                 updateDeleteEmployeeOptions(); // 更新删除页面的选项
                 alert(getText('employee-deleted-success'));
@@ -3540,11 +3540,11 @@
         }
         
         // 更新删除职员页面的选项
-        function updateDeleteEmployeeOptions() {
+        async function updateDeleteEmployeeOptions() {
             const selectElement = document.getElementById('deleteEmployeeSelect');
             if (!selectElement) return;
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
             
             employees.forEach(employee => {
@@ -3559,7 +3559,7 @@
         }
         
         // 删除选定的职员
-        function deleteSelectedEmployee() {
+        async function deleteSelectedEmployee() {
             const selectElement = document.getElementById('deleteEmployeeSelect');
             const selectedEmployeeId = selectElement.value;
             
@@ -3568,11 +3568,11 @@
                 return;
             }
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             const employee = employees.find(e => e.id == selectedEmployeeId);
             
             if (employee && confirm(getText('confirm-delete-employee').replace('{name}', employee.name))) {
-                deleteEmployee(parseInt(selectedEmployeeId));
+                await deleteEmployee(parseInt(selectedEmployeeId));
                 updateDeleteEmployeeOptions(); // 更新下拉列表
                 alert(getText('employee-deleted-success'));
                 
