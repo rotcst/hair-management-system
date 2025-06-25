@@ -11,207 +11,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase配置 -->
     <script src="firebase-config.js"></script>
-    <!-- Firebase数据管理器 -->
-    <script>
-        // Firebase数据管理器 - 实现云端数据同步
-        class FirebaseDataManager {
-            constructor() {
-                this.isOnline = navigator.onLine;
-                this.syncQueue = [];
-                
-                window.addEventListener('online', () => {
-                    this.isOnline = true;
-                    this.processSyncQueue();
-                    console.log('网络已连接，开始同步数据...');
-                });
-                
-                window.addEventListener('offline', () => {
-                    this.isOnline = false;
-                    console.log('网络已断开，启用离线模式...');
-                });
-            }
-
-            async processSyncQueue() {
-                while (this.syncQueue.length > 0) {
-                    const operation = this.syncQueue.shift();
-                    try {
-                        await operation();
-                    } catch (error) {
-                        console.error('同步操作失败:', error);
-                        this.syncQueue.unshift(operation);
-                        break;
-                    }
-                }
-            }
-
-            // 员工数据管理
-            async getEmployees() {
-                try {
-                    if (!this.isOnline || !window.db) {
-                        const employees = localStorage.getItem('employees');
-                        return employees ? JSON.parse(employees) : [];
-                    }
-
-                    const snapshot = await db.collection('employees').orderBy('createTime', 'desc').get();
-                    const employees = [];
-                    snapshot.forEach(doc => {
-                        employees.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    localStorage.setItem('employees', JSON.stringify(employees));
-                    return employees;
-                } catch (error) {
-                    console.error('获取员工数据失败:', error);
-                    const employees = localStorage.getItem('employees');
-                    return employees ? JSON.parse(employees) : [];
-                }
-            }
-
-            async saveEmployee(employee) {
-                try {
-                    if (!this.isOnline || !window.db) {
-                        this.syncQueue.push(() => this.saveEmployee(employee));
-                        const employees = JSON.parse(localStorage.getItem('employees') || '[]');
-                        if (employee.id) {
-                            const index = employees.findIndex(emp => emp.id == employee.id);
-                            if (index !== -1) {
-                                employees[index] = employee;
-                            } else {
-                                employees.push(employee);
-                            }
-                        } else {
-                            employee.id = Date.now();
-                            employees.push(employee);
-                        }
-                        localStorage.setItem('employees', JSON.stringify(employees));
-                        return employee;
-                    }
-
-                    const empId = employee.id ? employee.id.toString() : Date.now().toString();
-                    employee.id = empId;
-
-                    await db.collection('employees').doc(empId).set(employee);
-                    
-                    const employees = await this.getEmployees();
-                    localStorage.setItem('employees', JSON.stringify(employees));
-                    
-                    return employee;
-                } catch (error) {
-                    console.error('保存员工数据失败:', error);
-                    // 出错时仍然保存到本地
-                    const employees = JSON.parse(localStorage.getItem('employees') || '[]');
-                    if (!employee.id) employee.id = Date.now();
-                    const index = employees.findIndex(emp => emp.id == employee.id);
-                    if (index !== -1) {
-                        employees[index] = employee;
-                    } else {
-                        employees.push(employee);
-                    }
-                    localStorage.setItem('employees', JSON.stringify(employees));
-                    return employee;
-                }
-            }
-
-            async deleteEmployee(employeeId) {
-                try {
-                    if (!this.isOnline || !window.db) {
-                        this.syncQueue.push(() => this.deleteEmployee(employeeId));
-                        const employees = JSON.parse(localStorage.getItem('employees') || '[]');
-                        const filteredEmployees = employees.filter(emp => emp.id != employeeId);
-                        localStorage.setItem('employees', JSON.stringify(filteredEmployees));
-                        return;
-                    }
-
-                    await db.collection('employees').doc(employeeId.toString()).delete();
-                    
-                    const employees = await this.getEmployees();
-                    localStorage.setItem('employees', JSON.stringify(employees));
-                } catch (error) {
-                    console.error('删除员工数据失败:', error);
-                    // 出错时仍然从本地删除
-                    const employees = JSON.parse(localStorage.getItem('employees') || '[]');
-                    const filteredEmployees = employees.filter(emp => emp.id != employeeId);
-                    localStorage.setItem('employees', JSON.stringify(filteredEmployees));
-                }
-            }
-
-            getSyncStatus() {
-                const hasFirebase = window.firebase && window.db;
-                const isOnline = navigator.onLine && hasFirebase;
-                
-                return {
-                    isOnline: isOnline,
-                    pendingSync: this.syncQueue.length,
-                    message: isOnline ? '已连接云端数据库' : `离线模式 (${this.syncQueue.length}个操作待同步)`
-                };
-            }
-        }
-
-        // 创建全局数据管理器实例
-        const firebaseDataManager = new FirebaseDataManager();
-        window.firebaseDataManager = firebaseDataManager;
-
-        // 等待Firebase初始化完成后添加状态指示器
-        setTimeout(() => {
-            addSyncStatusIndicator();
-        }, 3000);
-        
-        // 也在页面完全加载后再次检查
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                console.log('页面加载完成后再次检查Firebase状态');
-                if (window.firebaseDataManager) {
-                    const status = window.firebaseDataManager.getSyncStatus();
-                    console.log('当前状态:', status);
-                }
-            }, 1000);
-        });
-
-        // 添加连接状态指示器
-        function addSyncStatusIndicator() {
-            const indicator = document.createElement('div');
-            indicator.id = 'sync-status';
-            indicator.style.cssText = `
-                position: fixed;
-                top: 70px;
-                right: 20px;
-                padding: 8px 12px;
-                border-radius: 6px;
-                font-size: 0.8em;
-                z-index: 1001;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            `;
-            
-            function updateStatus() {
-                const status = firebaseDataManager.getSyncStatus();
-                indicator.textContent = status.message;
-                
-                if (status.isOnline) {
-                    indicator.style.background = 'rgba(76, 175, 80, 0.9)';
-                    indicator.style.color = 'white';
-                    indicator.style.border = '1px solid #4CAF50';
-                } else {
-                    indicator.style.background = 'rgba(255, 193, 7, 0.9)';
-                    indicator.style.color = 'black';
-                    indicator.style.border = '1px solid #FFC107';
-                }
-            }
-            
-            updateStatus();
-            setInterval(updateStatus, 2000); // 更频繁的状态更新
-            
-            // 添加调试信息
-            console.log('Firebase状态指示器已启动');
-            console.log('window.firebase存在:', !!window.firebase);
-            console.log('window.db存在:', !!window.db);
-            console.log('网络状态:', navigator.onLine);
-            
-            document.body.appendChild(indicator);
-        }
-
-        console.log('🔥 Firebase数据管理器已启动 - 支持实时数据同步！');
-    </script>
     <style>
         :root {
             --gold: #D4AF37;
@@ -1005,7 +804,7 @@
                         <button onclick="displaySalonList('guro')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-guro">九老区</button>
                         <button onclick="displaySalonList('yeongdeungpo')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-yeongdeungpo">永登浦区</button>
                         <button onclick="displaySalonList('geumcheon')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-geumcheon">衿川区</button>
-                        <button onclick="displaySalonList('overseas')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-other">海外区域</button>
+                        <button onclick="displaySalonList('overseas')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-other">해외지역</button>
                     </div>
                 </div>
             </div>
@@ -2573,11 +2372,11 @@
         }
         
         // 更新负责人员筛选选项
-        async function updateResponsibleFilterOptions() {
+        function updateResponsibleFilterOptions() {
             const selectElement = document.getElementById('responsible-filter');
             if (!selectElement) return;
             
-            const employees = await getEmployees();
+            const employees = getEmployees();
             let optionsHtml = `<option value="">${getText('all-employees')}</option>`;
             optionsHtml += `<option value="unassigned">${getText('unassigned')}</option>`;
             
@@ -2614,23 +2413,23 @@
         }
         
         // 更新所有动态选项
-        async function updateAllDynamicOptions() {
+        function updateAllDynamicOptions() {
             // 安全更新函数（检查元素是否存在）
-            async function safeUpdate(updateFn) {
+            function safeUpdate(updateFn) {
                 try {
-                    await updateFn();
+                    updateFn();
                 } catch (e) {
                     // 忽略不存在的元素错误
                 }
             }
             
-            await safeUpdate(() => updateResponsibleEmployeeOptions());
-            await safeUpdate(() => updateEditResponsibleEmployeeOptions());
-            await safeUpdate(() => updateSalespersonOptions());
-            await safeUpdate(() => updateEditSalespersonOptions());
-            await safeUpdate(() => updateDeleteSalonOptions());
-            await safeUpdate(() => updateDeleteEmployeeOptions());
-            await safeUpdate(() => updateResponsibleFilterOptions());
+            safeUpdate(() => updateResponsibleEmployeeOptions());
+            safeUpdate(() => updateEditResponsibleEmployeeOptions());
+            safeUpdate(() => updateSalespersonOptions());
+            safeUpdate(() => updateEditSalespersonOptions());
+            safeUpdate(() => updateDeleteSalonOptions());
+            safeUpdate(() => updateDeleteEmployeeOptions());
+            safeUpdate(() => updateResponsibleFilterOptions());
         }
         
         // 刷新当前页面内容
@@ -2867,6 +2666,102 @@
             initializeFileUpload();
         });
         
+        // Firebase数据管理器 - 实现云端数据同步
+        class FirebaseDataManager {
+            constructor() {
+                this.isOnline = navigator.onLine;
+                this.syncQueue = [];
+                
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.processSyncQueue();
+                    console.log('网络已连接，开始同步数据...');
+                });
+                
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    console.log('网络已断开，启用离线模式...');
+                });
+            }
+
+            async processSyncQueue() {
+                while (this.syncQueue.length > 0) {
+                    const operation = this.syncQueue.shift();
+                    try {
+                        await operation();
+                    } catch (error) {
+                        console.error('同步操作失败:', error);
+                        this.syncQueue.unshift(operation);
+                        break;
+                    }
+                }
+            }
+
+            getSyncStatus() {
+                const hasFirebase = window.firebase && window.db;
+                const isOnline = navigator.onLine && hasFirebase;
+                
+                return {
+                    isOnline: isOnline,
+                    pendingSync: this.syncQueue.length,
+                    message: isOnline ? '已连接云端数据库' : `离线模式 (${this.syncQueue.length}个操作待同步)`
+                };
+            }
+        }
+
+        // 创建全局数据管理器实例
+        const firebaseDataManager = new FirebaseDataManager();
+        window.firebaseDataManager = firebaseDataManager;
+
+        // 等待Firebase初始化完成后添加状态指示器
+        setTimeout(() => {
+            addSyncStatusIndicator();
+        }, 3000);
+
+        // 添加连接状态指示器
+        function addSyncStatusIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'sync-status';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 0.8em;
+                z-index: 1001;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            `;
+            
+            function updateStatus() {
+                const status = firebaseDataManager.getSyncStatus();
+                indicator.textContent = status.message;
+                
+                if (status.isOnline) {
+                    indicator.style.background = 'rgba(76, 175, 80, 0.9)';
+                    indicator.style.color = 'white';
+                    indicator.style.border = '1px solid #4CAF50';
+                } else {
+                    indicator.style.background = 'rgba(255, 193, 7, 0.9)';
+                    indicator.style.color = 'black';
+                    indicator.style.border = '1px solid #FFC107';
+                }
+            }
+            
+            updateStatus();
+            setInterval(updateStatus, 3000);
+            
+            console.log('Firebase状态指示器已启动');
+            console.log('window.firebase存在:', !!window.firebase);
+            console.log('window.db存在:', !!window.db);
+            console.log('网络状态:', navigator.onLine);
+            
+            document.body.appendChild(indicator);
+        }
+
+        console.log('🔥 Firebase数据管理器已启动 - 支持实时数据同步！');
+        
         // 다국어 텍스트 가져오기 함수
         function getText(key) {
             return translations[currentLanguage] && translations[currentLanguage][key] 
@@ -3003,18 +2898,18 @@
             return false;
         }
         
-        // 职员数据管理 - 使用Firebase云同步
-        async function getEmployees() {
-            return await firebaseDataManager.getEmployees();
+        // 职员数据管理
+        function getEmployees() {
+            const employees = localStorage.getItem('employees');
+            return employees ? JSON.parse(employees) : [];
         }
         
-        async function saveEmployees(employees) {
-            // 此函数保留用于兼容性，但实际保存通过saveEmployee逐个处理
-            console.log('使用saveEmployee函数来保存单个员工数据');
+        function saveEmployees(employees) {
+            localStorage.setItem('employees', JSON.stringify(employees));
         }
         
-        async function addEmployee(employee) {
-            const employees = await getEmployees();
+        function addEmployee(employee) {
+            const employees = getEmployees();
             
             // 检查用户名是否已存在
             if (employees.some(emp => emp.username === employee.username)) {
@@ -3023,7 +2918,8 @@
             
             employee.id = Date.now();
             employee.createTime = new Date().toLocaleString('zh-CN');
-            await firebaseDataManager.saveEmployee(employee);
+            employees.push(employee);
+            saveEmployees(employees);
             
             // 记录操作历史
             recordOperation(
@@ -3039,10 +2935,11 @@
             return true;
         }
         
-        async function deleteEmployee(employeeId) {
-            const employees = await getEmployees();
+        function deleteEmployee(employeeId) {
+            const employees = getEmployees();
             const employeeToDelete = employees.find(employee => employee.id === employeeId);
-            await firebaseDataManager.deleteEmployee(employeeId);
+            const filteredEmployees = employees.filter(employee => employee.id !== employeeId);
+            saveEmployees(filteredEmployees);
             
             // 记录操作历史
             if (employeeToDelete) {
@@ -3058,8 +2955,8 @@
             }
         }
         
-        async function updateEmployee(updatedEmployee) {
-            const employees = await getEmployees();
+        function updateEmployee(updatedEmployee) {
+            const employees = getEmployees();
             const index = employees.findIndex(emp => emp.id === updatedEmployee.id);
             
             if (index !== -1) {
@@ -3079,7 +2976,8 @@
                     updatedEmployee.password = employees[index].password;
                 }
                 
-                await firebaseDataManager.saveEmployee(updatedEmployee);
+                employees[index] = updatedEmployee;
+                saveEmployees(employees);
                 
                 // 记录操作历史
                 recordOperation(
@@ -3244,11 +3142,11 @@
         }
         
         // 获取职员姓名
-        async function getEmployeeName(employeeId) {
+        function getEmployeeName(employeeId) {
             if (employeeId === 'unassigned' || employeeId === '' || !employeeId) {
                 return getText('unassigned');
             }
-            const employees = await getEmployees();
+            const employees = getEmployees();
             const employee = employees.find(emp => emp.id == employeeId);
             return employee ? employee.name : getText('unassigned');
         }
@@ -3286,9 +3184,9 @@
         }
         
         // 初始化系统
-        async function initializeSystem() {
+        function initializeSystem() {
             // 检查是否有员工，如果没有则创建默认管理员
-            const employees = await getEmployees();
+            const employees = getEmployees();
             if (employees.length === 0) {
                 const defaultAdmin = {
                     name: '시스템 관리자',
@@ -3297,7 +3195,7 @@
                     password: 'admin',
                     mobile: '010-0000-0000'
                 };
-                await addEmployee(defaultAdmin);
+                addEmployee(defaultAdmin);
             }
             
             // 检查当前登录状态
@@ -3443,9 +3341,9 @@
         }
         
         // 显示职员列表
-        async function displayEmployeeList() {
+        function displayEmployeeList() {
             const employeeListContainer = document.getElementById('employee-list-content');
-            const employees = await getEmployees();
+            const employees = getEmployees();
             
             if (employees.length === 0) {
                 employeeListContainer.innerHTML = `<div style="text-align: center; color: #cccccc; padding: 40px;"><p>暂无职员信息</p><p style="font-size: 0.9em;">请前往"新增职员"页面添加职员信息</p></div>`;
@@ -3528,11 +3426,11 @@
         }
         
         // 确认删除职员
-        async function confirmDeleteEmployee(employeeId) {
-            const employees = await getEmployees();
+        function confirmDeleteEmployee(employeeId) {
+            const employees = getEmployees();
             const employee = employees.find(e => e.id === employeeId);
             if (employee && confirm(getText('confirm-delete-employee').replace('{name}', employee.name))) {
-                await deleteEmployee(employeeId);
+                deleteEmployee(employeeId);
                 displayEmployeeList(); // 刷新列表
                 updateDeleteEmployeeOptions(); // 更新删除页面的选项
                 alert(getText('employee-deleted-success'));
@@ -3540,11 +3438,11 @@
         }
         
         // 更新删除职员页面的选项
-        async function updateDeleteEmployeeOptions() {
+        function updateDeleteEmployeeOptions() {
             const selectElement = document.getElementById('deleteEmployeeSelect');
             if (!selectElement) return;
             
-            const employees = await getEmployees();
+            const employees = getEmployees();
             let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
             
             employees.forEach(employee => {
@@ -3559,7 +3457,7 @@
         }
         
         // 删除选定的职员
-        async function deleteSelectedEmployee() {
+        function deleteSelectedEmployee() {
             const selectElement = document.getElementById('deleteEmployeeSelect');
             const selectedEmployeeId = selectElement.value;
             
@@ -3568,11 +3466,11 @@
                 return;
             }
             
-            const employees = await getEmployees();
+            const employees = getEmployees();
             const employee = employees.find(e => e.id == selectedEmployeeId);
             
             if (employee && confirm(getText('confirm-delete-employee').replace('{name}', employee.name))) {
-                await deleteEmployee(parseInt(selectedEmployeeId));
+                deleteEmployee(parseInt(selectedEmployeeId));
                 updateDeleteEmployeeOptions(); // 更新下拉列表
                 alert(getText('employee-deleted-success'));
                 
@@ -3704,6 +3602,312 @@
             }
             
             return salons;
+        }
+        
+        // 处理上传的文件
+        function processSalonFile() {
+            // 检查SheetJS库是否已加载
+            if (typeof XLSX === 'undefined') {
+                alert('Excel处理库尚未加载完成，请稍后再试！');
+                return;
+            }
+            
+            const fileInput = document.getElementById('salon-file-upload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert(getText('select-file-first'));
+                return;
+            }
+            
+            // 检查文件类型
+            const fileName = file.name.toLowerCase();
+            if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+                alert(getText('unsupported-file-type'));
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    
+                    batchSalonData = parseExcel(workbook);
+                    
+                    if (batchSalonData.length === 0) {
+                        alert(getText('no-valid-data'));
+                        return;
+                    }
+                    
+                    // 显示预览
+                    displayBatchPreview();
+                    alert(getText('file-processed-success').replace('{count}', batchSalonData.length));
+                    
+                } catch (error) {
+                    alert(getText('file-processing-error').replace('{error}', error.message));
+                }
+            };
+            
+            reader.readAsBinaryString(file);
+        }
+        
+        // 显示批量数据预览
+        function displayBatchPreview() {
+            const previewDiv = document.getElementById('file-preview');
+            const tableDiv = document.getElementById('preview-table');
+            
+            let tableHTML = `
+                <table style="width: 100%; border-collapse: collapse; color: var(--text-light);">
+                    <thead>
+                        <tr style="background: rgba(212, 175, 55, 0.2);">
+                            <th style="border: 1px solid #555; padding: 8px;">${getText('salon-name').replace('：', '')}</th>
+                            <th style="border: 1px solid #555; padding: 8px;">${getText('salon-address').replace('：', '')}</th>
+                            <th style="border: 1px solid #555; padding: 8px;">${getText('salon-district').replace('：', '')}</th>
+                            <th style="border: 1px solid #555; padding: 8px;">${getText('director-name').replace('：', '')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            batchSalonData.forEach(salon => {
+                const districtText = getText(salon.district + '-district');
+                tableHTML += `
+                    <tr>
+                        <td style="border: 1px solid #555; padding: 8px;">${salon.name}</td>
+                        <td style="border: 1px solid #555; padding: 8px;">${salon.address}</td>
+                        <td style="border: 1px solid #555; padding: 8px;">${districtText}</td>
+                        <td style="border: 1px solid #555; padding: 8px;">${salon.directorName}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table>';
+            tableDiv.innerHTML = tableHTML;
+            previewDiv.style.display = 'block';
+        }
+        
+        // 确认批量创建
+        function confirmBatchCreate() {
+            if (batchSalonData.length === 0) {
+                alert(getText('no-valid-data'));
+                return;
+            }
+            
+            // 获取当前用户作为默认负责人（如果没有设置的话）
+            const defaultEmployeeId = currentUser ? currentUser.id : '';
+            
+            let successCount = 0;
+            batchSalonData.forEach(salonData => {
+                // 设置默认负责人（如果没有设置）
+                if (!salonData.responsibleEmployeeId) {
+                    salonData.responsibleEmployeeId = defaultEmployeeId;
+                }
+                
+                // 创建沙龙
+                if (addSalon(salonData)) {
+                    successCount++;
+                }
+            });
+            
+            alert(getText('batch-create-success').replace('{count}', successCount));
+            
+            // 清理数据和界面
+            cancelBatchUpload();
+            
+            // 刷新沙龙列表（如果当前在沙龙信息页面）
+            const salonInfoPage = document.getElementById('salon-info');
+            if (salonInfoPage && salonInfoPage.classList.contains('active')) {
+                displaySalonList();
+            }
+        }
+        
+        // 取消批量上传
+        function cancelBatchUpload() {
+            batchSalonData = [];
+            document.getElementById('file-preview').style.display = 'none';
+            document.getElementById('salon-file-upload').value = '';
+        }
+        
+        // 下载样例模板文件
+        function downloadSampleFile() {
+            // 检查SheetJS库是否已加载
+            if (typeof XLSX === 'undefined') {
+                alert('Excel处理库尚未加载完成，请稍后再试！');
+                return;
+            }
+            
+            const sampleData = [
+                ['살롱 정보 일괄 업로드 템플릿', '', '', ''],  // 第1행：表格标题
+                ['업소명', '영업소 주소', '전화번호', '대표자명'],    // 第2행：列标题
+                ['미용실 A', '서울 구로구 구로중앙로 12', '02-1234-5678', '김대표'],
+                ['헤어샵 B', '서울 영등포구 영등포로 34', '02-2345-6789', '이사장'],
+                ['뷰티샵 C', '서울 금천구 금천로 56', '02-3456-7890', '박원장'],
+                ['살롱 D', '부산 해운대구 해운대로 78', '051-4567-8901', '최원장']
+            ];
+            
+            // 创建新的工作簿
+            const workbook = XLSX.utils.book_new();
+            
+            // 创建工作表
+            const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
+            
+            // 设置列宽
+            worksheet['!cols'] = [
+                { width: 25 }, // 업소명/标题
+                { width: 35 }, // 영업소 주소
+                { width: 15 }, // 전화번호
+                { width: 15 }  // 대표자명
+            ];
+            
+            // 合并第一行的单元格作为标题
+            worksheet['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }  // 合并第1行的A1到D1单元格
+            ];
+            
+            // 添加工작表到工作簿
+            XLSX.utils.book_append_sheet(workbook, worksheet, '沙龙信息');
+            
+            // 下载Excel文件
+            XLSX.writeFile(workbook, 'salon_template_sample.xlsx');
+        }
+        
+        // 更新业务员选择下拉框
+        function updateSalespersonOptions() {
+            const selectElement = document.getElementById('salespersonSelect');
+            if (!selectElement) return;
+            
+            const employees = getEmployees();
+            let optionsHtml = `<option value="">${getText('please-select-salesperson')}</option>`;
+            
+            employees.forEach(employee => {
+                // 根据权限过滤可见的业务员
+                if (currentUser) {
+                    if (currentUser.position === 'admin' || currentUser.position === 'manager') {
+                        // 管理员和经理可以看到所有业务员
+                        const positionText = getPositionText(employee.position);
+                        optionsHtml += `<option value="${employee.id}" ${currentUser.id === employee.id ? 'selected' : ''}>${employee.name} - ${positionText}</option>`;
+                    } else if (currentUser.position === 'salesperson' && currentUser.id === employee.id) {
+                        // 业务员只能选择自己
+                        optionsHtml += `<option value="${employee.id}" selected>${employee.name}</option>`;
+                    }
+                } else {
+                    // 如果没有登录用户（向后兼容），显示所有
+                    const positionText = getPositionText(employee.position);
+                    optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
+                }
+            });
+            
+            selectElement.innerHTML = optionsHtml;
+        }
+        
+        // 获取业务员手机号
+        function getSalespersonMobile(salespersonId) {
+            if (!salespersonId) return '';
+            const employees = getEmployees();
+            const employee = employees.find(emp => emp.id == salespersonId);
+            return employee ? employee.mobile : '';
+        }
+        
+        // 显示编辑职员模态框
+        function showEditEmployeeModal(employeeId) {
+            const employees = getEmployees();
+            const employee = employees.find(emp => emp.id === employeeId);
+            
+            if (!employee) return;
+            
+            // 填充表单数据
+            document.getElementById('editEmployeeId').value = employee.id;
+            document.getElementById('editEmployeeName').value = employee.name;
+            document.getElementById('editEmployeePosition').value = employee.position;
+            document.getElementById('editEmployeeUsername').value = employee.username;
+            document.getElementById('editEmployeePassword').value = ''; // 密码字段留空
+            document.getElementById('editEmployeeMobile').value = employee.mobile;
+            
+            // 填充银行账户信息
+            const bankInfo = employee.bankInfo || {};
+            document.getElementById('editEmployeeBankName').value = bankInfo.bankName || '';
+            document.getElementById('editEmployeeAccountNumber').value = bankInfo.accountNumber || '';
+            document.getElementById('editEmployeeAccountHolder').value = bankInfo.accountHolder || '';
+            document.getElementById('editEmployeeBankBranch').value = bankInfo.bankBranch || '';
+            
+            // 权限控制：经理不能修改管理员权限，业务员不能修改自己的权限，管理员不能调低自己的权限
+            const positionSelect = document.getElementById('editEmployeePosition');
+            if (currentUser.position === 'manager' && employee.position === 'admin') {
+                positionSelect.disabled = true;
+            } else if (currentUser.position === 'manager') {
+                // 经理只能设置业务员职位
+                positionSelect.innerHTML = `
+                    <option value="salesperson" data-i18n="salesperson">业务员</option>
+                `;
+                updateTexts(); // 更新翻译
+            } else if (currentUser.position === 'salesperson' && employee.id === currentUser.id) {
+                // 业务员不能修改自己的权限等级
+                positionSelect.disabled = true;
+            } else if (currentUser.position === 'admin' && employee.id === currentUser.id) {
+                // 管理员不能调低自己的权限，只能保持管理员
+                positionSelect.innerHTML = `
+                    <option value="admin" data-i18n="admin" selected>管理员</option>
+                `;
+                positionSelect.disabled = true;
+                updateTexts(); // 更新翻译
+            } else {
+                positionSelect.disabled = false;
+                positionSelect.innerHTML = `
+                    <option value="salesperson" data-i18n="salesperson">业务员</option>
+                    <option value="manager" data-i18n="manager">经理</option>
+                    <option value="admin" data-i18n="admin">管理员</option>
+                `;
+                updateTexts(); // 更新翻译
+            }
+            
+            // 添加姓名自动填充到账户持有人的功能
+            const editNameField = document.getElementById('editEmployeeName');
+            const editAccountHolderField = document.getElementById('editEmployeeAccountHolder');
+            
+            // 移除之前的事件监听器（如果存在）
+            editNameField.removeEventListener('input', editNameAutoFill);
+            
+            // 添加新的事件监听器
+            function editNameAutoFill() {
+                if (!editAccountHolderField.value.trim() || editAccountHolderField.value === employee.name) {
+                    editAccountHolderField.value = editNameField.value.trim();
+                }
+            }
+            editNameField.addEventListener('input', editNameAutoFill);
+            
+            // 显示模态框
+            const modal = document.getElementById('editEmployeeModal');
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭编辑职员模态框
+        function closeEditEmployeeModal() {
+            const modal = document.getElementById('editEmployeeModal');
+            modal.style.display = 'none';
+            document.getElementById('editEmployeeForm').reset();
+        }
+        
+        // 搜索沙龙功能
+        let originalSalonList = [];
+        function searchSalons() {
+            const searchTerm = document.getElementById('salon-search').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                // 如果搜索框为空，但有其他筛选条件，应用筛选
+                const selectedResponsible = document.getElementById('responsible-filter').value;
+                const selectedDistrict = document.getElementById('district-filter').value;
+                
+                if (selectedResponsible || selectedDistrict) {
+                    filterSalons();
+                } else {
+                displaySalonList();
+                }
+                return;
+            }
+            
+            // 有搜索内容时，使用统一筛选逻辑
+            filterSalons();
         }
         
         // 显示筛选后的沙龙列表
@@ -5713,9 +5917,9 @@
         }
         
         // 处理交易记录表单提交
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // 初始化系统，创建默认管理员账号
-            await initializeSystem();
+            initializeSystem();
             
             // 页面加载时添加一行产品
             addProductRow();
@@ -5778,6 +5982,13 @@
                 }
             });
             
+            // 交易模态框不允许点击外部关闭，只能通过按钮关闭
+            // document.getElementById('transactionModal').addEventListener('click', function(e) {
+            //     if (e.target === this) {
+            //         closeTransactionModal();
+            //     }
+            // });
+            
             // 编辑交易记录表单提交处理
             document.getElementById('editTransactionForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -5828,6 +6039,13 @@
                 displaySalonList(currentFilter, currentPage); // 保持当前筛选和页面
                 alert(getText('transaction-updated-success'));
             });
+            
+            // 编辑交易模态框不允许点击外部关闭，只能通过按钮关闭
+            // document.getElementById('editTransactionModal').addEventListener('click', function(e) {
+            //     if (e.target === this) {
+            //         closeEditTransactionModal();
+            //     }
+            // });
         });
         
         // 显示子菜单（支持展开/收起切换）
@@ -7006,6 +7224,25 @@
             return value;
         }
         
+        // 翻译对象名称
+        function translateObjectName(objectName) {
+            if (!objectName) return objectName;
+            
+            // 对象名称映射
+            const objectNameMap = {
+                '首页导航': 'object-name-home-navigation',
+                '系统登出': 'object-name-system-logout'
+            };
+            
+            const translationKey = objectNameMap[objectName];
+            if (translationKey) {
+                const translated = getText(translationKey);
+                return translated !== translationKey ? translated : objectName;
+            }
+            
+            return objectName;
+        }
+        
         // 翻译操作描述
         function translateOperationDescription(description, operation) {
             if (!description) return description;
@@ -7628,6 +7865,70 @@
                             </thead>
                             <tbody>
             `;
+            
+            employees.forEach(employee => {
+                const target = targets[employee.id] || 0;
+                const actual = actuals[employee.id] || 0;
+                const progress = target > 0 ? Math.min((actual / target) * 100, 100) : 0;
+                
+                // 检查上月业绩是否超标
+                const lastMonth = getPreviousMonth(selectedMonth);
+                const lastMonthActuals = getPerformanceActuals()[lastMonth] || {};
+                const lastMonthTargets = getPerformanceTargets()[lastMonth] || {};
+                const lastMonthActual = lastMonthActuals[employee.id] || 0;
+                const lastMonthTarget = lastMonthTargets[employee.id] || 0;
+                const isTargetIncreased = lastMonthActual > lastMonthTarget;
+                
+                // 进度条颜色
+                let progressColor = '#4CAF50';
+                if (progress < 50) progressColor = '#ff6666';
+                else if (progress < 80) progressColor = '#ffaa00';
+                
+                html += `
+                    <tr style="border: 1px solid rgba(135, 206, 235, 0.3);">
+                        <td style="padding: 12px; color: var(--text-light); border: 1px solid rgba(135, 206, 235, 0.3);">
+                            <div style="font-weight: bold;">${employee.name}</div>
+                            <div style="font-size: 0.8em; color: #aaa;">${getPositionText(employee.position)}</div>
+                        </td>
+                        <td style="padding: 12px; text-align: center; color: var(--gold); border: 1px solid rgba(135, 206, 235, 0.3);">
+                            <div style="font-size: 1.2em; font-weight: bold;">${target.toLocaleString()}</div>
+                            <div style="font-size: 0.8em; color: #aaa;" data-i18n="thousand-won">千韩元</div>
+                        </td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(135, 206, 235, 0.3);">
+                            <div style="margin-bottom: 5px;">
+                                <input type="number" id="actual-${employee.id}" value="${actual}" onchange="updateActualAmount('${employee.id}', this.value)" style="width: 100px; padding: 5px; background: var(--dark-gray); border: 1px solid var(--gold); color: var(--text-light); border-radius: 3px; text-align: center;">
+                            </div>
+                            <div style="font-size: 0.8em; color: #aaa;" data-i18n="thousand-won">千韩元</div>
+                        </td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(135, 206, 235, 0.3);">
+                            <div style="margin-bottom: 5px;">
+                                <span style="font-size: 1.1em; font-weight: bold; color: ${progressColor};">${progress.toFixed(1)}%</span>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); height: 8px; border-radius: 4px; overflow: hidden; margin: 5px 0;">
+                                <div style="height: 100%; background: ${progressColor}; width: ${progress}%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(135, 206, 235, 0.3);">
+                            ${isTargetIncreased ? 
+                                `<span style="color: #ffaa00; font-size: 0.9em;" data-i18n="target-increased">目标上调10%</span>` : 
+                                `<span style="color: #90EE90; font-size: 0.9em;" data-i18n="target-maintained">目标保持</span>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // 更新多语言
+            updateTexts();
         }
         
         // 更新实际金额
