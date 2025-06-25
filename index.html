@@ -136,16 +136,36 @@
             }
 
             getSyncStatus() {
+                const hasFirebase = window.firebase && window.db;
+                const isOnline = navigator.onLine && hasFirebase;
+                
                 return {
-                    isOnline: this.isOnline && window.db,
+                    isOnline: isOnline,
                     pendingSync: this.syncQueue.length,
-                    message: (this.isOnline && window.db) ? '已连接云端数据库' : `离线模式 (${this.syncQueue.length}个操作待同步)`
+                    message: isOnline ? '已连接云端数据库' : `离线模式 (${this.syncQueue.length}个操作待同步)`
                 };
             }
         }
 
         // 创建全局数据管理器实例
         const firebaseDataManager = new FirebaseDataManager();
+        window.firebaseDataManager = firebaseDataManager;
+
+        // 等待Firebase初始化完成后添加状态指示器
+        setTimeout(() => {
+            addSyncStatusIndicator();
+        }, 3000);
+        
+        // 也在页面完全加载后再次检查
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('页面加载完成后再次检查Firebase状态');
+                if (window.firebaseDataManager) {
+                    const status = window.firebaseDataManager.getSyncStatus();
+                    console.log('当前状态:', status);
+                }
+            }, 1000);
+        });
 
         // 添加连接状态指示器
         function addSyncStatusIndicator() {
@@ -179,13 +199,16 @@
             }
             
             updateStatus();
-            setInterval(updateStatus, 5000);
+            setInterval(updateStatus, 2000); // 更频繁的状态更新
+            
+            // 添加调试信息
+            console.log('Firebase状态指示器已启动');
+            console.log('window.firebase存在:', !!window.firebase);
+            console.log('window.db存在:', !!window.db);
+            console.log('网络状态:', navigator.onLine);
             
             document.body.appendChild(indicator);
         }
-
-        // 等待Firebase初始化完成后添加状态指示器
-        setTimeout(addSyncStatusIndicator, 2000);
 
         console.log('🔥 Firebase数据管理器已启动 - 支持实时数据同步！');
     </script>
@@ -982,7 +1005,7 @@
                         <button onclick="displaySalonList('guro')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-guro">九老区</button>
                         <button onclick="displaySalonList('yeongdeungpo')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-yeongdeungpo">永登浦区</button>
                         <button onclick="displaySalonList('geumcheon')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-geumcheon">衿川区</button>
-                        <button onclick="displaySalonList('overseas')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-other">해외지역</button>
+                        <button onclick="displaySalonList('overseas')" style="background: rgba(212, 175, 55, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.4)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.2)'" data-i18n="district-other">海外区域</button>
                     </div>
                 </div>
             </div>
@@ -3683,312 +3706,6 @@
             return salons;
         }
         
-        // 处理上传的文件
-        function processSalonFile() {
-            // 检查SheetJS库是否已加载
-            if (typeof XLSX === 'undefined') {
-                alert('Excel处理库尚未加载完成，请稍后再试！');
-                return;
-            }
-            
-            const fileInput = document.getElementById('salon-file-upload');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert(getText('select-file-first'));
-                return;
-            }
-            
-            // 检查文件类型
-            const fileName = file.name.toLowerCase();
-            if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
-                alert(getText('unsupported-file-type'));
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary' });
-                    
-                    batchSalonData = parseExcel(workbook);
-                    
-                    if (batchSalonData.length === 0) {
-                        alert(getText('no-valid-data'));
-                        return;
-                    }
-                    
-                    // 显示预览
-                    displayBatchPreview();
-                    alert(getText('file-processed-success').replace('{count}', batchSalonData.length));
-                    
-                } catch (error) {
-                    alert(getText('file-processing-error').replace('{error}', error.message));
-                }
-            };
-            
-            reader.readAsBinaryString(file);
-        }
-        
-        // 显示批量数据预览
-        function displayBatchPreview() {
-            const previewDiv = document.getElementById('file-preview');
-            const tableDiv = document.getElementById('preview-table');
-            
-            let tableHTML = `
-                <table style="width: 100%; border-collapse: collapse; color: var(--text-light);">
-                    <thead>
-                        <tr style="background: rgba(212, 175, 55, 0.2);">
-                            <th style="border: 1px solid #555; padding: 8px;">${getText('salon-name').replace('：', '')}</th>
-                            <th style="border: 1px solid #555; padding: 8px;">${getText('salon-address').replace('：', '')}</th>
-                            <th style="border: 1px solid #555; padding: 8px;">${getText('salon-district').replace('：', '')}</th>
-                            <th style="border: 1px solid #555; padding: 8px;">${getText('director-name').replace('：', '')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            batchSalonData.forEach(salon => {
-                const districtText = getText(salon.district + '-district');
-                tableHTML += `
-                    <tr>
-                        <td style="border: 1px solid #555; padding: 8px;">${salon.name}</td>
-                        <td style="border: 1px solid #555; padding: 8px;">${salon.address}</td>
-                        <td style="border: 1px solid #555; padding: 8px;">${districtText}</td>
-                        <td style="border: 1px solid #555; padding: 8px;">${salon.directorName}</td>
-                    </tr>
-                `;
-            });
-            
-            tableHTML += '</tbody></table>';
-            tableDiv.innerHTML = tableHTML;
-            previewDiv.style.display = 'block';
-        }
-        
-        // 确认批量创建
-        function confirmBatchCreate() {
-            if (batchSalonData.length === 0) {
-                alert(getText('no-valid-data'));
-                return;
-            }
-            
-            // 获取当前用户作为默认负责人（如果没有设置的话）
-            const defaultEmployeeId = currentUser ? currentUser.id : '';
-            
-            let successCount = 0;
-            batchSalonData.forEach(salonData => {
-                // 设置默认负责人（如果没有设置）
-                if (!salonData.responsibleEmployeeId) {
-                    salonData.responsibleEmployeeId = defaultEmployeeId;
-                }
-                
-                // 创建沙龙
-                if (addSalon(salonData)) {
-                    successCount++;
-                }
-            });
-            
-            alert(getText('batch-create-success').replace('{count}', successCount));
-            
-            // 清理数据和界面
-            cancelBatchUpload();
-            
-            // 刷新沙龙列表（如果当前在沙龙信息页面）
-            const salonInfoPage = document.getElementById('salon-info');
-            if (salonInfoPage && salonInfoPage.classList.contains('active')) {
-                displaySalonList();
-            }
-        }
-        
-        // 取消批量上传
-        function cancelBatchUpload() {
-            batchSalonData = [];
-            document.getElementById('file-preview').style.display = 'none';
-            document.getElementById('salon-file-upload').value = '';
-        }
-        
-        // 下载样例模板文件
-        function downloadSampleFile() {
-            // 检查SheetJS库是否已加载
-            if (typeof XLSX === 'undefined') {
-                alert('Excel处理库尚未加载完成，请稍后再试！');
-                return;
-            }
-            
-            const sampleData = [
-                ['살롱 정보 일괄 업로드 템플릿', '', '', ''],  // 第1행：表格标题
-                ['업소명', '영업소 주소', '전화번호', '대표자명'],    // 第2행：列标题
-                ['미용실 A', '서울 구로구 구로중앙로 12', '02-1234-5678', '김대표'],
-                ['헤어샵 B', '서울 영등포구 영등포로 34', '02-2345-6789', '이사장'],
-                ['뷰티샵 C', '서울 금천구 금천로 56', '02-3456-7890', '박원장'],
-                ['살롱 D', '부산 해운대구 해운대로 78', '051-4567-8901', '최원장']
-            ];
-            
-            // 创建新的工作簿
-            const workbook = XLSX.utils.book_new();
-            
-            // 创建工作表
-            const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
-            
-            // 设置列宽
-            worksheet['!cols'] = [
-                { width: 25 }, // 업소명/标题
-                { width: 35 }, // 영업소 주소
-                { width: 15 }, // 전화번호
-                { width: 15 }  // 대표자명
-            ];
-            
-            // 合并第一行的单元格作为标题
-            worksheet['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }  // 合并第1行的A1到D1单元格
-            ];
-            
-            // 添加工작表到工作簿
-            XLSX.utils.book_append_sheet(workbook, worksheet, '沙龙信息');
-            
-            // 下载Excel文件
-            XLSX.writeFile(workbook, 'salon_template_sample.xlsx');
-        }
-        
-        // 更新业务员选择下拉框
-        function updateSalespersonOptions() {
-            const selectElement = document.getElementById('salespersonSelect');
-            if (!selectElement) return;
-            
-            const employees = getEmployees();
-            let optionsHtml = `<option value="">${getText('please-select-salesperson')}</option>`;
-            
-            employees.forEach(employee => {
-                // 根据权限过滤可见的业务员
-                if (currentUser) {
-                    if (currentUser.position === 'admin' || currentUser.position === 'manager') {
-                        // 管理员和经理可以看到所有业务员
-                        const positionText = getPositionText(employee.position);
-                        optionsHtml += `<option value="${employee.id}" ${currentUser.id === employee.id ? 'selected' : ''}>${employee.name} - ${positionText}</option>`;
-                    } else if (currentUser.position === 'salesperson' && currentUser.id === employee.id) {
-                        // 业务员只能选择自己
-                        optionsHtml += `<option value="${employee.id}" selected>${employee.name}</option>`;
-                    }
-                } else {
-                    // 如果没有登录用户（向后兼容），显示所有
-                    const positionText = getPositionText(employee.position);
-                    optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
-                }
-            });
-            
-            selectElement.innerHTML = optionsHtml;
-        }
-        
-        // 获取业务员手机号
-        function getSalespersonMobile(salespersonId) {
-            if (!salespersonId) return '';
-            const employees = getEmployees();
-            const employee = employees.find(emp => emp.id == salespersonId);
-            return employee ? employee.mobile : '';
-        }
-        
-        // 显示编辑职员模态框
-        function showEditEmployeeModal(employeeId) {
-            const employees = getEmployees();
-            const employee = employees.find(emp => emp.id === employeeId);
-            
-            if (!employee) return;
-            
-            // 填充表单数据
-            document.getElementById('editEmployeeId').value = employee.id;
-            document.getElementById('editEmployeeName').value = employee.name;
-            document.getElementById('editEmployeePosition').value = employee.position;
-            document.getElementById('editEmployeeUsername').value = employee.username;
-            document.getElementById('editEmployeePassword').value = ''; // 密码字段留空
-            document.getElementById('editEmployeeMobile').value = employee.mobile;
-            
-            // 填充银行账户信息
-            const bankInfo = employee.bankInfo || {};
-            document.getElementById('editEmployeeBankName').value = bankInfo.bankName || '';
-            document.getElementById('editEmployeeAccountNumber').value = bankInfo.accountNumber || '';
-            document.getElementById('editEmployeeAccountHolder').value = bankInfo.accountHolder || '';
-            document.getElementById('editEmployeeBankBranch').value = bankInfo.bankBranch || '';
-            
-            // 权限控制：经理不能修改管理员权限，业务员不能修改自己的权限，管理员不能调低自己的权限
-            const positionSelect = document.getElementById('editEmployeePosition');
-            if (currentUser.position === 'manager' && employee.position === 'admin') {
-                positionSelect.disabled = true;
-            } else if (currentUser.position === 'manager') {
-                // 经理只能设置业务员职位
-                positionSelect.innerHTML = `
-                    <option value="salesperson" data-i18n="salesperson">业务员</option>
-                `;
-                updateTexts(); // 更新翻译
-            } else if (currentUser.position === 'salesperson' && employee.id === currentUser.id) {
-                // 业务员不能修改自己的权限等级
-                positionSelect.disabled = true;
-            } else if (currentUser.position === 'admin' && employee.id === currentUser.id) {
-                // 管理员不能调低自己的权限，只能保持管理员
-                positionSelect.innerHTML = `
-                    <option value="admin" data-i18n="admin" selected>管理员</option>
-                `;
-                positionSelect.disabled = true;
-                updateTexts(); // 更新翻译
-            } else {
-                positionSelect.disabled = false;
-                positionSelect.innerHTML = `
-                    <option value="salesperson" data-i18n="salesperson">业务员</option>
-                    <option value="manager" data-i18n="manager">经理</option>
-                    <option value="admin" data-i18n="admin">管理员</option>
-                `;
-                updateTexts(); // 更新翻译
-            }
-            
-            // 添加姓名自动填充到账户持有人的功能
-            const editNameField = document.getElementById('editEmployeeName');
-            const editAccountHolderField = document.getElementById('editEmployeeAccountHolder');
-            
-            // 移除之前的事件监听器（如果存在）
-            editNameField.removeEventListener('input', editNameAutoFill);
-            
-            // 添加新的事件监听器
-            function editNameAutoFill() {
-                if (!editAccountHolderField.value.trim() || editAccountHolderField.value === employee.name) {
-                    editAccountHolderField.value = editNameField.value.trim();
-                }
-            }
-            editNameField.addEventListener('input', editNameAutoFill);
-            
-            // 显示模态框
-            const modal = document.getElementById('editEmployeeModal');
-            modal.style.display = 'flex';
-        }
-        
-        // 关闭编辑职员模态框
-        function closeEditEmployeeModal() {
-            const modal = document.getElementById('editEmployeeModal');
-            modal.style.display = 'none';
-            document.getElementById('editEmployeeForm').reset();
-        }
-        
-        // 搜索沙龙功能
-        let originalSalonList = [];
-        function searchSalons() {
-            const searchTerm = document.getElementById('salon-search').value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                // 如果搜索框为空，但有其他筛选条件，应用筛选
-                const selectedResponsible = document.getElementById('responsible-filter').value;
-                const selectedDistrict = document.getElementById('district-filter').value;
-                
-                if (selectedResponsible || selectedDistrict) {
-                    filterSalons();
-                } else {
-                displaySalonList();
-                }
-                return;
-            }
-            
-            // 有搜索内容时，使用统一筛选逻辑
-            filterSalons();
-        }
-        
         // 显示筛选后的沙龙列表
         function displayFilteredSalonList(salons) {
             const salonListContainer = document.getElementById('salon-list');
@@ -6061,13 +5778,6 @@
                 }
             });
             
-            // 交易模态框不允许点击外部关闭，只能通过按钮关闭
-            // document.getElementById('transactionModal').addEventListener('click', function(e) {
-            //     if (e.target === this) {
-            //         closeTransactionModal();
-            //     }
-            // });
-            
             // 编辑交易记录表单提交处理
             document.getElementById('editTransactionForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -6118,13 +5828,6 @@
                 displaySalonList(currentFilter, currentPage); // 保持当前筛选和页面
                 alert(getText('transaction-updated-success'));
             });
-            
-            // 编辑交易模态框不允许点击外部关闭，只能通过按钮关闭
-            // document.getElementById('editTransactionModal').addEventListener('click', function(e) {
-            //     if (e.target === this) {
-            //         closeEditTransactionModal();
-            //     }
-            // });
         });
         
         // 显示子菜单（支持展开/收起切换）
@@ -7303,25 +7006,6 @@
             return value;
         }
         
-        // 翻译对象名称
-        function translateObjectName(objectName) {
-            if (!objectName) return objectName;
-            
-            // 对象名称映射
-            const objectNameMap = {
-                '首页导航': 'object-name-home-navigation',
-                '系统登出': 'object-name-system-logout'
-            };
-            
-            const translationKey = objectNameMap[objectName];
-            if (translationKey) {
-                const translated = getText(translationKey);
-                return translated !== translationKey ? translated : objectName;
-            }
-            
-            return objectName;
-        }
-        
         // 翻译操作描述
         function translateOperationDescription(description, operation) {
             if (!description) return description;
@@ -7944,70 +7628,6 @@
                             </thead>
                             <tbody>
             `;
-            
-            employees.forEach(employee => {
-                const target = targets[employee.id] || 0;
-                const actual = actuals[employee.id] || 0;
-                const progress = target > 0 ? Math.min((actual / target) * 100, 100) : 0;
-                
-                // 检查上月业绩是否超标
-                const lastMonth = getPreviousMonth(selectedMonth);
-                const lastMonthActuals = getPerformanceActuals()[lastMonth] || {};
-                const lastMonthTargets = getPerformanceTargets()[lastMonth] || {};
-                const lastMonthActual = lastMonthActuals[employee.id] || 0;
-                const lastMonthTarget = lastMonthTargets[employee.id] || 0;
-                const isTargetIncreased = lastMonthActual > lastMonthTarget;
-                
-                // 进度条颜色
-                let progressColor = '#4CAF50';
-                if (progress < 50) progressColor = '#ff6666';
-                else if (progress < 80) progressColor = '#ffaa00';
-                
-                html += `
-                    <tr style="border: 1px solid rgba(135, 206, 235, 0.3);">
-                        <td style="padding: 12px; color: var(--text-light); border: 1px solid rgba(135, 206, 235, 0.3);">
-                            <div style="font-weight: bold;">${employee.name}</div>
-                            <div style="font-size: 0.8em; color: #aaa;">${getPositionText(employee.position)}</div>
-                        </td>
-                        <td style="padding: 12px; text-align: center; color: var(--gold); border: 1px solid rgba(135, 206, 235, 0.3);">
-                            <div style="font-size: 1.2em; font-weight: bold;">${target.toLocaleString()}</div>
-                            <div style="font-size: 0.8em; color: #aaa;" data-i18n="thousand-won">千韩元</div>
-                        </td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(135, 206, 235, 0.3);">
-                            <div style="margin-bottom: 5px;">
-                                <input type="number" id="actual-${employee.id}" value="${actual}" onchange="updateActualAmount('${employee.id}', this.value)" style="width: 100px; padding: 5px; background: var(--dark-gray); border: 1px solid var(--gold); color: var(--text-light); border-radius: 3px; text-align: center;">
-                            </div>
-                            <div style="font-size: 0.8em; color: #aaa;" data-i18n="thousand-won">千韩元</div>
-                        </td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(135, 206, 235, 0.3);">
-                            <div style="margin-bottom: 5px;">
-                                <span style="font-size: 1.1em; font-weight: bold; color: ${progressColor};">${progress.toFixed(1)}%</span>
-                            </div>
-                            <div style="background: rgba(0,0,0,0.3); height: 8px; border-radius: 4px; overflow: hidden; margin: 5px 0;">
-                                <div style="height: 100%; background: ${progressColor}; width: ${progress}%; transition: width 0.3s ease;"></div>
-                            </div>
-                        </td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(135, 206, 235, 0.3);">
-                            ${isTargetIncreased ? 
-                                `<span style="color: #ffaa00; font-size: 0.9em;" data-i18n="target-increased">目标上调10%</span>` : 
-                                `<span style="color: #90EE90; font-size: 0.9em;" data-i18n="target-maintained">目标保持</span>`
-                            }
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-            
-            // 更新多语言
-            updateTexts();
         }
         
         // 更新实际金额

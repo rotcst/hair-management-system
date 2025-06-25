@@ -14,6 +14,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// 设置全局变量
+window.db = db;
+window.firebase = firebase;
+
+// 测试Firebase连接
+console.log('Firebase配置信息:', firebaseConfig);
+
 // 配置Firestore离线持久化
 db.enablePersistence({
   synchronizeTabs: true
@@ -25,4 +32,15 @@ db.enablePersistence({
   }
 });
 
-console.log('Firebase初始化成功 - 支持实时数据同步！'); 
+// 测试数据库连接
+db.collection('test').add({
+  message: 'Firebase连接测试',
+  timestamp: new Date()
+}).then(() => {
+  console.log('✅ Firebase连接成功！');
+}).catch((error) => {
+  console.error('❌ Firebase连接失败:', error);
+  console.log('错误详情:', error.code, error.message);
+});
+
+console.log('🔥 Firebase初始化完成！'); 
