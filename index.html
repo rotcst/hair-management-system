@@ -18,6 +18,53 @@
             --black: #000000;
             --dark-gray: #1a1a1a;
             --text-light: #ffffff;
+            --text-muted: #cccccc;
+            --border-color: #444444;
+            --hover-bg: rgba(212, 175, 55, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: #555555;
+            --table-border: #555555;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+        }
+
+        /* 白天模式变量 */
+        :root[data-theme="light"] {
+            --gold: #B8860B;
+            --gold-light: #DAA520;
+            --black: #ffffff;
+            --dark-gray: #f5f5f5;
+            --text-light: #333333;
+            --text-muted: #666666;
+            --border-color: #e0e0e0;
+            --hover-bg: rgba(184, 134, 11, 0.1);
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+            --table-border: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+        }
+
+        /* 自动模式：根据系统偏好设置 */
+        @media (prefers-color-scheme: light) {
+            :root[data-theme="auto"] {
+                --gold: #B8860B;
+                --gold-light: #DAA520;
+                --black: #ffffff;
+                --dark-gray: #f5f5f5;
+                --text-light: #333333;
+                --text-muted: #666666;
+                --border-color: #e0e0e0;
+                --hover-bg: rgba(184, 134, 11, 0.1);
+                --input-bg: #ffffff;
+                --input-border: #cccccc;
+                --table-border: #e0e0e0;
+                --success-color: #28a745;
+                --warning-color: #ffc107;
+                --error-color: #dc3545;
+            }
         }
         
         body {
@@ -319,6 +366,46 @@
             color: var(--black);
             font-weight: bold;
         }
+
+        /* 主题切换样式 */
+        .theme-switcher {
+            display: flex;
+            gap: 5px;
+            background: var(--dark-gray);
+            padding: 8px 15px;
+            border-radius: 8px;
+            height: 40px;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        
+        .theme-btn {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--gold);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            min-width: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-btn:hover {
+            background: var(--gold);
+            color: var(--black);
+            transform: scale(1.1);
+        }
+        
+        .theme-btn.active {
+            background: var(--gold);
+            color: var(--black);
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+        }
         
         /* 隐藏数字输入框的上下调节按钮 */
         input[type="number"]::-webkit-outer-spin-button,
@@ -466,6 +553,13 @@
             <div class="user-info" id="userInfo" style="display: none;">
                 <span id="userPosition" class="user-position"></span>
                 <span id="userName" class="user-name" onclick="showUserMenu()" style="cursor: pointer; position: relative;"></span>
+            </div>
+            
+            <!-- 主题切换器 -->
+            <div class="theme-switcher">
+                <button class="theme-btn" onclick="switchTheme('light')" id="btn-light" title="白天模式">☀️</button>
+                <button class="theme-btn active" onclick="switchTheme('dark')" id="btn-dark" title="黑夜模式">🌙</button>
+                <button class="theme-btn" onclick="switchTheme('auto')" id="btn-auto" title="自动模式">🔄</button>
             </div>
             
             <!-- 语言切换器 -->
@@ -639,7 +733,7 @@
                     <h3 style="color: var(--gold); margin: 0 0 15px 0;" data-i18n="bank-account-info">银行账户信息</h3>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeBankName" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="bank-name">银行名称：</label>
-                        <input type="text" id="employeeBankName" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="例：中国银行">
+                        <input type="text" id="employeeBankName" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeAccountNumber" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="account-number">银行账号：</label>
@@ -647,7 +741,7 @@
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeAccountHolder" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="account-holder">账户持有人：</label>
-                        <input type="text" id="employeeAccountHolder" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="默认使用职员姓名">
+                        <input type="text" id="employeeAccountHolder" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeBankBranch" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="bank-branch">开户支行（选填）：</label>
@@ -728,8 +822,12 @@
                     <input type="text" id="salonName" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label for="salonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
-                    <input type="text" id="salonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
+                                                <label for="salonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
+                            <input type="text" id="salonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label for="businessLicense" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="business-license">营业执照号：</label>
+                            <input type="text" id="businessLicense" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="000-00-00000" oninput="formatBusinessLicense(this)">
                 </div>
                 <div style="margin-bottom: 20px;">
                     <label for="salonDistrict" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-district">沙龙区域：</label>
@@ -1188,7 +1286,7 @@
                     
                     <div style="margin-bottom: 20px;">
                         <label for="editEmployeePassword" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="employee-password">密码：</label>
-                        <input type="password" id="editEmployeePassword" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="留空则不修改密码">
+                        <input type="password" id="editEmployeePassword" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="">
                     </div>
                     
                     <div style="margin-bottom: 20px;">
@@ -1238,8 +1336,12 @@
                     </div>
                     
                     <div style="margin-bottom: 20px;">
-                        <label for="editSalonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
-                        <input type="text" id="editSalonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                                    <label for="editSalonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
+                            <input type="text" id="editSalonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label for="editBusinessLicense" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="business-license">营业执照号：</label>
+                            <input type="text" id="editBusinessLicense" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="000-00-00000" oninput="formatBusinessLicense(this)">
                     </div>
                     
                     <div style="margin-bottom: 20px;">
@@ -1329,17 +1431,17 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="received-amount">实收款：</label>
-                            <input type="text" id="receivedAmount" placeholder="0,000" oninput="formatReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="receivedAmount" oninput="formatReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                         </div>
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="current-outstanding">本次欠款：</label>
-                            <input type="text" id="currentOutstanding" placeholder="0,000" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="currentOutstanding" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
                         </div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="notes">备注（选填）：</label>
-                        <textarea id="transactionNotes" placeholder="其他备注信息..." style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
+                        <textarea id="transactionNotes" placeholder="" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -1398,17 +1500,17 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="received-amount">实收款：</label>
-                            <input type="text" id="editReceivedAmount" placeholder="0,000" oninput="formatEditReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="editReceivedAmount" oninput="formatEditReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                         </div>
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="current-outstanding">本次欠款：</label>
-                            <input type="text" id="editCurrentOutstanding" placeholder="0,000" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="editCurrentOutstanding" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
                         </div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="notes">备注（选填）：</label>
-                        <textarea id="editTransactionNotes" placeholder="其他备注信息..." style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
+                        <textarea id="editTransactionNotes" placeholder="" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -1851,7 +1953,42 @@
                 'jump': '跳转',
                 'invalid-page-number': '无效的页码！请输入1到{max}之间的数字。',
                 // 操作描述
-                'batch-assign-description': '批量指定负责人：将{salons}（共{count}个沙龙）的负责人设为{employee}'
+                'batch-assign-description': '批量指定负责人：将{salons}（共{count}个沙龙）的负责人设为{employee}',
+                // 新增的翻译
+                'excel-library-loading': 'Excel处理库尚未加载完成，请稍后再试！',
+                'bank-name-placeholder': '例：中国银行',
+                'account-holder-placeholder': '默认使用职员姓名',
+                'password-edit-placeholder': '留空则不修改密码',
+                'transaction-notes-placeholder': '其他备注信息...',
+                'product-name-placeholder': '产品名称',
+                'amount-placeholder': '0,000',
+                'received-amount-placeholder': '0,000',
+                'current-outstanding-placeholder': '0,000',
+                // 白天/黑夜模式相关
+                'theme-toggle': '主题切换',
+                'light-mode': '白天模式',
+                'dark-mode': '黑夜模式',
+                'auto-mode': '自动模式',
+                // 新增的console信息翻译
+                'network-connected': '网络已连接，开始同步数据...',
+                'network-disconnected': '网络已断开，启用离线模式...',
+                'system-preference': '系统偏好',
+                'system-theme-changed': '系统主题已变更为',
+                'firebase-status-indicator-started': 'Firebase状态指示器已启动',
+                'exists': '存在',
+                'network-status': '网络状态',
+                'firebase-data-manager-started': 'Firebase数据管理器已启动 - 支持实时数据同步！',
+                'current-login-user': '当前登录用户',
+                'permission': '权限',
+                'cloud-database-connected': '已连接云端数据库',
+                'offline-mode-with-pending': '离线模式 ({count}个操作待同步)',
+                'business-license': '营业执照号',
+                'batch-assign-responsible': '批量分配负责人',
+                'select-all': '全选',
+                'assign-to': '分配给',
+                'assign-selected': '分配选中项',
+                'please-select-items': '请先选择要分配的项目',
+                'batch-assign-success': '已成功为 {count} 个沙龙分配负责人'
             },
             ko: {
                 // 시스템 정보
@@ -2279,7 +2416,42 @@
                 'jump': '이동',
                 'invalid-page-number': '잘못된 페이지 번호입니다! 1부터 {max}까지의 숫자를 입력해주세요.',
                 // 작업 설명
-                'batch-assign-description': '일괄 담당자 지정: {salons}(총 {count}개 살롱)의 담당자를 {employee}로 설정'
+                'batch-assign-description': '일괄 담당자 지정: {salons}(총 {count}개 살롱)의 담당자를 {employee}로 설정',
+                // 새로 추가된 번역
+                'excel-library-loading': 'Excel 처리 라이브러리가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요!',
+                'bank-name-placeholder': '예: 중국은행',
+                'account-holder-placeholder': '기본적으로 직원 이름 사용',
+                'password-edit-placeholder': '비어두면 비밀번호 변경 안함',
+                'transaction-notes-placeholder': '기타 비고 정보...',
+                'product-name-placeholder': '제품명',
+                'amount-placeholder': '0,000',
+                'received-amount-placeholder': '0,000',
+                'current-outstanding-placeholder': '0,000',
+                // 낮/밤 모드 관련
+                'theme-toggle': '테마 전환',
+                'light-mode': '낮 모드',
+                'dark-mode': '밤 모드',
+                'auto-mode': '자동 모드',
+                // 새로운 콘솔 정보 번역
+                'network-connected': '네트워크가 연결되었습니다. 데이터 동기화를 시작합니다...',
+                'network-disconnected': '네트워크가 끊어졌습니다. 오프라인 모드를 활성화합니다...',
+                'system-preference': '시스템 환경설정',
+                'system-theme-changed': '시스템 테마가 변경되었습니다',
+                'firebase-status-indicator-started': 'Firebase 상태 표시기가 시작되었습니다',
+                'exists': '존재',
+                'network-status': '네트워크 상태',
+                'firebase-data-manager-started': 'Firebase 데이터 관리자가 시작되었습니다 - 실시간 데이터 동기화 지원!',
+                'current-login-user': '현재 로그인 사용자',
+                'permission': '권한',
+                'cloud-database-connected': '클라우드 데이터베이스에 연결됨',
+                'offline-mode-with-pending': '오프라인 모드 ({count}개 작업 동기화 대기 중)',
+                'business-license': '영업등록번호',
+                'batch-assign-responsible': '일괄 담당자 지정',
+                'select-all': '전체 선택',
+                'assign-to': '지정',
+                'assign-selected': '선택된 항목 지정',
+                'please-select-items': '지정할 항목을 먼저 선택하세요',
+                'batch-assign-success': '{count}개 살롱에 담당자를 성공적으로 지정했습니다'
             }
         };
         
@@ -2306,8 +2478,52 @@
             // 更新日期输入框的语言设置
             updateDateInputLanguages(lang);
             
+            // 更新placeholder文本
+            updatePlaceholders();
+            
+            // 更新主题工具提示
+            updateThemeTooltips();
+            
             // 重新渲染当前活跃的页面内容
             refreshCurrentPageContent();
+        }
+        
+        // 更新所有placeholder文本
+        function updatePlaceholders() {
+            // 更新静态placeholder
+            const bankNameInput = document.getElementById('employeeBankName');
+            if (bankNameInput) bankNameInput.placeholder = getText('bank-name-placeholder');
+            
+            const accountHolderInput = document.getElementById('employeeAccountHolder');
+            if (accountHolderInput) accountHolderInput.placeholder = getText('account-holder-placeholder');
+            
+            const editPasswordInput = document.getElementById('editEmployeePassword');
+            if (editPasswordInput) editPasswordInput.placeholder = getText('password-edit-placeholder');
+            
+            const transactionNotesInput = document.getElementById('transactionNotes');
+            if (transactionNotesInput) transactionNotesInput.placeholder = getText('transaction-notes-placeholder');
+            
+            const editTransactionNotesInput = document.getElementById('editTransactionNotes');
+            if (editTransactionNotesInput) editTransactionNotesInput.placeholder = getText('transaction-notes-placeholder');
+            
+            // 更新搜索框placeholder
+            const searchInputs = document.querySelectorAll('#salon-search, #delete-salon-search');
+            searchInputs.forEach(input => {
+                if (input) input.placeholder = getText('search-salon-placeholder');
+            });
+            
+            // 更新金额输入框placeholder
+            const receivedAmountInput = document.getElementById('receivedAmount');
+            if (receivedAmountInput) receivedAmountInput.placeholder = getText('received-amount-placeholder');
+            
+            const currentOutstandingInput = document.getElementById('currentOutstanding');
+            if (currentOutstandingInput) currentOutstandingInput.placeholder = getText('current-outstanding-placeholder');
+            
+            const editReceivedAmountInput = document.getElementById('editReceivedAmount');
+            if (editReceivedAmountInput) editReceivedAmountInput.placeholder = getText('received-amount-placeholder');
+            
+            const editCurrentOutstandingInput = document.getElementById('editCurrentOutstanding');
+            if (editCurrentOutstandingInput) editCurrentOutstandingInput.placeholder = getText('current-outstanding-placeholder');
         }
         
         // 更新日期输入框的语言设置
@@ -2634,6 +2850,26 @@
             }
         }
         
+        // 营业执照号格式化函数
+        function formatBusinessLicense(input) {
+            // 获取输入的值，只保留数字
+            let value = input.value.replace(/[^0-9]/g, '');
+            
+            // 限制最大长度为10位数字
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            // 格式化为 000-00-00000
+            if (value.length >= 6) {
+                value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5);
+            } else if (value.length >= 4) {
+                value = value.substring(0, 3) + '-' + value.substring(3);
+            }
+            
+            input.value = value;
+        }
+        
         // 페이지 로드 시 저장된 언어 불러오기
         document.addEventListener('DOMContentLoaded', function() {
             const savedLanguage = localStorage.getItem('language') || 'zh';
@@ -2675,12 +2911,12 @@
                 window.addEventListener('online', () => {
                     this.isOnline = true;
                     this.processSyncQueue();
-                    console.log('网络已连接，开始同步数据...');
+                    console.log(getText('network-connected'));
                 });
                 
                 window.addEventListener('offline', () => {
                     this.isOnline = false;
-                    console.log('网络已断开，启用离线模式...');
+                    console.log(getText('network-disconnected'));
                 });
             }
 
@@ -2704,7 +2940,7 @@
                 return {
                     isOnline: isOnline,
                     pendingSync: this.syncQueue.length,
-                    message: isOnline ? '已连接云端数据库' : `离线模式 (${this.syncQueue.length}个操作待同步)`
+                    message: isOnline ? getText('cloud-database-connected') : getText('offline-mode-with-pending').replace('{count}', this.syncQueue.length)
                 };
             }
         }
@@ -2739,28 +2975,105 @@
                 indicator.textContent = status.message;
                 
                 if (status.isOnline) {
-                    indicator.style.background = 'rgba(76, 175, 80, 0.9)';
-                    indicator.style.color = 'white';
-                    indicator.style.border = '1px solid #4CAF50';
+                    indicator.style.background = 'var(--success-color)';
+                    indicator.style.color = 'var(--black)';
+                    indicator.style.border = '1px solid var(--success-color)';
                 } else {
-                    indicator.style.background = 'rgba(255, 193, 7, 0.9)';
-                    indicator.style.color = 'black';
-                    indicator.style.border = '1px solid #FFC107';
+                    indicator.style.background = 'var(--warning-color)';
+                    indicator.style.color = 'var(--black)';
+                    indicator.style.border = '1px solid var(--warning-color)';
                 }
             }
             
             updateStatus();
             setInterval(updateStatus, 3000);
             
-            console.log('Firebase状态指示器已启动');
-            console.log('window.firebase存在:', !!window.firebase);
-            console.log('window.db存在:', !!window.db);
-            console.log('网络状态:', navigator.onLine);
+            console.log(getText('firebase-status-indicator-started'));
+            console.log('window.firebase' + getText('exists') + ':', !!window.firebase);
+            console.log('window.db' + getText('exists') + ':', !!window.db);
+            console.log(getText('network-status') + ':', navigator.onLine);
             
             document.body.appendChild(indicator);
         }
 
-        console.log('🔥 Firebase数据管理器已启动 - 支持实时数据同步！');
+        console.log('🔥 ' + getText('firebase-data-manager-started'));
+        
+        // 主题管理系统
+        let currentTheme = 'dark'; // 默认为黑夜模式
+        
+        // 主题切换函数
+        function switchTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('theme', theme);
+            
+            // 更新按钮活跃状态
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + theme).classList.add('active');
+            
+            // 应用主题
+            applyTheme(theme);
+            
+            // 更新工具提示
+            updateThemeTooltips();
+            
+            // 更新placeholder文本
+            updatePlaceholders();
+        }
+        
+        // 应用主题
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            
+            // 如果是自动模式，添加媒体查询监听
+            if (theme === 'auto') {
+                // 立即检查系统偏好
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                console.log(getText('system-preference') + ':', prefersDark ? getText('dark-mode') : getText('light-mode'));
+                
+                // 监听系统主题变化
+                if (!window.themeMediaQuery) {
+                    window.themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                    window.themeMediaQuery.addListener((e) => {
+                        if (currentTheme === 'auto') {
+                            console.log(getText('system-theme-changed') + ':', e.matches ? getText('dark-mode') : getText('light-mode'));
+                        }
+                    });
+                }
+            }
+        }
+        
+        // 更新主题工具提示
+        function updateThemeTooltips() {
+            const lightBtn = document.getElementById('btn-light');
+            const darkBtn = document.getElementById('btn-dark');
+            const autoBtn = document.getElementById('btn-auto');
+            
+            if (lightBtn) lightBtn.title = getText('light-mode');
+            if (darkBtn) darkBtn.title = getText('dark-mode');
+            if (autoBtn) autoBtn.title = getText('auto-mode');
+        }
+        
+        // 初始化主题系统
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                currentTheme = savedTheme;
+            } else {
+                // 首次访问，检测系统偏好
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                currentTheme = prefersDark ? 'dark' : 'light';
+            }
+            
+            switchTheme(currentTheme);
+        }
+        
+        // 页面加载完成后初始化主题
+        window.addEventListener('load', () => {
+            initializeTheme();
+        });
         
         // 다국어 텍스트 가져오기 함수
         function getText(key) {
@@ -3202,7 +3515,7 @@
             currentUser = getCurrentUser();
             if (currentUser) {
                 // 如果有登录用户，设置界面状态
-                console.log('현재 로그인 사용자:', currentUser.name, '- 권한:', currentUser.position);
+                console.log(getText('current-login-user') + ':', currentUser.name, '- ' + getText('permission') + ':', getText(currentUser.position));
                 // 更新用户信息显示
                 updateUserInfo();
             } else {
@@ -3350,22 +3663,32 @@
                 return;
             }
             
+            // 按权限等级排序：admin > manager > salesperson
+            const positionOrder = { 'admin': 1, 'manager': 2, 'salesperson': 3 };
+            employees.sort((a, b) => {
+                return positionOrder[a.position] - positionOrder[b.position];
+            });
+            
             let html = '';
             employees.forEach((employee, index) => {
                 // 权限检查：管理员可以看到所有，经理不能看到其他经理和管理员，业务员可以看到所有但只能编辑自己
                 let canView = false;
                 let canEdit = false;
                 
+                // 确保id比较时都转换为字符串
+                const employeeIdStr = String(employee.id);
+                const currentUserIdStr = String(currentUser.id);
+                
                 if (currentUser.position === 'admin') {
                     canView = true;
                     canEdit = true;
                 } else if (currentUser.position === 'manager') {
                     canView = true; // 经理可以看到所有职员
-                    canEdit = employee.position === 'salesperson' || employee.id === currentUser.id;
+                    canEdit = employee.position === 'salesperson' || employeeIdStr === currentUserIdStr;
                 } else {
                     // 业务员可以看到所有职员信息，但只能编辑自己的
                     canView = true;
-                    canEdit = employee.id === currentUser.id;
+                    canEdit = employeeIdStr === currentUserIdStr;
                 }
                 
                 if (!canView) return;
@@ -3381,7 +3704,7 @@
                             <h3 style="color: var(--gold-light); margin: 0; flex-grow: 1;">${employee.name}</h3>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <span style="background: var(--gold); color: var(--black); padding: 3px 8px; border-radius: 15px; font-size: 0.8em;">${positionText}</span>
-                                ${canEdit ? `<button onclick="showEditEmployeeModal(${employee.id})" style="background: var(--gold); color: var(--black); border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8em;">${getText('edit-btn')}</button>` : ''}
+                                ${canEdit ? `<button onclick="showEditEmployeeModal(${employee.id})" style="background: var(--gold); color: var(--black); border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8em;" data-employee-id="${employee.id}">${getText('edit-btn')}</button>` : ''}
                             </div>
                         </div>
                         
@@ -3447,7 +3770,11 @@
             
             employees.forEach(employee => {
                 // 只有管理员可以看到删除选项，且不能删除自己
-                if (currentUser && currentUser.position === 'admin' && employee.id !== currentUser.id) {
+                // 确保id比较时都转换为字符串
+                const employeeIdStr = String(employee.id);
+                const currentUserIdStr = String(currentUser.id);
+                
+                if (currentUser && currentUser.position === 'admin' && employeeIdStr !== currentUserIdStr) {
                     const positionText = getPositionText(employee.position);
                     optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
                 }
@@ -3608,7 +3935,7 @@
         function processSalonFile() {
             // 检查SheetJS库是否已加载
             if (typeof XLSX === 'undefined') {
-                alert('Excel处理库尚未加载完成，请稍后再试！');
+                alert(getText('excel-library-loading'));
                 return;
             }
             
@@ -3657,33 +3984,72 @@
             const previewDiv = document.getElementById('file-preview');
             const tableDiv = document.getElementById('preview-table');
             
+            // 批量分配功能HTML
+            let batchAssignHTML = `
+                <div style="margin-bottom: 20px; padding: 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                    <h4 style="color: #87CEEB; margin: 0 0 15px 0;">${getText('batch-assign-responsible')}</h4>
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" id="selectAllBatchSalons" onchange="toggleSelectAllBatchSalons()" style="cursor: pointer;">
+                            <label for="selectAllBatchSalons" style="color: #87CEEB; cursor: pointer;">${getText('select-all')}</label>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label style="color: #87CEEB;">${getText('assign-to')}：</label>
+                            <select id="batchResponsibleSelect" style="padding: 8px; background: var(--dark-gray); border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px;">
+                                <option value="">${getText('please-select-employee')}</option>
+                            </select>
+                        </div>
+                        <button onclick="executeBatchAssignSalons()" style="background: #87CEEB; color: var(--black); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">${getText('assign-selected')}</button>
+                    </div>
+                </div>
+            `;
+            
             let tableHTML = `
                 <table style="width: 100%; border-collapse: collapse; color: var(--text-light);">
                     <thead>
                         <tr style="background: rgba(212, 175, 55, 0.2);">
+                            <th style="border: 1px solid #555; padding: 8px; width: 40px;">
+                                <input type="checkbox" id="headerCheckbox" onchange="toggleSelectAllBatchSalons()" style="cursor: pointer;">
+                            </th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('salon-name').replace('：', '')}</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('salon-address').replace('：', '')}</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('salon-district').replace('：', '')}</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('director-name').replace('：', '')}</th>
+                            <th style="border: 1px solid #555; padding: 8px;">${getText('responsible-employee')}</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             
-            batchSalonData.forEach(salon => {
+            batchSalonData.forEach((salon, index) => {
                 const districtText = getText(salon.district + '-district');
+                const responsibleName = salon.responsibleEmployeeId ? getEmployeeName(salon.responsibleEmployeeId) : getText('unassigned');
                 tableHTML += `
                     <tr>
+                        <td style="border: 1px solid #555; padding: 8px; text-align: center;">
+                            <input type="checkbox" class="batch-salon-checkbox" data-index="${index}" style="cursor: pointer;">
+                        </td>
                         <td style="border: 1px solid #555; padding: 8px;">${salon.name}</td>
                         <td style="border: 1px solid #555; padding: 8px;">${salon.address}</td>
                         <td style="border: 1px solid #555; padding: 8px;">${districtText}</td>
                         <td style="border: 1px solid #555; padding: 8px;">${salon.directorName}</td>
+                        <td style="border: 1px solid #555; padding: 8px;" id="responsible-${index}">${responsibleName}</td>
                     </tr>
                 `;
             });
             
             tableHTML += '</tbody></table>';
-            tableDiv.innerHTML = tableHTML;
+            
+            tableDiv.innerHTML = batchAssignHTML + tableHTML;
+            
+            // 在DOM更新后立即更新负责人员选项
+            updateBatchResponsibleOptions();
+            
+            // 确保选项加载完成
+            setTimeout(() => {
+                updateBatchResponsibleOptions();
+            }, 100);
+            
             previewDiv.style.display = 'block';
         }
         
@@ -3722,6 +4088,87 @@
             }
         }
         
+        // 更新批量负责人员选项
+        function updateBatchResponsibleOptions() {
+            const selectElement = document.getElementById('batchResponsibleSelect');
+            if (!selectElement) return;
+            
+            const employees = getEmployees();
+            let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
+            optionsHtml += `<option value="unassigned">${getText('unassigned')}</option>`;
+            
+            if (currentUser) {
+                if (currentUser.position === 'admin') {
+                    // 管理员可以选择所有人
+                    employees.forEach(employee => {
+                        const positionText = getPositionText(employee.position);
+                        optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
+                    });
+                } else if (currentUser.position === 'manager') {
+                    // 经理可以选择业务员
+                    employees.forEach(employee => {
+                        if (employee.position === 'salesperson') {
+                            const positionText = getPositionText(employee.position);
+                            optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
+                        }
+                    });
+                } else if (currentUser.position === 'salesperson') {
+                    // 业务员只能选择自己
+                    const positionText = getPositionText(currentUser.position);
+                    optionsHtml += `<option value="${currentUser.id}">${currentUser.name} - ${positionText}</option>`;
+                }
+            }
+            
+            selectElement.innerHTML = optionsHtml;
+        }
+        
+        // 切换选择所有批量沙龙
+        function toggleSelectAllBatchSalons() {
+            const selectAllCheckbox = document.getElementById('selectAllBatchSalons') || document.getElementById('headerCheckbox');
+            const checkboxes = document.querySelectorAll('.batch-salon-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+        
+        // 执行批量分配沙龙负责人
+        function executeBatchAssignSalons() {
+            const selectedEmployee = document.getElementById('batchResponsibleSelect').value;
+            const checkboxes = document.querySelectorAll('.batch-salon-checkbox:checked');
+            
+            if (!selectedEmployee) {
+                alert(getText('please-select-employee'));
+                return;
+            }
+            
+            if (checkboxes.length === 0) {
+                alert(getText('please-select-items'));
+                return;
+            }
+            
+            checkboxes.forEach(checkbox => {
+                const index = parseInt(checkbox.dataset.index);
+                batchSalonData[index].responsibleEmployeeId = selectedEmployee === 'unassigned' ? '' : selectedEmployee;
+                
+                // 更新显示
+                const employeeName = selectedEmployee === 'unassigned' ? getText('unassigned') : getEmployeeName(selectedEmployee);
+                const responsibleCell = document.getElementById(`responsible-${index}`);
+                if (responsibleCell) {
+                    responsibleCell.textContent = employeeName;
+                }
+            });
+            
+            alert(getText('batch-assign-success').replace('{count}', checkboxes.length));
+            
+            // 清空选择
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+            document.getElementById('selectAllBatchSalons').checked = false;
+            if (document.getElementById('headerCheckbox')) {
+                document.getElementById('headerCheckbox').checked = false;
+            }
+        }
+        
         // 取消批量上传
         function cancelBatchUpload() {
             batchSalonData = [];
@@ -3733,7 +4180,7 @@
         function downloadSampleFile() {
             // 检查SheetJS库是否已加载
             if (typeof XLSX === 'undefined') {
-                alert('Excel处理库尚未加载完成，请稍后再试！');
+                alert(getText('excel-library-loading'));
                 return;
             }
             
@@ -3812,7 +4259,7 @@
         // 显示编辑职员模态框
         function showEditEmployeeModal(employeeId) {
             const employees = getEmployees();
-            const employee = employees.find(emp => emp.id === employeeId);
+            const employee = employees.find(emp => String(emp.id) === String(employeeId));
             
             if (!employee) return;
             
@@ -3833,6 +4280,11 @@
             
             // 权限控制：经理不能修改管理员权限，业务员不能修改自己的权限，管理员不能调低自己的权限
             const positionSelect = document.getElementById('editEmployeePosition');
+            
+            // 确保id比较时都转换为字符串
+            const employeeIdStr = String(employee.id);
+            const currentUserIdStr = String(currentUser.id);
+            
             if (currentUser.position === 'manager' && employee.position === 'admin') {
                 positionSelect.disabled = true;
             } else if (currentUser.position === 'manager') {
@@ -3841,10 +4293,10 @@
                     <option value="salesperson" data-i18n="salesperson">业务员</option>
                 `;
                 updateTexts(); // 更新翻译
-            } else if (currentUser.position === 'salesperson' && employee.id === currentUser.id) {
+            } else if (currentUser.position === 'salesperson' && employeeIdStr === currentUserIdStr) {
                 // 业务员不能修改自己的权限等级
                 positionSelect.disabled = true;
-            } else if (currentUser.position === 'admin' && employee.id === currentUser.id) {
+            } else if (currentUser.position === 'admin' && employeeIdStr === currentUserIdStr) {
                 // 管理员不能调低自己的权限，只能保持管理员
                 positionSelect.innerHTML = `
                     <option value="admin" data-i18n="admin" selected>管理员</option>
@@ -3879,6 +4331,7 @@
             // 显示模态框
             const modal = document.getElementById('editEmployeeModal');
             modal.style.display = 'flex';
+            updateTexts(); // 更新翻译
         }
         
         // 关闭编辑职员模态框
@@ -4932,13 +5385,26 @@
         // 显示添加交易记录模态框
         function showAddTransactionModal(salonId) {
             currentSalonId = salonId;
-            updateSalespersonOptions(); // 加载业务员选项
+            
+            // 确保模态框内容完全清空
+            closeTransactionModal();
+            
+            // 重新加载业务员选项
+            updateSalespersonOptions();
+            
+            // 显示模态框
             const modal = document.getElementById('transactionModal');
             modal.style.display = 'flex';
-            // 如果业务员只能选择自己，则自动聚焦到产品输入
+            
+            // 如果业务员只能选择自己，则自动选择，但不填入其他任何预设值
             const salespersonSelect = document.getElementById('salespersonSelect');
             if (salespersonSelect.options.length === 2) { // 只有默认选项和当前用户
                 salespersonSelect.selectedIndex = 1;
+            }
+            
+            // 确保有一个空的产品行
+            if (!document.querySelector('#productTableBody tr')) {
+                addProductRow();
             }
         }
         
@@ -4946,7 +5412,35 @@
         function closeTransactionModal() {
             const modal = document.getElementById('transactionModal');
             modal.style.display = 'none';
+            
+            // 彻底清除表单，不保留任何记忆
             document.getElementById('transactionForm').reset();
+            
+            // 清空所有输入框
+            document.getElementById('receivedAmount').value = '';
+            document.getElementById('currentOutstanding').value = '';
+            document.getElementById('transactionNotes').value = '';
+            
+            // 重置业务员选择
+            const salespersonSelect = document.getElementById('salespersonSelect');
+            if (salespersonSelect) {
+                salespersonSelect.selectedIndex = 0;
+            }
+            
+            // 清空产品表格并重新添加一个空行
+            const productTableBody = document.getElementById('productTableBody');
+            if (productTableBody) {
+                productTableBody.innerHTML = '';
+                productRowCounter = 0;
+                addProductRow(); // 重新添加一个干净的空行
+            }
+            
+            // 重置总金额显示
+            const totalProductsAmount = document.getElementById('totalProductsAmount');
+            if (totalProductsAmount) {
+                totalProductsAmount.textContent = formatCurrency(0);
+            }
+            
             currentSalonId = null;
         }
         
@@ -5031,7 +5525,7 @@
             row.id = `editProductRow_${editProductRowCounter}`;
             row.innerHTML = `
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                    <input type="text" placeholder="产品名称" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
+                    <input type="text" placeholder="${getText('product-name-placeholder')}" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
                 </td>
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
                     <input type="text" placeholder="1,000" oninput="formatEditInputAndCalculate(this, ${editProductRowCounter})" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box; text-align: center;">
@@ -5331,11 +5825,11 @@
                 transaction.products.forEach(product => {
                     productsTable += `
                         <tr>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white;">${product.name}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${formatCurrency(product.unitPrice)}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${product.quantity || 0}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${product.giftQuantity || 0}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${formatCurrency(product.totalAmount)}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light);">${product.name}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${formatCurrency(product.unitPrice)}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${product.quantity || 0}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${product.giftQuantity || 0}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${formatCurrency(product.totalAmount)}</td>
                         </tr>`;
                 });
                 
@@ -5354,7 +5848,7 @@
                 productsTable = `
                     <div style="margin-bottom: 20px;">
                         <h4 style="color: var(--gold-light); margin-bottom: 10px;">${getText('products')}</h4>
-                        <p style="color: white; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px;">${transaction.products}</p>
+                        <p style="color: var(--text-light); padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px;">${transaction.products}</p>
                     </div>`;
             }
             
@@ -5750,7 +6244,7 @@
             row.id = `productRow_${productRowCounter}`;
             row.innerHTML = `
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                    <input type="text" placeholder="产品名称" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
+                    <input type="text" placeholder="${getText('product-name-placeholder')}" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
                 </td>
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
                     <input type="text" placeholder="1,000" oninput="formatInputAndCalculate(this, ${productRowCounter})" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box; text-align: center;">
@@ -5934,12 +6428,12 @@
                 const notes = document.getElementById('transactionNotes').value.trim();
                 
                 if (!salespersonId) {
-                    alert(translations[currentLanguage]['please-select-salesperson']);
+                    alert(getText('please-select-salesperson'));
                     return;
                 }
                 
                 if (products.length === 0) {
-                    alert(translations[currentLanguage]['add-at-least-one-product']);
+                    alert(getText('add-at-least-one-product'));
                     return;
                 }
                 
@@ -5979,6 +6473,8 @@
                     displaySalonList(currentFilter, currentPage); // 保持当前筛选和页面
                     closeTransactionModal();
                     alert(getText('transaction-added-success'));
+                    // 跳转到对应沙龙的交易记录
+                    viewAllTransactions(currentSalonId);
                 }
             });
             
@@ -6000,12 +6496,12 @@
                 const notes = document.getElementById('editTransactionNotes').value.trim();
                 
                 if (!salespersonId) {
-                    alert(translations[currentLanguage]['please-select-salesperson']);
+                    alert(getText('please-select-salesperson'));
                     return;
                 }
                 
                 if (products.length === 0) {
-                    alert(translations[currentLanguage]['add-at-least-one-product']);
+                    alert(getText('add-at-least-one-product'));
                     return;
                 }
                 
@@ -6303,6 +6799,7 @@
             const directorName = document.getElementById('directorName').value;
             const directorMobile = document.getElementById('directorMobile').value;
             const responsibleEmployeeId = document.getElementById('responsibleEmployee').value;
+            const businessLicense = document.getElementById('businessLicense').value;
             
             // 所有字段都改为可选填，只需要有沙龙名称即可
             if (salonName) {
@@ -6314,7 +6811,8 @@
                     phone: salonPhone,
                     directorName: directorName,
                     directorMobile: directorMobile,
-                    responsibleEmployeeId: responsibleEmployeeId
+                    responsibleEmployeeId: responsibleEmployeeId,
+                    businessLicense: businessLicense
                 };
                 
                 // 检查是否需要审批
@@ -6330,7 +6828,9 @@
                 alert(alertMessage);
                 // 清空表单
                 this.reset();
-                    updateResponsibleEmployeeOptions(); // 重置负责职员选项
+                updateResponsibleEmployeeOptions(); // 重置负责职员选项
+                // 跳转到沙龙列表
+                showContent('salon-info');
                 } else {
                     // 经理和业务员需要审批
                     const description = `新增沙龙：${salonName} (${salonAddress})`;
@@ -6340,19 +6840,21 @@
                     // 清空表单
                     this.reset();
                     updateResponsibleEmployeeOptions(); // 重置负责职员选项
+                    // 跳转到沙龙列表
+                    showContent('salon-info');
                 }
             } else {
                 alert(getText('salon-name-required'));
             }
         });
         
-        // 新增职员姓名自动填充到账户持有人
-        document.getElementById('employeeName').addEventListener('input', function(e) {
-            const accountHolderField = document.getElementById('employeeAccountHolder');
-            if (!accountHolderField.value.trim()) {
-                accountHolderField.value = e.target.value.trim();
-            }
-        });
+        // 移除新增职员姓名自动填充到账户持有人的功能
+        // document.getElementById('employeeName').addEventListener('input', function(e) {
+        //     const accountHolderField = document.getElementById('employeeAccountHolder');
+        //     if (!accountHolderField.value.trim()) {
+        //         accountHolderField.value = e.target.value.trim();
+        //     }
+        // });
         
 
         
@@ -6395,6 +6897,8 @@
                 if (addEmployee(newEmployee)) {
                     alert(getText('employee-added-success'));
                     this.reset();
+                    // 跳转到职员列表
+                    showContent('employee-list');
                 } else {
                     alert(getText('username-already-exists'));
                 }
@@ -7473,6 +7977,7 @@
             document.getElementById('editSalonId').value = salon.id;
             document.getElementById('editSalonName').value = salon.name;
             document.getElementById('editSalonAddress').value = salon.address;
+            document.getElementById('editBusinessLicense').value = salon.businessLicense || '';
             document.getElementById('editSalonDistrict').value = salon.district;
             document.getElementById('editSalonPhone').value = salon.phone || '';
             document.getElementById('editDirectorName').value = salon.directorName;
@@ -7505,6 +8010,7 @@
             const salonId = parseInt(document.getElementById('editSalonId').value);
             const salonName = document.getElementById('editSalonName').value.trim();
             const salonAddress = document.getElementById('editSalonAddress').value.trim();
+            const businessLicense = document.getElementById('editBusinessLicense').value.trim();
             const salonDistrict = document.getElementById('editSalonDistrict').value;
             const salonPhone = document.getElementById('editSalonPhone').value.trim();
             const directorName = document.getElementById('editDirectorName').value.trim();
@@ -7525,7 +8031,8 @@
                 phone: salonPhone,
                 directorName: directorName,
                 directorMobile: directorMobile,
-                responsibleEmployeeId: responsibleEmployeeId
+                responsibleEmployeeId: responsibleEmployeeId,
+                businessLicense: businessLicense
             };
             
             if (updateSalon(updatedSalon)) {
