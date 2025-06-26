@@ -3357,12 +3357,11 @@
                 );
             }
             
+            // 清除登录状态
             currentUser = null;
             localStorage.removeItem('currentUser');
-            // 更新用户信息显示
-            updateUserInfo();
             
-            // 跳转到登录页面
+            // 立即跳转到登录页面
             window.location.href = 'login.html';
         }
         
@@ -3511,21 +3510,32 @@
                 addEmployee(defaultAdmin);
             }
             
-            // 检查当前登录状态
+            // 强制检查登录状态 - 没有登录用户时跳转到登录页面
             currentUser = getCurrentUser();
-            if (currentUser) {
-                // 如果有登录用户，设置界面状态
-                console.log(getText('current-login-user') + ':', currentUser.name, '- ' + getText('permission') + ':', getText(currentUser.position));
-                // 更新用户信息显示
-                updateUserInfo();
-            } else {
-                // 临时设置为管理员用户（向后兼容）
-                currentUser = employees.find(emp => emp.position === 'admin') || employees[0];
-                if (currentUser) {
-                    setCurrentUser(currentUser);
-                    // updateUserInfo会在setCurrentUser中被调用
-                }
+            if (!currentUser) {
+                // 没有登录用户，跳转到登录页面
+                console.log('没有登录用户，跳转到登录页面');
+                window.location.href = 'login.html';
+                return;
             }
+            
+            // 验证登录用户是否仍然有效（是否在员工列表中）
+            const validUser = employees.find(emp => 
+                String(emp.id) === String(currentUser.id) && 
+                emp.username === currentUser.username
+            );
+            
+            if (!validUser) {
+                // 登录用户已失效，清除登录状态并跳转到登录页面
+                console.log('登录用户已失效，跳转到登录页面');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // 有效登录用户，设置界面状态
+            console.log(getText('current-login-user') + ':', currentUser.name, '- ' + getText('permission') + ':', getText(currentUser.position));
+            updateUserInfo();
         }
         
         // 添加交易记录
@@ -6412,6 +6422,13 @@
         
         // 处理交易记录表单提交
         document.addEventListener('DOMContentLoaded', function() {
+            // 立即检查登录状态，这是最高优先级的检查
+            if (!getCurrentUser()) {
+                console.log('页面加载检查：没有登录用户，跳转到登录页面');
+                window.location.href = 'login.html';
+                return;
+            }
+            
             // 初始化系统，创建默认管理员账号
             initializeSystem();
             
