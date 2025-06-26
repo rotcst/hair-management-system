@@ -9,6 +9,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <!-- Firebase配置 -->
     <script src="firebase-config.js"></script>
+    <!-- Firebase数据管理器 -->
+    <script src="firebase-data-manager.js"></script>
     <style>
         :root {
             --gold: #D4AF37;
@@ -411,11 +413,21 @@
               }
           }
           
-          // 获取员工数据
-          function getEmployees() {
-              const employees = localStorage.getItem('employees');
-              return employees ? JSON.parse(employees) : [];
-          }
+                  // 获取员工数据
+        async function getEmployees() {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    return await dataManager.getEmployees();
+                } else {
+                    const employees = localStorage.getItem('employees');
+                    return employees ? JSON.parse(employees) : [];
+                }
+            } catch (error) {
+                console.error('获取员工数据失败:', error);
+                const employees = localStorage.getItem('employees');
+                return employees ? JSON.parse(employees) : [];
+            }
+        }
         
         // 设置当前用户
         function setCurrentUser(user) {
@@ -433,60 +445,84 @@
             return false;
         }
         
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
-            const employees = getEmployees();
-            
-            // 如果没有员工数据，创建默认管理员
-            if (employees.length === 0) {
-                const defaultAdmin = {
-                    id: Date.now(),
-                    name: '시스템 관리자',
-                    position: 'admin',
-                    username: 'admin',
-                    password: 'admin',
-                    mobile: '010-0000-0000',
-                    createTime: new Date().toLocaleString('zh-CN')
-                };
-                employees.push(defaultAdmin);
-                localStorage.setItem('employees', JSON.stringify(employees));
-            }
-            
-            // 查找匹配的用户
-            const user = employees.find(emp => emp.username === username && emp.password === password);
-            
-            if (user) {
-                // 登录成功，设置当前用户
-                setCurrentUser(user);
+            try {
+                // 初始化数据管理器
+                if (window.dataManager && !window.dataManager.db) {
+                    await dataManager.initialize();
+                }
                 
-                // 记录登录操作历史
-                const operations = JSON.parse(localStorage.getItem('operations')) || [];
-                operations.push({
-                    id: Date.now(),
-                    type: 'login',
-                    category: 'system',
-                    targetId: user.id,
-                    targetName: '系统登录',
-                    description: `用户 ${user.name} (${user.position}) 登录系统`,
-                    operatorId: user.id,
-                    operatorName: user.name,
-                    timestamp: new Date().toISOString(),
-                    beforeData: null,
-                    afterData: null
-                });
-                localStorage.setItem('operations', JSON.stringify(operations));
+                const employees = await getEmployees();
                 
-                // 跳转到主页面
-                window.location.href = 'index.html';
-            } else {
-                // 登录失败，显示错误消息
+                // 如果没有员工数据，创建默认管理员
+                if (employees.length === 0) {
+                    const defaultAdmin = {
+                        id: Date.now(),
+                        name: '시스템 관리자',
+                        position: 'admin',
+                        username: 'admin',
+                        password: 'admin',
+                        mobile: '010-0000-0000',
+                        createTime: new Date().toLocaleString('zh-CN')
+                    };
+                    
+                    if (window.dataManager && window.dataManager.db) {
+                        await dataManager.saveEmployee(defaultAdmin);
+                    } else {
+                        employees.push(defaultAdmin);
+                        localStorage.setItem('employees', JSON.stringify(employees));
+                    }
+                }
+                
+                // 查找匹配的用户
+                const user = employees.find(emp => emp.username === username && emp.password === password);
+                
+                if (user) {
+                    // 登录成功，设置当前用户
+                    setCurrentUser(user);
+                    
+                    // 记录登录操作历史
+                    const operation = {
+                        id: Date.now(),
+                        type: 'login',
+                        category: 'system',
+                        targetId: user.id,
+                        targetName: '系统登录',
+                        description: `用户 ${user.name} (${user.position}) 登录系统`,
+                        operatorId: user.id,
+                        operatorName: user.name,
+                        timestamp: new Date().toISOString(),
+                        beforeData: null,
+                        afterData: null
+                    };
+                    
+                    if (window.dataManager && window.dataManager.db) {
+                        await dataManager.saveOperation(operation);
+                    } else {
+                        const operations = JSON.parse(localStorage.getItem('operations')) || [];
+                        operations.push(operation);
+                        localStorage.setItem('operations', JSON.stringify(operations));
+                    }
+                    
+                    // 跳转到主页面
+                    window.location.href = 'index.html';
+                } else {
+                    // 登录失败，显示错误消息
+                    document.getElementById('errorMessage').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('errorMessage').style.display = 'none';
+                    }, 3000); // 3秒后自动隐藏错误消息
+                }
+            } catch (error) {
+                console.error('登录处理失败:', error);
                 document.getElementById('errorMessage').style.display = 'block';
                 setTimeout(() => {
                     document.getElementById('errorMessage').style.display = 'none';
-                }, 3000); // 3秒后自动隐藏错误消息
+                }, 3000);
             }
         });
         

@@ -11,6 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase配置 -->
     <script src="firebase-config.js"></script>
+    <!-- Firebase数据管理器 -->
+    <script src="firebase-data-manager.js"></script>
     <style>
         :root {
             --gold: #D4AF37;
@@ -3121,82 +3123,166 @@
         }
         
         // 살롱 데이터 관리
-        function getSalons() {
-            const salons = localStorage.getItem('salons');
-            return salons ? JSON.parse(salons) : [];
-        }
-        
-        function saveSalons(salons) {
-            // 清除所有沙龙的缓存数据，确保下次计算时使用最新数据
-            salons.forEach(salon => {
-                delete salon._cachedTotalOutstanding;
-                delete salon._lastCalculatedTime;
-                delete salon._cachedOutstandingMonths;
-                delete salon._lastMonthsCalculatedTime;
-            });
-            localStorage.setItem('salons', JSON.stringify(salons));
-        }
-        
-        function addSalon(salon) {
-            const salons = getSalons();
-            salon.id = Date.now(); // 简单的ID生成
-            salon.addTime = new Date().toLocaleString('zh-CN');
-            salon.joinDate = new Date(); // 加入日期，用于计算
-            salon.transactions = []; // 初始化交易记录数组
-            salon.lastTransactionDate = null; // 最后一次交易日期
-            salons.push(salon);
-            saveSalons(salons);
-            
-            // 记录操作历史
-            recordOperation(
-                'create', 
-                'salon', 
-                salon.id, 
-                salon.name, 
-                `创建新沙龙：${salon.name}，院长：${salon.directorName}`,
-                null,
-                salon
-            );
-        }
-        
-        function deleteSalon(salonId) {
-            const salons = getSalons();
-            const salonToDelete = salons.find(salon => salon.id === salonId);
-            const filteredSalons = salons.filter(salon => salon.id !== salonId);
-            saveSalons(filteredSalons);
-            
-            // 记录操作历史
-            if (salonToDelete) {
-                recordOperation(
-                    'delete', 
-                    'salon', 
-                    salonToDelete.id, 
-                    salonToDelete.name, 
-                    `删除沙龙：${salonToDelete.name}，院长：${salonToDelete.directorName}`,
-                    salonToDelete,
-                    null
-                );
+        async function getSalons() {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    return await dataManager.getSalons();
+                } else {
+                    // 回退到localStorage
+                    const salons = localStorage.getItem('salons');
+                    return salons ? JSON.parse(salons) : [];
+                }
+            } catch (error) {
+                console.error('获取沙龙数据失败:', error);
+                // 回退到localStorage
+                const salons = localStorage.getItem('salons');
+                return salons ? JSON.parse(salons) : [];
             }
         }
         
-        function updateSalon(updatedSalon) {
-            const salons = getSalons();
-            const index = salons.findIndex(salon => salon.id === updatedSalon.id);
-            
-            if (index !== -1) {
-                const beforeData = JSON.parse(JSON.stringify(salons[index]));
+        async function saveSalons(salons) {
+            try {
+                // 清除所有沙龙的缓存数据，确保下次计算时使用最新数据
+                salons.forEach(salon => {
+                    delete salon._cachedTotalOutstanding;
+                    delete salon._lastCalculatedTime;
+                    delete salon._cachedOutstandingMonths;
+                    delete salon._lastMonthsCalculatedTime;
+                });
                 
-                // 保留原有的创建时间和交易记录
-                updatedSalon.addTime = salons[index].addTime;
-                updatedSalon.joinDate = salons[index].joinDate;
-                updatedSalon.transactions = salons[index].transactions;
-                updatedSalon.lastTransactionDate = salons[index].lastTransactionDate;
+                if (window.dataManager && window.dataManager.db) {
+                    // 保存到Firebase
+                    for (const salon of salons) {
+                        await dataManager.saveSalon(salon);
+                    }
+                } else {
+                    // 回退到localStorage
+                    localStorage.setItem('salons', JSON.stringify(salons));
+                }
+            } catch (error) {
+                console.error('保存沙龙数据失败:', error);
+                // 回退到localStorage
+                localStorage.setItem('salons', JSON.stringify(salons));
+            }
+        }
+        
+        async function addSalon(salon) {
+            try {
+                if (!salon.id) {
+                    salon.id = Date.now(); // 简单的ID生成
+                }
+                if (!salon.addTime) {
+                    salon.addTime = new Date().toLocaleString('zh-CN');
+                }
+                if (!salon.joinDate) {
+                    salon.joinDate = new Date(); // 加入日期，用于计算
+                }
+                if (!salon.transactions) {
+                    salon.transactions = []; // 初始化交易记录数组
+                }
+                if (salon.lastTransactionDate === undefined) {
+                    salon.lastTransactionDate = null; // 最后一次交易日期
+                }
                 
-                salons[index] = updatedSalon;
-                saveSalons(salons);
+                if (window.dataManager && window.dataManager.db) {
+                    await dataManager.saveSalon(salon);
+                } else {
+                    const salons = await getSalons();
+                    salons.push(salon);
+                    await saveSalons(salons);
+                }
                 
                 // 记录操作历史
-                recordOperation(
+                await recordOperation(
+                    'create', 
+                    'salon', 
+                    salon.id, 
+                    salon.name, 
+                    `创建新沙龙：${salon.name}，院长：${salon.directorName}`,
+                    null,
+                    salon
+                );
+                
+                return true;
+            } catch (error) {
+                console.error('添加沙龙失败:', error);
+                return false;
+            }
+        }
+        
+        async function deleteSalon(salonId) {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    const salons = await getSalons();
+                    const salonToDelete = salons.find(salon => salon.id === salonId);
+                    
+                    await dataManager.deleteSalon(salonId);
+                    
+                    // 记录操作历史
+                    if (salonToDelete) {
+                        await recordOperation(
+                            'delete', 
+                            'salon', 
+                            salonToDelete.id, 
+                            salonToDelete.name, 
+                            `删除沙龙：${salonToDelete.name}，院长：${salonToDelete.directorName}`,
+                            salonToDelete,
+                            null
+                        );
+                    }
+                } else {
+                    const salons = await getSalons();
+                    const salonToDelete = salons.find(salon => salon.id === salonId);
+                    const filteredSalons = salons.filter(salon => salon.id !== salonId);
+                    await saveSalons(filteredSalons);
+                    
+                    // 记录操作历史
+                    if (salonToDelete) {
+                        await recordOperation(
+                            'delete', 
+                            'salon', 
+                            salonToDelete.id, 
+                            salonToDelete.name, 
+                            `删除沙龙：${salonToDelete.name}，院长：${salonToDelete.directorName}`,
+                            salonToDelete,
+                            null
+                        );
+                    }
+                }
+                return true;
+            } catch (error) {
+                console.error('删除沙龙失败:', error);
+                return false;
+            }
+        }
+        
+        async function updateSalon(updatedSalon) {
+            try {
+                const salons = await getSalons();
+                const existingSalon = salons.find(salon => salon.id === updatedSalon.id);
+                
+                if (!existingSalon) {
+                    return false; // 沙龙不存在
+                }
+                
+                const beforeData = JSON.parse(JSON.stringify(existingSalon));
+                
+                // 保留原有的创建时间和交易记录
+                updatedSalon.addTime = existingSalon.addTime;
+                updatedSalon.joinDate = existingSalon.joinDate;
+                updatedSalon.transactions = existingSalon.transactions;
+                updatedSalon.lastTransactionDate = existingSalon.lastTransactionDate;
+                
+                if (window.dataManager && window.dataManager.db) {
+                    await dataManager.saveSalon(updatedSalon);
+                } else {
+                    const index = salons.findIndex(salon => salon.id === updatedSalon.id);
+                    salons[index] = updatedSalon;
+                    await saveSalons(salons);
+                }
+                
+                // 记录操作历史
+                await recordOperation(
                     'edit', 
                     'salon', 
                     updatedSalon.id, 
@@ -3207,93 +3293,169 @@
                 );
                 
                 return true;
+            } catch (error) {
+                console.error('更新沙龙失败:', error);
+                return false;
             }
-            return false;
         }
         
         // 职员数据管理
-        function getEmployees() {
-            const employees = localStorage.getItem('employees');
-            return employees ? JSON.parse(employees) : [];
+        async function getEmployees() {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    return await dataManager.getEmployees();
+                } else {
+                    // 回退到localStorage
+                    const employees = localStorage.getItem('employees');
+                    return employees ? JSON.parse(employees) : [];
+                }
+            } catch (error) {
+                console.error('获取员工数据失败:', error);
+                // 回退到localStorage
+                const employees = localStorage.getItem('employees');
+                return employees ? JSON.parse(employees) : [];
+            }
         }
         
-        function saveEmployees(employees) {
-            localStorage.setItem('employees', JSON.stringify(employees));
+        async function saveEmployees(employees) {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    // 保存到Firebase
+                    for (const employee of employees) {
+                        await dataManager.saveEmployee(employee);
+                    }
+                } else {
+                    // 回退到localStorage
+                    localStorage.setItem('employees', JSON.stringify(employees));
+                }
+            } catch (error) {
+                console.error('保存员工数据失败:', error);
+                // 回退到localStorage
+                localStorage.setItem('employees', JSON.stringify(employees));
+            }
         }
         
-        function addEmployee(employee) {
-            const employees = getEmployees();
+        async function addEmployee(employee) {
+            const employees = await getEmployees();
             
             // 检查用户名是否已存在
             if (employees.some(emp => emp.username === employee.username)) {
                 return false; // 用户名已存在
             }
             
-            employee.id = Date.now();
-            employee.createTime = new Date().toLocaleString('zh-CN');
-            employees.push(employee);
-            saveEmployees(employees);
+            if (!employee.id) {
+                employee.id = Date.now();
+            }
+            if (!employee.createTime) {
+                employee.createTime = new Date().toLocaleString('zh-CN');
+            }
             
-            // 记录操作历史
-            recordOperation(
-                'create', 
-                'employee', 
-                employee.id, 
-                employee.name, 
-                `创建新职员：${employee.name}，职位：${employee.position}`,
-                null,
-                employee
-            );
-            
-            return true;
-        }
-        
-        function deleteEmployee(employeeId) {
-            const employees = getEmployees();
-            const employeeToDelete = employees.find(employee => employee.id === employeeId);
-            const filteredEmployees = employees.filter(employee => employee.id !== employeeId);
-            saveEmployees(filteredEmployees);
-            
-            // 记录操作历史
-            if (employeeToDelete) {
-                recordOperation(
-                    'delete', 
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    await dataManager.saveEmployee(employee);
+                } else {
+                    employees.push(employee);
+                    await saveEmployees(employees);
+                }
+                
+                // 记录操作历史
+                await recordOperation(
+                    'create', 
                     'employee', 
-                    employeeToDelete.id, 
-                    employeeToDelete.name, 
-                    `删除职员：${employeeToDelete.name}，职位：${employeeToDelete.position}`,
-                    employeeToDelete,
-                    null
+                    employee.id, 
+                    employee.name, 
+                    `创建新职员：${employee.name}，职位：${employee.position}`,
+                    null,
+                    employee
                 );
+                
+                return true;
+            } catch (error) {
+                console.error('添加员工失败:', error);
+                return false;
             }
         }
         
-        function updateEmployee(updatedEmployee) {
-            const employees = getEmployees();
-            const index = employees.findIndex(emp => emp.id === updatedEmployee.id);
-            
-            if (index !== -1) {
+        async function deleteEmployee(employeeId) {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    const employees = await getEmployees();
+                    const employeeToDelete = employees.find(employee => employee.id === employeeId);
+                    
+                    await dataManager.deleteEmployee(employeeId);
+                    
+                    // 记录操作历史
+                    if (employeeToDelete) {
+                        await recordOperation(
+                            'delete', 
+                            'employee', 
+                            employeeToDelete.id, 
+                            employeeToDelete.name, 
+                            `删除职员：${employeeToDelete.name}，职位：${employeeToDelete.position}`,
+                            employeeToDelete,
+                            null
+                        );
+                    }
+                } else {
+                    const employees = await getEmployees();
+                    const employeeToDelete = employees.find(employee => employee.id === employeeId);
+                    const filteredEmployees = employees.filter(employee => employee.id !== employeeId);
+                    await saveEmployees(filteredEmployees);
+                    
+                    // 记录操作历史
+                    if (employeeToDelete) {
+                        await recordOperation(
+                            'delete', 
+                            'employee', 
+                            employeeToDelete.id, 
+                            employeeToDelete.name, 
+                            `删除职员：${employeeToDelete.name}，职位：${employeeToDelete.position}`,
+                            employeeToDelete,
+                            null
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error('删除员工失败:', error);
+                throw error;
+            }
+        }
+        
+        async function updateEmployee(updatedEmployee) {
+            try {
+                const employees = await getEmployees();
+                const existingEmployee = employees.find(emp => emp.id === updatedEmployee.id);
+                
+                if (!existingEmployee) {
+                    return false; // 员工不存在
+                }
+                
                 // 检查用户名是否被其他职员使用
                 const existingUser = employees.find(emp => emp.username === updatedEmployee.username && emp.id !== updatedEmployee.id);
                 if (existingUser) {
                     return false; // 用户名已存在
                 }
                 
-                const beforeData = JSON.parse(JSON.stringify(employees[index]));
+                const beforeData = JSON.parse(JSON.stringify(existingEmployee));
                 
                 // 保留创建时间
-                updatedEmployee.createTime = employees[index].createTime;
+                updatedEmployee.createTime = existingEmployee.createTime;
                 
                 // 如果密码为空，保留原密码
                 if (!updatedEmployee.password || updatedEmployee.password.trim() === '') {
-                    updatedEmployee.password = employees[index].password;
+                    updatedEmployee.password = existingEmployee.password;
                 }
                 
-                employees[index] = updatedEmployee;
-                saveEmployees(employees);
+                if (window.dataManager && window.dataManager.db) {
+                    await dataManager.saveEmployee(updatedEmployee);
+                } else {
+                    const index = employees.findIndex(emp => emp.id === updatedEmployee.id);
+                    employees[index] = updatedEmployee;
+                    await saveEmployees(employees);
+                }
                 
                 // 记录操作历史
-                recordOperation(
+                await recordOperation(
                     'edit', 
                     'employee', 
                     updatedEmployee.id, 
@@ -3310,8 +3472,10 @@
                 }
                 
                 return true;
+            } catch (error) {
+                console.error('更新员工失败:', error);
+                return false;
             }
-            return false;
         }
         
         // 当前登录用户信息
@@ -3496,46 +3660,73 @@
         }
         
         // 初始化系统
-        function initializeSystem() {
-            // 检查是否有员工，如果没有则创建默认管理员
-            const employees = getEmployees();
-            if (employees.length === 0) {
-                const defaultAdmin = {
-                    name: '시스템 관리자',
-                    position: 'admin',
-                    username: 'admin',
-                    password: 'admin',
-                    mobile: '010-0000-0000'
-                };
-                addEmployee(defaultAdmin);
+        async function initializeSystem() {
+            try {
+                // 初始化Firebase数据管理器
+                const dataManagerReady = await dataManager.initialize();
+                
+                if (dataManagerReady) {
+                    console.log('🔥 开始数据迁移检查...');
+                    // 检查是否需要从localStorage迁移数据
+                    const localEmployees = JSON.parse(localStorage.getItem('employees') || '[]');
+                    if (localEmployees.length > 0) {
+                        const cloudEmployees = await dataManager.getEmployees();
+                        if (cloudEmployees.length === 0) {
+                            console.log('检测到本地数据，开始迁移到云端...');
+                            await dataManager.migrateFromLocalStorage();
+                        }
+                    }
+                }
+                
+                // 检查是否有员工，如果没有则创建默认管理员
+                const employees = await getEmployees();
+                if (employees.length === 0) {
+                    const defaultAdmin = {
+                        id: Date.now(),
+                        name: '시스템 관리자',
+                        position: 'admin',
+                        username: 'admin',
+                        password: 'admin',
+                        mobile: '010-0000-0000',
+                        createTime: new Date().toLocaleString('zh-CN')
+                    };
+                    await addEmployee(defaultAdmin);
+                    console.log('已创建默认管理员账号');
+                }
+                
+                // 强制检查登录状态 - 没有登录用户时跳转到登录页面
+                currentUser = getCurrentUser();
+                if (!currentUser) {
+                    // 没有登录用户，跳转到登录页面
+                    console.log('没有登录用户，跳转到登录页面');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // 验证登录用户是否仍然有效（是否在员工列表中）
+                const validUser = employees.find(emp => 
+                    String(emp.id) === String(currentUser.id) && 
+                    emp.username === currentUser.username
+                );
+                
+                if (!validUser) {
+                    // 登录用户已失效，清除登录状态并跳转到登录页面
+                    console.log('登录用户已失效，跳转到登录页面');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // 有效登录用户，设置界面状态
+                console.log(getText('current-login-user') + ':', currentUser.name, '- ' + getText('permission') + ':', getText(currentUser.position));
+                updateUserInfo();
+                
+                console.log('✅ 系统初始化完成 - 已启用云端数据同步');
+            } catch (error) {
+                console.error('❌ 系统初始化失败:', error);
+                // 如果Firebase初始化失败，仍然可以使用本地存储
+                console.log('⚠️ 回退到本地存储模式');
             }
-            
-            // 强制检查登录状态 - 没有登录用户时跳转到登录页面
-            currentUser = getCurrentUser();
-            if (!currentUser) {
-                // 没有登录用户，跳转到登录页面
-                console.log('没有登录用户，跳转到登录页面');
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            // 验证登录用户是否仍然有效（是否在员工列表中）
-            const validUser = employees.find(emp => 
-                String(emp.id) === String(currentUser.id) && 
-                emp.username === currentUser.username
-            );
-            
-            if (!validUser) {
-                // 登录用户已失效，清除登录状态并跳转到登录页面
-                console.log('登录用户已失效，跳转到登录页面');
-                localStorage.removeItem('currentUser');
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            // 有效登录用户，设置界面状态
-            console.log(getText('current-login-user') + ':', currentUser.name, '- ' + getText('permission') + ':', getText(currentUser.position));
-            updateUserInfo();
         }
         
         // 添加交易记录
@@ -6421,7 +6612,7 @@
         }
         
         // 处理交易记录表单提交
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // 立即检查登录状态，这是最高优先级的检查
             if (!getCurrentUser()) {
                 console.log('页面加载检查：没有登录用户，跳转到登录页面');
@@ -6430,7 +6621,7 @@
             }
             
             // 初始化系统，创建默认管理员账号
-            initializeSystem();
+            await initializeSystem();
             
             // 页面加载时添加一行产品
             addProductRow();
@@ -7201,43 +7392,71 @@
         // ==================== 操作历史记录功能 ====================
         
         // 获取操作历史记录
-        function getOperationHistory() {
-            return JSON.parse(localStorage.getItem('operationHistory')) || [];
+        async function getOperationHistory() {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    return await dataManager.getOperations();
+                } else {
+                    return JSON.parse(localStorage.getItem('operationHistory')) || [];
+                }
+            } catch (error) {
+                console.error('获取操作历史失败:', error);
+                return JSON.parse(localStorage.getItem('operationHistory')) || [];
+            }
         }
         
         // 保存操作历史记录
-        function saveOperationHistory(history) {
-            localStorage.setItem('operationHistory', JSON.stringify(history));
+        async function saveOperationHistory(history) {
+            try {
+                if (window.dataManager && window.dataManager.db) {
+                    // Firebase模式下，每个操作都是单独保存的，不需要批量保存
+                    console.log('Firebase模式下不需要批量保存操作历史');
+                } else {
+                    localStorage.setItem('operationHistory', JSON.stringify(history));
+                }
+            } catch (error) {
+                console.error('保存操作历史失败:', error);
+                localStorage.setItem('operationHistory', JSON.stringify(history));
+            }
         }
         
         // 记录操作历史
-        function recordOperation(operationType, objectType, objectId, objectName, description, beforeData = null, afterData = null) {
-            const history = getOperationHistory();
-            const operation = {
-                id: Date.now() + Math.random(),
-                timestamp: new Date().toISOString(),
-                userId: currentUser ? currentUser.id : null,
-                userName: currentUser ? currentUser.name : '系统',
-                userPosition: currentUser ? currentUser.position : 'system',
-                operationType: operationType, // create, edit, delete, login, logout
-                objectType: objectType, // salon, transaction, employee, system
-                objectId: objectId,
-                objectName: objectName,
-                description: description,
-                beforeData: beforeData ? JSON.parse(JSON.stringify(beforeData)) : null,
-                afterData: afterData ? JSON.parse(JSON.stringify(afterData)) : null,
-                ipAddress: '127.0.0.1', // 在真实环境中可以获取真实IP
-                browserInfo: navigator.userAgent
-            };
-            
-            history.unshift(operation); // 添加到开头，最新的在前面
-            
-            // 保留最近1000条记录
-            if (history.length > 1000) {
-                history.splice(1000);
+        async function recordOperation(operationType, objectType, objectId, objectName, description, beforeData = null, afterData = null) {
+            try {
+                const operation = {
+                    id: Date.now() + Math.random(),
+                    timestamp: new Date().toISOString(),
+                    userId: currentUser ? currentUser.id : null,
+                    userName: currentUser ? currentUser.name : '系统',
+                    userPosition: currentUser ? currentUser.position : 'system',
+                    operationType: operationType, // create, edit, delete, login, logout
+                    objectType: objectType, // salon, transaction, employee, system
+                    objectId: objectId,
+                    objectName: objectName,
+                    description: description,
+                    beforeData: beforeData ? JSON.parse(JSON.stringify(beforeData)) : null,
+                    afterData: afterData ? JSON.parse(JSON.stringify(afterData)) : null,
+                    ipAddress: '127.0.0.1', // 在真实环境中可以获取真实IP
+                    browserInfo: navigator.userAgent
+                };
+                
+                if (window.dataManager && window.dataManager.db) {
+                    await dataManager.saveOperation(operation);
+                } else {
+                    const history = await getOperationHistory();
+                    history.unshift(operation); // 添加到开头，最新的在前面
+                    
+                    // 保留最近1000条记录
+                    if (history.length > 1000) {
+                        history.splice(1000);
+                    }
+                    
+                    await saveOperationHistory(history);
+                }
+            } catch (error) {
+                console.error('记录操作历史失败:', error);
+                // 不抛出错误，避免影响主业务流程
             }
-            
-            saveOperationHistory(history);
         }
         
         // 显示操作历史记录（支持分页）
