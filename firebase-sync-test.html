@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase云端同步测试</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase配置 -->
+    <script src="firebase-config.js"></script>
+    <!-- Firebase数据管理器 -->
+    <script src="firebase-data-manager.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .test-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .data-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 3px;
+            padding: 10px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase云端数据同步测试</h1>
+        
+        <div id="connection-status" class="status info">
+            正在连接Firebase...
+        </div>
+        
+        <div id="sync-status" class="status warning">
+            等待同步状态...
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 连接测试</h3>
+            <button onclick="testConnection()">测试Firebase连接</button>
+            <button onclick="initializeDataManager()">初始化数据管理器</button>
+            <div id="connection-results" class="data-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>👥 员工数据测试</h3>
+            <button onclick="testEmployeeData()">测试员工数据读写</button>
+            <button onclick="loadEmployees()">加载所有员工</button>
+            <button onclick="migrateLocalData()">迁移本地数据</button>
+            <div id="employee-results" class="data-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏪 沙龙数据测试</h3>
+            <button onclick="testSalonData()">测试沙龙数据读写</button>
+            <button onclick="loadSalons()">加载所有沙龙</button>
+            <div id="salon-results" class="data-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 操作历史测试</h3>
+            <button onclick="testOperationHistory()">测试操作历史记录</button>
+            <button onclick="loadOperations()">加载操作历史</button>
+            <div id="operation-results" class="data-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔄 同步状态监控</h3>
+            <button onclick="showSyncStatus()">查看同步状态</button>
+            <button onclick="clearAllData()">清空云端数据</button>
+            <div id="sync-results" class="data-display"></div>
+        </div>
+    </div>
+    
+    <script>
+        let statusInterval;
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            log('connection-results', '🚀 开始初始化Firebase...');
+            await initializeDataManager();
+            startStatusMonitoring();
+        });
+        
+        // 日志记录函数
+        function log(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            element.textContent += logEntry;
+            element.scrollTop = element.scrollHeight;
+            
+            if (isError) {
+                console.error(message);
+            } else {
+                console.log(message);
+            }
+        }
+        
+        // 初始化数据管理器
+        async function initializeDataManager() {
+            try {
+                const result = await dataManager.initialize();
+                if (result) {
+                    document.getElementById('connection-status').className = 'status success';
+                    document.getElementById('connection-status').textContent = '✅ Firebase连接成功！';
+                    log('connection-results', '✅ Firebase数据管理器初始化成功');
+                } else {
+                    document.getElementById('connection-status').className = 'status error';
+                    document.getElementById('connection-status').textContent = '❌ Firebase连接失败';
+                    log('connection-results', '❌ Firebase数据管理器初始化失败', true);
+                }
+            } catch (error) {
+                document.getElementById('connection-status').className = 'status error';
+                document.getElementById('connection-status').textContent = '❌ 连接错误: ' + error.message;
+                log('connection-results', '❌ 初始化错误: ' + error.message, true);
+            }
+        }
+        
+        // 测试Firebase连接
+        async function testConnection() {
+            log('connection-results', '🔍 测试Firebase连接...');
+            try {
+                const testData = {
+                    message: 'Firebase连接测试',
+                    timestamp: new Date().toISOString(),
+                    testId: Date.now()
+                };
+                
+                // 写入测试数据
+                const result = await dataManager.saveData('test', testData);
+                if (result.success) {
+                    log('connection-results', '✅ 写入测试数据成功: ' + result.id);
+                    
+                    // 读取测试数据
+                    const readData = await dataManager.getData('test');
+                    log('connection-results', '✅ 读取测试数据成功，共 ' + readData.length + ' 条记录');
+                    
+                    // 删除测试数据
+                    await dataManager.deleteData('test', result.id);
+                    log('connection-results', '✅ 清理测试数据完成');
+                } else {
+                    log('connection-results', '❌ 写入测试数据失败: ' + result.error, true);
+                }
+            } catch (error) {
+                log('connection-results', '❌ 连接测试失败: ' + error.message, true);
+            }
+        }
+        
+        // 测试员工数据
+        async function testEmployeeData() {
+            log('employee-results', '👥 测试员工数据操作...');
+            try {
+                const testEmployee = {
+                    id: Date.now(),
+                    name: '测试员工_' + Math.random().toString(36).substr(2, 5),
+                    position: 'salesperson',
+                    username: 'test_' + Date.now(),
+                    password: 'test123',
+                    mobile: '010-1234-5678',
+                    createTime: new Date().toLocaleString('zh-CN')
+                };
+                
+                // 保存员工
+                const saveResult = await dataManager.saveEmployee(testEmployee);
+                if (saveResult.success) {
+                    log('employee-results', '✅ 保存员工成功: ' + testEmployee.name);
+                    
+                    // 读取所有员工
+                    const employees = await dataManager.getEmployees();
+                    log('employee-results', '✅ 读取员工列表，共 ' + employees.length + ' 个员工');
+                    
+                    // 删除测试员工
+                    await dataManager.deleteEmployee(testEmployee.id);
+                    log('employee-results', '✅ 删除测试员工完成');
+                } else {
+                    log('employee-results', '❌ 保存员工失败', true);
+                }
+            } catch (error) {
+                log('employee-results', '❌ 员工数据测试失败: ' + error.message, true);
+            }
+        }
+        
+        // 加载所有员工
+        async function loadEmployees() {
+            try {
+                const employees = await dataManager.getEmployees();
+                log('employee-results', '📋 员工列表 (' + employees.length + ' 个):');
+                employees.forEach(emp => {
+                    log('employee-results', `  - ${emp.name} (${emp.position}) - ${emp.username}`);
+                });
+            } catch (error) {
+                log('employee-results', '❌ 加载员工失败: ' + error.message, true);
+            }
+        }
+        
+        // 测试沙龙数据
+        async function testSalonData() {
+            log('salon-results', '🏪 测试沙龙数据操作...');
+            try {
+                const testSalon = {
+                    id: Date.now(),
+                    name: '测试沙龙_' + Math.random().toString(36).substr(2, 5),
+                    address: '测试地址123号',
+                    district: 'guro',
+                    phone: '02-1234-5678',
+                    directorName: '测试院长',
+                    directorMobile: '010-9876-5432',
+                    addTime: new Date().toLocaleString('zh-CN'),
+                    joinDate: new Date(),
+                    transactions: []
+                };
+                
+                // 保存沙龙
+                const saveResult = await dataManager.saveSalon(testSalon);
+                if (saveResult.success) {
+                    log('salon-results', '✅ 保存沙龙成功: ' + testSalon.name);
+                    
+                    // 读取所有沙龙
+                    const salons = await dataManager.getSalons();
+                    log('salon-results', '✅ 读取沙龙列表，共 ' + salons.length + ' 个沙龙');
+                    
+                    // 删除测试沙龙
+                    await dataManager.deleteSalon(testSalon.id);
+                    log('salon-results', '✅ 删除测试沙龙完成');
+                } else {
+                    log('salon-results', '❌ 保存沙龙失败', true);
+                }
+            } catch (error) {
+                log('salon-results', '❌ 沙龙数据测试失败: ' + error.message, true);
+            }
+        }
+        
+        // 加载所有沙龙
+        async function loadSalons() {
+            try {
+                const salons = await dataManager.getSalons();
+                log('salon-results', '📋 沙龙列表 (' + salons.length + ' 个):');
+                salons.forEach(salon => {
+                    log('salon-results', `  - ${salon.name} (${salon.district}) - ${salon.directorName}`);
+                });
+            } catch (error) {
+                log('salon-results', '❌ 加载沙龙失败: ' + error.message, true);
+            }
+        }
+        
+        // 测试操作历史
+        async function testOperationHistory() {
+            log('operation-results', '📝 测试操作历史记录...');
+            try {
+                const testOperation = {
+                    id: Date.now() + Math.random(),
+                    timestamp: new Date().toISOString(),
+                    userId: 'test_user',
+                    userName: '测试用户',
+                    userPosition: 'admin',
+                    operationType: 'create',
+                    objectType: 'test',
+                    objectId: 'test_object',
+                    objectName: '测试对象',
+                    description: '这是一个测试操作记录',
+                    ipAddress: '127.0.0.1',
+                    browserInfo: navigator.userAgent
+                };
+                
+                // 保存操作记录
+                const saveResult = await dataManager.saveOperation(testOperation);
+                if (saveResult.success) {
+                    log('operation-results', '✅ 保存操作记录成功');
+                    
+                    // 读取操作历史
+                    const operations = await dataManager.getOperations();
+                    log('operation-results', '✅ 读取操作历史，共 ' + operations.length + ' 条记录');
+                } else {
+                    log('operation-results', '❌ 保存操作记录失败', true);
+                }
+            } catch (error) {
+                log('operation-results', '❌ 操作历史测试失败: ' + error.message, true);
+            }
+        }
+        
+        // 加载操作历史
+        async function loadOperations() {
+            try {
+                const operations = await dataManager.getOperations();
+                log('operation-results', '📋 操作历史 (' + operations.length + ' 条):');
+                operations.slice(0, 10).forEach(op => {
+                    const date = new Date(op.timestamp).toLocaleString();
+                    log('operation-results', `  - ${date} ${op.userName} ${op.operationType} ${op.objectType}`);
+                });
+                if (operations.length > 10) {
+                    log('operation-results', `  ... 还有 ${operations.length - 10} 条记录`);
+                }
+            } catch (error) {
+                log('operation-results', '❌ 加载操作历史失败: ' + error.message, true);
+            }
+        }
+        
+        // 迁移本地数据
+        async function migrateLocalData() {
+            log('employee-results', '🔄 开始迁移本地数据到云端...');
+            try {
+                const result = await dataManager.migrateFromLocalStorage();
+                if (result) {
+                    log('employee-results', '✅ 数据迁移完成！');
+                } else {
+                    log('employee-results', '❌ 数据迁移失败', true);
+                }
+            } catch (error) {
+                log('employee-results', '❌ 数据迁移错误: ' + error.message, true);
+            }
+        }
+        
+        // 显示同步状态
+        function showSyncStatus() {
+            const status = dataManager.getSyncStatus();
+            log('sync-results', '🔄 同步状态:');
+            log('sync-results', `  - 在线状态: ${status.isOnline ? '✅ 在线' : '❌ 离线'}`);
+            log('sync-results', `  - 同步队列: ${status.queueSize} 个操作待同步`);
+            log('sync-results', `  - 最后同步: ${status.lastSync || '从未同步'}`);
+        }
+        
+        // 开始状态监控
+        function startStatusMonitoring() {
+            statusInterval = setInterval(() => {
+                const status = dataManager.getSyncStatus();
+                const statusElement = document.getElementById('sync-status');
+                
+                if (status.isOnline) {
+                    statusElement.className = 'status success';
+                    statusElement.textContent = `🟢 已连接云端 | 队列: ${status.queueSize} 个操作`;
+                } else {
+                    statusElement.className = 'status warning';
+                    statusElement.textContent = `🟡 离线模式 | 队列: ${status.queueSize} 个操作待同步`;
+                }
+            }, 2000);
+        }
+        
+        // 清空云端数据
+        async function clearAllData() {
+            if (!confirm('⚠️ 确定要清空所有云端数据吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            log('sync-results', '🗑️ 开始清空云端数据...');
+            try {
+                // 注意：这里只是演示，实际生产环境中不应该提供这个功能
+                log('sync-results', '⚠️ 此功能仅用于测试，生产环境不应使用');
+                // 可以在这里添加清空数据的逻辑
+            } catch (error) {
+                log('sync-results', '❌ 清空数据失败: ' + error.message, true);
+            }
+        }
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+            }
+        });
+    </script>
+</body>
+</html> 

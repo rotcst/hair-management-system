@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>MAKE IT HAIR Professional - 管理系统</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <!-- SheetJS库用于处理Excel文件 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Firebase配置 -->
-    <script src="firebase-config.js"></script>
-    <!-- Firebase数据管理器 -->
-    <script src="firebase-data-manager.js"></script>
+    
+    <!-- Firebase SDK - 用于云端数据同步 -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --gold: #D4AF37;
@@ -20,53 +16,56 @@
             --black: #000000;
             --dark-gray: #1a1a1a;
             --text-light: #ffffff;
-            --text-muted: #cccccc;
-            --border-color: #444444;
-            --hover-bg: rgba(212, 175, 55, 0.1);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-border: #555555;
-            --table-border: #555555;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --error-color: #dc3545;
         }
-
-        /* 白天模式变量 */
-        :root[data-theme="light"] {
+        
+        /* 浅色模式变量 */
+        body.light-theme {
             --gold: #B8860B;
             --gold-light: #DAA520;
-            --black: #ffffff;
+            --black: #f8f9fa;
             --dark-gray: #f5f5f5;
-            --text-light: #333333;
-            --text-muted: #666666;
-            --border-color: #e0e0e0;
-            --hover-bg: rgba(184, 134, 11, 0.1);
-            --input-bg: #ffffff;
-            --input-border: #cccccc;
-            --table-border: #e0e0e0;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --error-color: #dc3545;
+            --text-light: #212529;
         }
-
-        /* 自动模式：根据系统偏好设置 */
-        @media (prefers-color-scheme: light) {
-            :root[data-theme="auto"] {
-                --gold: #B8860B;
-                --gold-light: #DAA520;
-                --black: #ffffff;
-                --dark-gray: #f5f5f5;
-                --text-light: #333333;
-                --text-muted: #666666;
-                --border-color: #e0e0e0;
-                --hover-bg: rgba(184, 134, 11, 0.1);
-                --input-bg: #ffffff;
-                --input-border: #cccccc;
-                --table-border: #e0e0e0;
-                --success-color: #28a745;
-                --warning-color: #ffc107;
-                --error-color: #dc3545;
-            }
+        
+        /* 浅色模式特定样式 */
+        body.light-theme .menu-item {
+            background: #ffffff;
+            border: 1px solid var(--gold);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        body.light-theme .menu-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        body.light-theme .content-area {
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        body.light-theme .top-nav .store-info,
+        body.light-theme .top-nav .user-info,
+        body.light-theme .top-nav .language-switcher {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        body.light-theme input,
+        body.light-theme select,
+        body.light-theme textarea {
+            background: #ffffff !important;
+            border-color: var(--gold) !important;
+            color: var(--text-light) !important;
+        }
+        
+        body.light-theme .submenu-item {
+            background: rgba(184, 134, 11, 0.1);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+        }
+        
+        body.light-theme .submenu-item:hover {
+            background: rgba(184, 134, 11, 0.2);
         }
         
         body {
@@ -368,46 +367,6 @@
             color: var(--black);
             font-weight: bold;
         }
-
-        /* 主题切换样式 */
-        .theme-switcher {
-            display: flex;
-            gap: 5px;
-            background: var(--dark-gray);
-            padding: 8px 15px;
-            border-radius: 8px;
-            height: 40px;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        
-        .theme-btn {
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid var(--gold);
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-            min-width: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .theme-btn:hover {
-            background: var(--gold);
-            color: var(--black);
-            transform: scale(1.1);
-        }
-        
-        .theme-btn.active {
-            background: var(--gold);
-            color: var(--black);
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
-        }
         
         /* 隐藏数字输入框的上下调节按钮 */
         input[type="number"]::-webkit-outer-spin-button,
@@ -558,10 +517,10 @@
             </div>
             
             <!-- 主题切换器 -->
-            <div class="theme-switcher">
-                <button class="theme-btn" onclick="switchTheme('light')" id="btn-light" title="白天模式">☀️</button>
-                <button class="theme-btn active" onclick="switchTheme('dark')" id="btn-dark" title="黑夜模式">🌙</button>
-                <button class="theme-btn" onclick="switchTheme('auto')" id="btn-auto" title="自动模式">🔄</button>
+            <div class="theme-switcher" style="margin-right: 15px;">
+                <button id="theme-toggle" onclick="toggleTheme()" style="background: none; border: 2px solid var(--gold); color: var(--gold); padding: 6px 10px; border-radius: 20px; cursor: pointer; font-size: 1.2em; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" title="切换深浅色模式">
+                    <span id="theme-icon">🌙</span>
+                </button>
             </div>
             
             <!-- 语言切换器 -->
@@ -572,7 +531,7 @@
         </div>
     </div>
     
-    <div class="container">
+    <div class="container" style="margin-top: 80px;">
         <div class="header">
             <div class="logo" onclick="goToHomePage()" title="点击返回首页">M</div>
             <div class="subtitle">MAKE IT HAIR Professional</div>
@@ -735,7 +694,7 @@
                     <h3 style="color: var(--gold); margin: 0 0 15px 0;" data-i18n="bank-account-info">银行账户信息</h3>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeBankName" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="bank-name">银行名称：</label>
-                        <input type="text" id="employeeBankName" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="">
+                        <input type="text" id="employeeBankName" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="例：中国银行">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeAccountNumber" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="account-number">银行账号：</label>
@@ -743,7 +702,7 @@
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeAccountHolder" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="account-holder">账户持有人：</label>
-                        <input type="text" id="employeeAccountHolder" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="">
+                        <input type="text" id="employeeAccountHolder" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="默认使用职员姓名">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label for="employeeBankBranch" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="bank-branch">开户支行（选填）：</label>
@@ -811,8 +770,23 @@
                 <div id="file-preview" style="margin-top: 20px; display: none;">
                     <h4 style="color: #87CEEB;" data-i18n="preview-data">数据预览：</h4>
                     <div id="preview-table" style="max-height: 300px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
+                    
+                    <!-- 批量创建进度条 -->
+                    <div id="batch-progress-container" style="display: none; margin: 15px 0; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="color: var(--gold); font-weight: bold;" id="batch-progress-text">正在创建沙龙...</span>
+                            <span style="color: var(--text-light);" id="batch-progress-count">0/0</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); height: 20px; border-radius: 10px; overflow: hidden; margin-bottom: 10px;">
+                            <div id="batch-progress-bar" style="height: 100%; background: linear-gradient(90deg, var(--gold), #FFD700); width: 0%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: center;">
+                                <span id="batch-progress-percent" style="color: var(--black); font-weight: bold; font-size: 0.8em;">0%</span>
+                            </div>
+                        </div>
+                        <div style="color: #cccccc; font-size: 0.9em;" id="batch-progress-status">准备开始...</div>
+                    </div>
+                    
                     <div style="display: flex; gap: 10px;">
-                        <button type="button" onclick="confirmBatchCreate()" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="confirm-batch-create">确认批量创建</button>
+                        <button type="button" id="confirm-batch-btn" onclick="confirmBatchCreate()" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="confirm-batch-create">确认批量创建</button>
                         <button type="button" onclick="cancelBatchUpload()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="cancel">取消</button>
                     </div>
                 </div>
@@ -824,12 +798,12 @@
                     <input type="text" id="salonName" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
                 </div>
                 <div style="margin-bottom: 20px;">
-                                                <label for="salonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
-                            <input type="text" id="salonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label for="businessLicense" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="business-license">营业执照号：</label>
-                            <input type="text" id="businessLicense" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="000-00-00000" oninput="formatBusinessLicense(this)">
+                    <label for="salonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
+                    <input type="text" id="salonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="businessLicense" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="business-license">营业执照号码：</label>
+                    <input type="text" id="businessLicense" maxlength="14" oninput="formatBusinessLicense(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;" placeholder="000-00-00000">
                 </div>
                 <div style="margin-bottom: 20px;">
                     <label for="salonDistrict" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-district">沙龙区域：</label>
@@ -1288,7 +1262,7 @@
                     
                     <div style="margin-bottom: 20px;">
                         <label for="editEmployeePassword" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="employee-password">密码：</label>
-                        <input type="password" id="editEmployeePassword" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="">
+                        <input type="password" id="editEmployeePassword" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="留空则不修改密码">
                     </div>
                     
                     <div style="margin-bottom: 20px;">
@@ -1338,12 +1312,8 @@
                     </div>
                     
                     <div style="margin-bottom: 20px;">
-                                                    <label for="editSalonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
-                            <input type="text" id="editSalonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label for="editBusinessLicense" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="business-license">营业执照号：</label>
-                            <input type="text" id="editBusinessLicense" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="000-00-00000" oninput="formatBusinessLicense(this)">
+                        <label for="editSalonAddress" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="salon-address">沙龙地址：</label>
+                        <input type="text" id="editSalonAddress" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                     </div>
                     
                     <div style="margin-bottom: 20px;">
@@ -1433,17 +1403,25 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="received-amount">实收款：</label>
-                            <input type="text" id="receivedAmount" oninput="formatReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="receivedAmount" placeholder="0,000" oninput="formatReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                         </div>
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="current-outstanding">本次欠款：</label>
-                            <input type="text" id="currentOutstanding" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="currentOutstanding" placeholder="0,000" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
                         </div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="notes">备注（选填）：</label>
-                        <textarea id="transactionNotes" placeholder="" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
+                        <textarea id="transactionNotes" placeholder="其他备注信息..." style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <!-- 产品历史交易记录 -->
+                    <div id="product-history-section" style="margin-bottom: 15px; display: none;">
+                        <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-history">产品历史交易记录：</label>
+                        <div id="product-history-display" style="max-height: 120px; overflow-y: auto; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 5px; padding: 10px;">
+                            <!-- 历史记录将在这里显示 -->
+                        </div>
                     </div>
                     
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -1502,17 +1480,17 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="received-amount">实收款：</label>
-                            <input type="text" id="editReceivedAmount" oninput="formatEditReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="editReceivedAmount" placeholder="0,000" oninput="formatEditReceivedAmountAndCalculate(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                         </div>
                         <div>
                             <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="current-outstanding">本次欠款：</label>
-                            <input type="text" id="editCurrentOutstanding" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
+                            <input type="text" id="editCurrentOutstanding" placeholder="0,000" readonly style="width: 100%; padding: 10px; background: rgba(100,100,100,0.3); border: 1px solid var(--gold); color: #888; border-radius: 5px; box-sizing: border-box;">
                         </div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="notes">备注（选填）：</label>
-                        <textarea id="editTransactionNotes" placeholder="" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
+                        <textarea id="editTransactionNotes" placeholder="其他备注信息..." style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 50px; resize: vertical;"></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -1887,6 +1865,8 @@
                 'no-salesperson-salons': '您还没有负责的沙龙',
                 'salesperson-salon-tip': '当您在沙龙中产生交易记录后，该沙龙就会出现在这里',
                 'responsible-employee': '负责职员',
+                'business-license': '营业执照号码',
+                'product-history': '产品历史交易记录',
                 'please-select-employee': '请选择职员...',
                 'approval-required': '操作需要管理员审批',
                 'approval-submitted': '操作已提交，等待管理员审批',
@@ -1955,42 +1935,7 @@
                 'jump': '跳转',
                 'invalid-page-number': '无效的页码！请输入1到{max}之间的数字。',
                 // 操作描述
-                'batch-assign-description': '批量指定负责人：将{salons}（共{count}个沙龙）的负责人设为{employee}',
-                // 新增的翻译
-                'excel-library-loading': 'Excel处理库尚未加载完成，请稍后再试！',
-                'bank-name-placeholder': '例：中国银行',
-                'account-holder-placeholder': '默认使用职员姓名',
-                'password-edit-placeholder': '留空则不修改密码',
-                'transaction-notes-placeholder': '其他备注信息...',
-                'product-name-placeholder': '产品名称',
-                'amount-placeholder': '0,000',
-                'received-amount-placeholder': '0,000',
-                'current-outstanding-placeholder': '0,000',
-                // 白天/黑夜模式相关
-                'theme-toggle': '主题切换',
-                'light-mode': '白天模式',
-                'dark-mode': '黑夜模式',
-                'auto-mode': '自动模式',
-                // 新增的console信息翻译
-                'network-connected': '网络已连接，开始同步数据...',
-                'network-disconnected': '网络已断开，启用离线模式...',
-                'system-preference': '系统偏好',
-                'system-theme-changed': '系统主题已变更为',
-                'firebase-status-indicator-started': 'Firebase状态指示器已启动',
-                'exists': '存在',
-                'network-status': '网络状态',
-                'firebase-data-manager-started': 'Firebase数据管理器已启动 - 支持实时数据同步！',
-                'current-login-user': '当前登录用户',
-                'permission': '权限',
-                'cloud-database-connected': '已连接云端数据库',
-                'offline-mode-with-pending': '离线模式 ({count}个操作待同步)',
-                'business-license': '营业执照号',
-                'batch-assign-responsible': '批量分配负责人',
-                'select-all': '全选',
-                'assign-to': '分配给',
-                'assign-selected': '分配选中项',
-                'please-select-items': '请先选择要分配的项目',
-                'batch-assign-success': '已成功为 {count} 个沙龙分配负责人'
+                'batch-assign-description': '批量指定负责人：将{salons}（共{count}个沙龙）的负责人设为{employee}'
             },
             ko: {
                 // 시스템 정보
@@ -2418,42 +2363,7 @@
                 'jump': '이동',
                 'invalid-page-number': '잘못된 페이지 번호입니다! 1부터 {max}까지의 숫자를 입력해주세요.',
                 // 작업 설명
-                'batch-assign-description': '일괄 담당자 지정: {salons}(총 {count}개 살롱)의 담당자를 {employee}로 설정',
-                // 새로 추가된 번역
-                'excel-library-loading': 'Excel 처리 라이브러리가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요!',
-                'bank-name-placeholder': '예: 중국은행',
-                'account-holder-placeholder': '기본적으로 직원 이름 사용',
-                'password-edit-placeholder': '비어두면 비밀번호 변경 안함',
-                'transaction-notes-placeholder': '기타 비고 정보...',
-                'product-name-placeholder': '제품명',
-                'amount-placeholder': '0,000',
-                'received-amount-placeholder': '0,000',
-                'current-outstanding-placeholder': '0,000',
-                // 낮/밤 모드 관련
-                'theme-toggle': '테마 전환',
-                'light-mode': '낮 모드',
-                'dark-mode': '밤 모드',
-                'auto-mode': '자동 모드',
-                // 새로운 콘솔 정보 번역
-                'network-connected': '네트워크가 연결되었습니다. 데이터 동기화를 시작합니다...',
-                'network-disconnected': '네트워크가 끊어졌습니다. 오프라인 모드를 활성화합니다...',
-                'system-preference': '시스템 환경설정',
-                'system-theme-changed': '시스템 테마가 변경되었습니다',
-                'firebase-status-indicator-started': 'Firebase 상태 표시기가 시작되었습니다',
-                'exists': '존재',
-                'network-status': '네트워크 상태',
-                'firebase-data-manager-started': 'Firebase 데이터 관리자가 시작되었습니다 - 실시간 데이터 동기화 지원!',
-                'current-login-user': '현재 로그인 사용자',
-                'permission': '권한',
-                'cloud-database-connected': '클라우드 데이터베이스에 연결됨',
-                'offline-mode-with-pending': '오프라인 모드 ({count}개 작업 동기화 대기 중)',
-                'business-license': '영업등록번호',
-                'batch-assign-responsible': '일괄 담당자 지정',
-                'select-all': '전체 선택',
-                'assign-to': '지정',
-                'assign-selected': '선택된 항목 지정',
-                'please-select-items': '지정할 항목을 먼저 선택하세요',
-                'batch-assign-success': '{count}개 살롱에 담당자를 성공적으로 지정했습니다'
+                'batch-assign-description': '일괄 담당자 지정: {salons}(총 {count}개 살롱)의 담당자를 {employee}로 설정'
             }
         };
         
@@ -2480,52 +2390,8 @@
             // 更新日期输入框的语言设置
             updateDateInputLanguages(lang);
             
-            // 更新placeholder文本
-            updatePlaceholders();
-            
-            // 更新主题工具提示
-            updateThemeTooltips();
-            
             // 重新渲染当前活跃的页面内容
             refreshCurrentPageContent();
-        }
-        
-        // 更新所有placeholder文本
-        function updatePlaceholders() {
-            // 更新静态placeholder
-            const bankNameInput = document.getElementById('employeeBankName');
-            if (bankNameInput) bankNameInput.placeholder = getText('bank-name-placeholder');
-            
-            const accountHolderInput = document.getElementById('employeeAccountHolder');
-            if (accountHolderInput) accountHolderInput.placeholder = getText('account-holder-placeholder');
-            
-            const editPasswordInput = document.getElementById('editEmployeePassword');
-            if (editPasswordInput) editPasswordInput.placeholder = getText('password-edit-placeholder');
-            
-            const transactionNotesInput = document.getElementById('transactionNotes');
-            if (transactionNotesInput) transactionNotesInput.placeholder = getText('transaction-notes-placeholder');
-            
-            const editTransactionNotesInput = document.getElementById('editTransactionNotes');
-            if (editTransactionNotesInput) editTransactionNotesInput.placeholder = getText('transaction-notes-placeholder');
-            
-            // 更新搜索框placeholder
-            const searchInputs = document.querySelectorAll('#salon-search, #delete-salon-search');
-            searchInputs.forEach(input => {
-                if (input) input.placeholder = getText('search-salon-placeholder');
-            });
-            
-            // 更新金额输入框placeholder
-            const receivedAmountInput = document.getElementById('receivedAmount');
-            if (receivedAmountInput) receivedAmountInput.placeholder = getText('received-amount-placeholder');
-            
-            const currentOutstandingInput = document.getElementById('currentOutstanding');
-            if (currentOutstandingInput) currentOutstandingInput.placeholder = getText('current-outstanding-placeholder');
-            
-            const editReceivedAmountInput = document.getElementById('editReceivedAmount');
-            if (editReceivedAmountInput) editReceivedAmountInput.placeholder = getText('received-amount-placeholder');
-            
-            const editCurrentOutstandingInput = document.getElementById('editCurrentOutstanding');
-            if (editCurrentOutstandingInput) editCurrentOutstandingInput.placeholder = getText('current-outstanding-placeholder');
         }
         
         // 更新日期输入框的语言设置
@@ -2651,25 +2517,25 @@
         }
         
         // 刷新当前页面内容
-        function refreshCurrentPageContent() {
+        async function refreshCurrentPageContent() {
             // 检查当前激活的页面并重新渲染
             const activePages = document.querySelectorAll('.content-area.active');
             
-            activePages.forEach(page => {
+            for (const page of activePages) {
                 const pageId = page.id;
                 
                 switch(pageId) {
                     case 'employee-list':
-                        displayEmployeeList();
+                        await displayEmployeeList();
                         break;
                     case 'salon-info':
-                        displaySalonList(null, 1); // 初始化时显示第一页
+                        await displaySalonList(null, 1); // 初始化时显示第一页
                         break;
                     case 'delete-salon':
-                        updateDeleteSalonOptions();
+                        await updateDeleteSalonOptions();
                         break;
                     case 'delete-employee':
-                        updateDeleteEmployeeOptions();
+                        await updateDeleteEmployeeOptions();
                         break;
                     case 'transaction-list':
                         if (currentViewingSalonId) {
@@ -2701,10 +2567,10 @@
                         }
                         break;
                 }
-            });
+            }
             
             // 更新模态框中的选项（如果有打开的模态框）
-            updateModalOptions();
+            await updateModalOptions();
             
             // 重新初始化日期输入框
             setTimeout(() => {
@@ -2713,29 +2579,29 @@
         }
         
         // 更新模态框选项
-        function updateModalOptions() {
+        async function updateModalOptions() {
             // 检查并更新新增沙龙模态框
             const newSalonModal = document.getElementById('newSalonForm');
             if (newSalonModal && newSalonModal.closest('.content-area').classList.contains('active')) {
-                updateResponsibleEmployeeOptions();
+                await updateResponsibleEmployeeOptions();
             }
             
             // 检查并更新编辑沙龙模态框
             const editSalonModal = document.getElementById('editSalonModal');
             if (editSalonModal && editSalonModal.style.display === 'flex') {
-                updateEditResponsibleEmployeeOptions();
+                await updateEditResponsibleEmployeeOptions();
             }
             
             // 检查并更新交易模态框
             const transactionModal = document.getElementById('transactionModal');
             if (transactionModal && transactionModal.style.display === 'flex') {
-                updateSalespersonOptions();
+                await updateSalespersonOptions();
             }
             
             // 检查并更新编辑交易模态框
             const editTransactionModal = document.getElementById('editTransactionModal');
             if (editTransactionModal && editTransactionModal.style.display === 'flex') {
-                updateEditSalespersonOptions();
+                await updateEditSalespersonOptions();
             }
         }
         
@@ -2852,26 +2718,6 @@
             }
         }
         
-        // 营业执照号格式化函数
-        function formatBusinessLicense(input) {
-            // 获取输入的值，只保留数字
-            let value = input.value.replace(/[^0-9]/g, '');
-            
-            // 限制最大长度为10位数字
-            if (value.length > 10) {
-                value = value.substring(0, 10);
-            }
-            
-            // 格式化为 000-00-00000
-            if (value.length >= 6) {
-                value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5);
-            } else if (value.length >= 4) {
-                value = value.substring(0, 3) + '-' + value.substring(3);
-            }
-            
-            input.value = value;
-        }
-        
         // 페이지 로드 시 저장된 언어 불러오기
         document.addEventListener('DOMContentLoaded', function() {
             const savedLanguage = localStorage.getItem('language') || 'zh';
@@ -2883,6 +2729,9 @@
                 // 初始化日期输入框的语言设置
                 updateDateInputLanguages('zh');
             }
+            
+            // 初始化主题
+            initializeTheme();
             
             // 初始化日期输入框
             initializeDateInputs();
@@ -2904,184 +2753,189 @@
             initializeFileUpload();
         });
         
-        // Firebase数据管理器 - 实现云端数据同步
-        class FirebaseDataManager {
-            constructor() {
-                this.isOnline = navigator.onLine;
-                this.syncQueue = [];
-                
-                window.addEventListener('online', () => {
-                    this.isOnline = true;
-                    this.processSyncQueue();
-                    console.log(getText('network-connected'));
-                });
-                
-                window.addEventListener('offline', () => {
-                    this.isOnline = false;
-                    console.log(getText('network-disconnected'));
-                });
-            }
-
-            async processSyncQueue() {
-                while (this.syncQueue.length > 0) {
-                    const operation = this.syncQueue.shift();
-                    try {
-                        await operation();
-                    } catch (error) {
-                        console.error('同步操作失败:', error);
-                        this.syncQueue.unshift(operation);
-                        break;
-                    }
-                }
-            }
-
-            getSyncStatus() {
-                const hasFirebase = window.firebase && window.db;
-                const isOnline = navigator.onLine && hasFirebase;
-                
-                return {
-                    isOnline: isOnline,
-                    pendingSync: this.syncQueue.length,
-                    message: isOnline ? getText('cloud-database-connected') : getText('offline-mode-with-pending').replace('{count}', this.syncQueue.length)
-                };
-            }
-        }
-
-        // 创建全局数据管理器实例
-        const firebaseDataManager = new FirebaseDataManager();
-        window.firebaseDataManager = firebaseDataManager;
-
-        // 等待Firebase初始化完成后添加状态指示器
-        setTimeout(() => {
-            addSyncStatusIndicator();
-        }, 3000);
-
-        // 添加连接状态指示器
-        function addSyncStatusIndicator() {
-            const indicator = document.createElement('div');
-            indicator.id = 'sync-status';
-            indicator.style.cssText = `
-                position: fixed;
-                top: 70px;
-                right: 20px;
-                padding: 8px 12px;
-                border-radius: 6px;
-                font-size: 0.8em;
-                z-index: 1001;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            `;
-            
-            function updateStatus() {
-                const status = firebaseDataManager.getSyncStatus();
-                indicator.textContent = status.message;
-                
-                if (status.isOnline) {
-                    indicator.style.background = 'var(--success-color)';
-                    indicator.style.color = 'var(--black)';
-                    indicator.style.border = '1px solid var(--success-color)';
-                } else {
-                    indicator.style.background = 'var(--warning-color)';
-                    indicator.style.color = 'var(--black)';
-                    indicator.style.border = '1px solid var(--warning-color)';
-                }
-            }
-            
-            updateStatus();
-            setInterval(updateStatus, 3000);
-            
-            console.log(getText('firebase-status-indicator-started'));
-            console.log('window.firebase' + getText('exists') + ':', !!window.firebase);
-            console.log('window.db' + getText('exists') + ':', !!window.db);
-            console.log(getText('network-status') + ':', navigator.onLine);
-            
-            document.body.appendChild(indicator);
-        }
-
-        console.log('🔥 ' + getText('firebase-data-manager-started'));
-        
-        // 主题管理系统
-        let currentTheme = 'dark'; // 默认为黑夜模式
-        
-        // 主题切换函数
-        function switchTheme(theme) {
-            currentTheme = theme;
-            localStorage.setItem('theme', theme);
-            
-            // 更新按钮活跃状态
-            document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById('btn-' + theme).classList.add('active');
-            
-            // 应用主题
-            applyTheme(theme);
-            
-            // 更新工具提示
-            updateThemeTooltips();
-            
-            // 更新placeholder文本
-            updatePlaceholders();
-        }
-        
-        // 应用主题
-        function applyTheme(theme) {
-            const root = document.documentElement;
-            root.setAttribute('data-theme', theme);
-            
-            // 如果是自动模式，添加媒体查询监听
-            if (theme === 'auto') {
-                // 立即检查系统偏好
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                console.log(getText('system-preference') + ':', prefersDark ? getText('dark-mode') : getText('light-mode'));
-                
-                // 监听系统主题变化
-                if (!window.themeMediaQuery) {
-                    window.themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                    window.themeMediaQuery.addListener((e) => {
-                        if (currentTheme === 'auto') {
-                            console.log(getText('system-theme-changed') + ':', e.matches ? getText('dark-mode') : getText('light-mode'));
-                        }
-                    });
-                }
-            }
-        }
-        
-        // 更新主题工具提示
-        function updateThemeTooltips() {
-            const lightBtn = document.getElementById('btn-light');
-            const darkBtn = document.getElementById('btn-dark');
-            const autoBtn = document.getElementById('btn-auto');
-            
-            if (lightBtn) lightBtn.title = getText('light-mode');
-            if (darkBtn) darkBtn.title = getText('dark-mode');
-            if (autoBtn) autoBtn.title = getText('auto-mode');
-        }
-        
-        // 初始化主题系统
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                currentTheme = savedTheme;
-            } else {
-                // 首次访问，检测系统偏好
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                currentTheme = prefersDark ? 'dark' : 'light';
-            }
-            
-            switchTheme(currentTheme);
-        }
-        
-        // 页面加载完成后初始化主题
-        window.addEventListener('load', () => {
-            initializeTheme();
-        });
-        
         // 다국어 텍스트 가져오기 함수
         function getText(key) {
             return translations[currentLanguage] && translations[currentLanguage][key] 
                 ? translations[currentLanguage][key] 
                 : key;
+        }
+        
+        // ==================== 主题切换功能 ====================
+        
+        // 检测系统主题偏好
+        function getSystemTheme() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                return 'light';
+            }
+            return 'dark';
+        }
+        
+        // 获取当前主题
+        function getCurrentTheme() {
+            return localStorage.getItem('theme') || getSystemTheme();
+        }
+        
+        // 应用主题
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+                themeIcon.textContent = '☀️';
+            } else {
+                body.classList.remove('light-theme');
+                themeIcon.textContent = '🌙';
+            }
+            
+            localStorage.setItem('theme', theme);
+        }
+        
+        // 切换主题
+        function toggleTheme() {
+            const currentTheme = getCurrentTheme();
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+        }
+        
+        // 监听系统主题变化
+        function initializeTheme() {
+            const savedTheme = getCurrentTheme();
+            applyTheme(savedTheme);
+            
+            // 监听系统主题变化（如果用户没有手动设置过）
+            if (!localStorage.getItem('theme')) {
+                window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+                    const systemTheme = e.matches ? 'light' : 'dark';
+                    applyTheme(systemTheme);
+                });
+            }
+        }
+        
+        // ==================== 营业执照号码格式化 ====================
+        
+        // 格式化营业执照号码为 000-00-00000 格式
+        function formatBusinessLicense(input) {
+            // 移除所有非数字字符
+            let value = input.value.replace(/\D/g, '');
+            
+            // 限制最多11位数字
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            
+            // 添加格式化
+            if (value.length > 5) {
+                value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5);
+            } else if (value.length > 3) {
+                value = value.substring(0, 3) + '-' + value.substring(3);
+            }
+            
+            input.value = value;
+        }
+        
+        // ==================== 产品历史记录检查 ====================
+        
+        // 检查产品历史交易记录
+        async function checkProductHistory(input) {
+            const productName = input.value.trim();
+            const historySection = document.getElementById('product-history-section');
+            const historyDisplay = document.getElementById('product-history-display');
+            
+            if (!productName || productName.length < 2) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            // 获取当前沙龙ID
+            if (!currentSalonId) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            // 获取沙龙数据
+            const salons = await getSalons();
+            const salon = salons.find(s => s.id === currentSalonId);
+            
+            if (!salon || !salon.transactions || salon.transactions.length === 0) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            // 查找包含相同产品的历史交易
+            const matchingTransactions = [];
+            salon.transactions.forEach(transaction => {
+                if (transaction.products && transaction.products.length > 0) {
+                    const matchingProducts = transaction.products.filter(product => 
+                        product.name && product.name.toLowerCase().includes(productName.toLowerCase())
+                    );
+                    
+                    if (matchingProducts.length > 0) {
+                        matchingTransactions.push({
+                            transaction: transaction,
+                            products: matchingProducts
+                        });
+                    }
+                }
+            });
+            
+            if (matchingTransactions.length === 0) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            // 显示历史记录
+            displayProductHistory(matchingTransactions, productName);
+            historySection.style.display = 'block';
+        }
+        
+        // 显示产品历史记录
+        function displayProductHistory(matchingTransactions, searchProductName) {
+            const historyDisplay = document.getElementById('product-history-display');
+            
+            if (matchingTransactions.length === 0) {
+                historyDisplay.innerHTML = `<p style="color: #cccccc; margin: 0;">未找到相关产品的历史交易记录</p>`;
+                return;
+            }
+            
+            // 按交易时间排序，最新的在前面
+            matchingTransactions.sort((a, b) => new Date(b.transaction.date) - new Date(a.transaction.date));
+            
+            let html = `<div style="margin-bottom: 8px; color: var(--gold); font-weight: bold;">产品"${searchProductName}"的历史交易记录：</div>`;
+            
+            // 只显示最近的3条记录
+            const recentTransactions = matchingTransactions.slice(0, 3);
+            
+            recentTransactions.forEach((item, index) => {
+                const transaction = item.transaction;
+                const products = item.products;
+                const transactionDate = new Date(transaction.date);
+                const daysSince = Math.floor((new Date() - transactionDate) / (1000 * 60 * 60 * 24));
+                
+                html += `<div style="background: rgba(0,0,0,0.2); padding: 8px; margin: 5px 0; border-radius: 3px; border: 1px solid rgba(212, 175, 55, 0.2);">`;
+                html += `<div style="color: #87CEEB; font-size: 0.9em; margin-bottom: 5px;">距上次交易：${daysSince}天前 (${transactionDate.toLocaleDateString()})</div>`;
+                
+                products.forEach(product => {
+                    html += `<div style="color: #cccccc; font-size: 0.9em;">`;
+                    html += `${product.name} - 单价: ${formatCurrency(product.unitPrice || 0)} - 数量: ${product.quantity || 0}`;
+                    if (product.giftQuantity && product.giftQuantity > 0) {
+                        html += ` - 赠送: ${product.giftQuantity}`;
+                    }
+                    html += ` - 金额: ${formatCurrency(product.totalAmount || 0)}`;
+                    html += `</div>`;
+                });
+                
+                if (transaction.salesperson) {
+                    html += `<div style="color: #aaa; font-size: 0.8em; margin-top: 3px;">业务员：${transaction.salesperson}</div>`;
+                }
+                html += `</div>`;
+            });
+            
+            if (matchingTransactions.length > 3) {
+                html += `<div style="text-align: center; color: #aaa; font-size: 0.8em; margin-top: 5px;">还有 ${matchingTransactions.length - 3} 条相关记录...</div>`;
+            }
+            
+            historyDisplay.innerHTML = html;
         }
         
         // 初始化文件上传控件
@@ -3122,78 +2976,39 @@
             return getText(district + '-district');
         }
         
-        // 살롱 데이터 관리
+        // 살롱 데이터 관리 - 云端同步版本
         async function getSalons() {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    return await dataManager.getSalons();
-                } else {
-                    // 回退到localStorage
-                    const salons = localStorage.getItem('salons');
-                    return salons ? JSON.parse(salons) : [];
-                }
-            } catch (error) {
-                console.error('获取沙龙数据失败:', error);
-                // 回退到localStorage
-                const salons = localStorage.getItem('salons');
-                return salons ? JSON.parse(salons) : [];
-            }
+            return await cloudDataManager.getSalons();
         }
         
         async function saveSalons(salons) {
-            try {
-                // 清除所有沙龙的缓存数据，确保下次计算时使用最新数据
-                salons.forEach(salon => {
-                    delete salon._cachedTotalOutstanding;
-                    delete salon._lastCalculatedTime;
-                    delete salon._cachedOutstandingMonths;
-                    delete salon._lastMonthsCalculatedTime;
-                });
-                
-                if (window.dataManager && window.dataManager.db) {
-                    // 保存到Firebase
-                    for (const salon of salons) {
-                        await dataManager.saveSalon(salon);
-                    }
-                } else {
-                    // 回退到localStorage
-                    localStorage.setItem('salons', JSON.stringify(salons));
-                }
-            } catch (error) {
-                console.error('保存沙龙数据失败:', error);
-                // 回退到localStorage
-                localStorage.setItem('salons', JSON.stringify(salons));
+            // 清除所有沙龙的缓存数据，确保下次计算时使用最新数据
+            salons.forEach(salon => {
+                delete salon._cachedTotalOutstanding;
+                delete salon._lastCalculatedTime;
+                delete salon._cachedOutstandingMonths;
+                delete salon._lastMonthsCalculatedTime;
+            });
+            
+            // 批量保存到云端
+            for (const salon of salons) {
+                await cloudDataManager.saveSalon(salon);
             }
         }
         
         async function addSalon(salon) {
             try {
-                if (!salon.id) {
-                    salon.id = Date.now(); // 简单的ID生成
-                }
-                if (!salon.addTime) {
-                    salon.addTime = new Date().toLocaleString('zh-CN');
-                }
-                if (!salon.joinDate) {
-                    salon.joinDate = new Date(); // 加入日期，用于计算
-                }
-                if (!salon.transactions) {
-                    salon.transactions = []; // 初始化交易记录数组
-                }
-                if (salon.lastTransactionDate === undefined) {
-                    salon.lastTransactionDate = null; // 最后一次交易日期
-                }
+                salon.id = Date.now(); // 简单的ID生成
+                salon.addTime = new Date().toLocaleString('zh-CN');
+                salon.joinDate = new Date(); // 加入日期，用于计算
+                salon.transactions = []; // 初始化交易记录数组
+                salon.lastTransactionDate = null; // 最后一次交易日期
                 
-                if (window.dataManager && window.dataManager.db) {
-                    await dataManager.saveSalon(salon);
-                } else {
-                    const salons = await getSalons();
-                    salons.push(salon);
-                    await saveSalons(salons);
-                }
+                // 直接保存到云端
+                await cloudDataManager.saveSalon(salon);
                 
                 // 记录操作历史
-                await recordOperation(
+                recordOperation(
                     'create', 
                     'salon', 
                     salon.id, 
@@ -3203,86 +3018,52 @@
                     salon
                 );
                 
-                return true;
+                return true; // 成功返回true
             } catch (error) {
-                console.error('添加沙龙失败:', error);
-                return false;
+                console.error('addSalon 失败:', error);
+                return false; // 失败返回false
             }
         }
         
         async function deleteSalon(salonId) {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    const salons = await getSalons();
-                    const salonToDelete = salons.find(salon => salon.id === salonId);
-                    
-                    await dataManager.deleteSalon(salonId);
-                    
-                    // 记录操作历史
-                    if (salonToDelete) {
-                        await recordOperation(
-                            'delete', 
-                            'salon', 
-                            salonToDelete.id, 
-                            salonToDelete.name, 
-                            `删除沙龙：${salonToDelete.name}，院长：${salonToDelete.directorName}`,
-                            salonToDelete,
-                            null
-                        );
-                    }
-                } else {
-                    const salons = await getSalons();
-                    const salonToDelete = salons.find(salon => salon.id === salonId);
-                    const filteredSalons = salons.filter(salon => salon.id !== salonId);
-                    await saveSalons(filteredSalons);
-                    
-                    // 记录操作历史
-                    if (salonToDelete) {
-                        await recordOperation(
-                            'delete', 
-                            'salon', 
-                            salonToDelete.id, 
-                            salonToDelete.name, 
-                            `删除沙龙：${salonToDelete.name}，院长：${salonToDelete.directorName}`,
-                            salonToDelete,
-                            null
-                        );
-                    }
-                }
-                return true;
-            } catch (error) {
-                console.error('删除沙龙失败:', error);
-                return false;
+            const salons = await getSalons();
+            const salonToDelete = salons.find(salon => salon.id === salonId);
+            
+            // 直接从云端删除
+            await cloudDataManager.deleteSalon(salonId);
+            
+            // 记录操作历史
+            if (salonToDelete) {
+                recordOperation(
+                    'delete', 
+                    'salon', 
+                    salonToDelete.id, 
+                    salonToDelete.name, 
+                    `删除沙龙：${salonToDelete.name}，院长：${salonToDelete.directorName}`,
+                    salonToDelete,
+                    null
+                );
             }
         }
         
         async function updateSalon(updatedSalon) {
-            try {
-                const salons = await getSalons();
-                const existingSalon = salons.find(salon => salon.id === updatedSalon.id);
-                
-                if (!existingSalon) {
-                    return false; // 沙龙不存在
-                }
-                
-                const beforeData = JSON.parse(JSON.stringify(existingSalon));
+            const salons = await getSalons();
+            const index = salons.findIndex(salon => salon.id === updatedSalon.id);
+            
+            if (index !== -1) {
+                const beforeData = JSON.parse(JSON.stringify(salons[index]));
                 
                 // 保留原有的创建时间和交易记录
-                updatedSalon.addTime = existingSalon.addTime;
-                updatedSalon.joinDate = existingSalon.joinDate;
-                updatedSalon.transactions = existingSalon.transactions;
-                updatedSalon.lastTransactionDate = existingSalon.lastTransactionDate;
+                updatedSalon.addTime = salons[index].addTime;
+                updatedSalon.joinDate = salons[index].joinDate;
+                updatedSalon.transactions = salons[index].transactions;
+                updatedSalon.lastTransactionDate = salons[index].lastTransactionDate;
                 
-                if (window.dataManager && window.dataManager.db) {
-                    await dataManager.saveSalon(updatedSalon);
-                } else {
-                    const index = salons.findIndex(salon => salon.id === updatedSalon.id);
-                    salons[index] = updatedSalon;
-                    await saveSalons(salons);
-                }
+                // 直接保存到云端
+                await cloudDataManager.saveSalon(updatedSalon);
                 
                 // 记录操作历史
-                await recordOperation(
+                recordOperation(
                     'edit', 
                     'salon', 
                     updatedSalon.id, 
@@ -3293,45 +3074,19 @@
                 );
                 
                 return true;
-            } catch (error) {
-                console.error('更新沙龙失败:', error);
-                return false;
             }
+            return false;
         }
         
-        // 职员数据管理
+        // 职员数据管理 - 云端同步版本
         async function getEmployees() {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    return await dataManager.getEmployees();
-                } else {
-                    // 回退到localStorage
-                    const employees = localStorage.getItem('employees');
-                    return employees ? JSON.parse(employees) : [];
-                }
-            } catch (error) {
-                console.error('获取员工数据失败:', error);
-                // 回退到localStorage
-                const employees = localStorage.getItem('employees');
-                return employees ? JSON.parse(employees) : [];
-            }
+            return await cloudDataManager.getEmployees();
         }
         
         async function saveEmployees(employees) {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    // 保存到Firebase
-                    for (const employee of employees) {
-                        await dataManager.saveEmployee(employee);
-                    }
-                } else {
-                    // 回退到localStorage
-                    localStorage.setItem('employees', JSON.stringify(employees));
-                }
-            } catch (error) {
-                console.error('保存员工数据失败:', error);
-                // 回退到localStorage
-                localStorage.setItem('employees', JSON.stringify(employees));
+            // 批量保存到云端
+            for (const employee of employees) {
+                await cloudDataManager.saveEmployee(employee);
             }
         }
         
@@ -3343,119 +3098,73 @@
                 return false; // 用户名已存在
             }
             
-            if (!employee.id) {
-                employee.id = Date.now();
-            }
-            if (!employee.createTime) {
-                employee.createTime = new Date().toLocaleString('zh-CN');
-            }
+            employee.id = Date.now();
+            employee.createTime = new Date().toLocaleString('zh-CN');
             
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    await dataManager.saveEmployee(employee);
-                } else {
-                    employees.push(employee);
-                    await saveEmployees(employees);
-                }
-                
-                // 记录操作历史
-                await recordOperation(
-                    'create', 
-                    'employee', 
-                    employee.id, 
-                    employee.name, 
-                    `创建新职员：${employee.name}，职位：${employee.position}`,
-                    null,
-                    employee
-                );
-                
-                return true;
-            } catch (error) {
-                console.error('添加员工失败:', error);
-                return false;
-            }
+            // 直接保存到云端
+            await cloudDataManager.saveEmployee(employee);
+            
+            // 记录操作历史
+            recordOperation(
+                'create', 
+                'employee', 
+                employee.id, 
+                employee.name, 
+                `创建新职员：${employee.name}，职位：${employee.position}`,
+                null,
+                employee
+            );
+            
+            return true;
         }
         
         async function deleteEmployee(employeeId) {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    const employees = await getEmployees();
-                    const employeeToDelete = employees.find(employee => employee.id === employeeId);
-                    
-                    await dataManager.deleteEmployee(employeeId);
-                    
-                    // 记录操作历史
-                    if (employeeToDelete) {
-                        await recordOperation(
-                            'delete', 
-                            'employee', 
-                            employeeToDelete.id, 
-                            employeeToDelete.name, 
-                            `删除职员：${employeeToDelete.name}，职位：${employeeToDelete.position}`,
-                            employeeToDelete,
-                            null
-                        );
-                    }
-                } else {
-                    const employees = await getEmployees();
-                    const employeeToDelete = employees.find(employee => employee.id === employeeId);
-                    const filteredEmployees = employees.filter(employee => employee.id !== employeeId);
-                    await saveEmployees(filteredEmployees);
-                    
-                    // 记录操作历史
-                    if (employeeToDelete) {
-                        await recordOperation(
-                            'delete', 
-                            'employee', 
-                            employeeToDelete.id, 
-                            employeeToDelete.name, 
-                            `删除职员：${employeeToDelete.name}，职位：${employeeToDelete.position}`,
-                            employeeToDelete,
-                            null
-                        );
-                    }
-                }
-            } catch (error) {
-                console.error('删除员工失败:', error);
-                throw error;
+            const employees = await getEmployees();
+            const employeeToDelete = employees.find(employee => employee.id === employeeId);
+            
+            // 直接从云端删除
+            await cloudDataManager.deleteEmployee(employeeId);
+            
+            // 记录操作历史
+            if (employeeToDelete) {
+                recordOperation(
+                    'delete', 
+                    'employee', 
+                    employeeToDelete.id, 
+                    employeeToDelete.name, 
+                    `删除职员：${employeeToDelete.name}，职位：${employeeToDelete.position}`,
+                    employeeToDelete,
+                    null
+                );
             }
         }
         
         async function updateEmployee(updatedEmployee) {
-            try {
-                const employees = await getEmployees();
-                const existingEmployee = employees.find(emp => emp.id === updatedEmployee.id);
-                
-                if (!existingEmployee) {
-                    return false; // 员工不存在
-                }
-                
+            const employees = await getEmployees();
+            const index = employees.findIndex(emp => emp.id === updatedEmployee.id);
+            
+            if (index !== -1) {
                 // 检查用户名是否被其他职员使用
                 const existingUser = employees.find(emp => emp.username === updatedEmployee.username && emp.id !== updatedEmployee.id);
                 if (existingUser) {
                     return false; // 用户名已存在
                 }
                 
-                const beforeData = JSON.parse(JSON.stringify(existingEmployee));
+                const beforeData = JSON.parse(JSON.stringify(employees[index]));
                 
                 // 保留创建时间
-                updatedEmployee.createTime = existingEmployee.createTime;
+                updatedEmployee.createTime = employees[index].createTime;
                 
                 // 如果密码为空，保留原密码
                 if (!updatedEmployee.password || updatedEmployee.password.trim() === '') {
-                    updatedEmployee.password = existingEmployee.password;
+                    updatedEmployee.password = employees[index].password;
                 }
                 
-                if (window.dataManager && window.dataManager.db) {
-                    await dataManager.saveEmployee(updatedEmployee);
-                } else {
-                    const index = employees.findIndex(emp => emp.id === updatedEmployee.id);
-                    employees[index] = updatedEmployee;
-                    await saveEmployees(employees);
-                }
+                // 直接保存到云端
+                await cloudDataManager.saveEmployee(updatedEmployee);
                 
                 // 记录操作历史
-                await recordOperation(
+                recordOperation(
                     'edit', 
                     'employee', 
                     updatedEmployee.id, 
@@ -3472,10 +3181,8 @@
                 }
                 
                 return true;
-            } catch (error) {
-                console.error('更新员工失败:', error);
-                return false;
             }
+            return false;
         }
         
         // 当前登录用户信息
@@ -3521,11 +3228,12 @@
                 );
             }
             
-            // 清除登录状态
             currentUser = null;
             localStorage.removeItem('currentUser');
+            // 更新用户信息显示
+            updateUserInfo();
             
-            // 立即跳转到登录页面
+            // 跳转到登录页面
             window.location.href = 'login.html';
         }
         
@@ -3661,77 +3369,40 @@
         
         // 初始化系统
         async function initializeSystem() {
-            try {
-                // 初始化Firebase数据管理器
-                const dataManagerReady = await dataManager.initialize();
-                
-                if (dataManagerReady) {
-                    console.log('🔥 开始数据迁移检查...');
-                    // 检查是否需要从localStorage迁移数据
-                    const localEmployees = JSON.parse(localStorage.getItem('employees') || '[]');
-                    if (localEmployees.length > 0) {
-                        const cloudEmployees = await dataManager.getEmployees();
-                        if (cloudEmployees.length === 0) {
-                            console.log('检测到本地数据，开始迁移到云端...');
-                            await dataManager.migrateFromLocalStorage();
-                        }
-                    }
-                }
-                
-                // 检查是否有员工，如果没有则创建默认管理员
-                const employees = await getEmployees();
-                if (employees.length === 0) {
-                    const defaultAdmin = {
-                        id: Date.now(),
-                        name: '시스템 관리자',
-                        position: 'admin',
-                        username: 'admin',
-                        password: 'admin',
-                        mobile: '010-0000-0000',
-                        createTime: new Date().toLocaleString('zh-CN')
-                    };
-                    await addEmployee(defaultAdmin);
-                    console.log('已创建默认管理员账号');
-                }
-                
-                // 强制检查登录状态 - 没有登录用户时跳转到登录页面
-                currentUser = getCurrentUser();
-                if (!currentUser) {
-                    // 没有登录用户，跳转到登录页面
-                    console.log('没有登录用户，跳转到登录页面');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                // 验证登录用户是否仍然有效（是否在员工列表中）
-                const validUser = employees.find(emp => 
-                    String(emp.id) === String(currentUser.id) && 
-                    emp.username === currentUser.username
-                );
-                
-                if (!validUser) {
-                    // 登录用户已失效，清除登录状态并跳转到登录页面
-                    console.log('登录用户已失效，跳转到登录页面');
-                    localStorage.removeItem('currentUser');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                // 有效登录用户，设置界面状态
-                console.log(getText('current-login-user') + ':', currentUser.name, '- ' + getText('permission') + ':', getText(currentUser.position));
+            // 检查是否有员工，如果没有则创建默认管理员
+            const employees = await getEmployees();
+            if (employees.length === 0) {
+                const defaultAdmin = {
+                    name: '시스템 관리자',
+                    position: 'admin',
+                    username: 'admin',
+                    password: 'admin',
+                    mobile: '010-0000-0000'
+                };
+                await addEmployee(defaultAdmin);
+            }
+            
+            // 检查当前登录状态
+            currentUser = getCurrentUser();
+            if (currentUser) {
+                // 如果有登录用户，设置界面状态
+                console.log('현재 로그인 사용자:', currentUser.name, '- 권한:', currentUser.position);
+                // 更新用户信息显示
                 updateUserInfo();
-                
-                console.log('✅ 系统初始化完成 - 已启用云端数据同步');
-            } catch (error) {
-                console.error('❌ 系统初始化失败:', error);
-                // 如果Firebase初始化失败，仍然可以使用本地存储
-                console.log('⚠️ 回退到本地存储模式');
+            } else {
+                // 临时设置为管理员用户（向后兼容）
+                const latestEmployees = await getEmployees();
+                currentUser = latestEmployees.find(emp => emp.position === 'admin') || latestEmployees[0];
+                if (currentUser) {
+                    setCurrentUser(currentUser);
+                    // updateUserInfo会在setCurrentUser中被调用
+                }
             }
         }
         
         // 添加交易记录
-        function addTransaction(salonId, transaction) {
-            const salons = getSalons();
+        async function addTransaction(salonId, transaction) {
+            const salons = await getSalons();
             const salonIndex = salons.findIndex(salon => salon.id === salonId);
             if (salonIndex !== -1) {
                 if (!salons[salonIndex].transactions) {
@@ -3750,7 +3421,9 @@
                 }
                 salons[salonIndex].transactions.push(transaction);
                 salons[salonIndex].lastTransactionDate = new Date();
-                saveSalons(salons);
+                
+                // 直接保存到云端
+                await cloudDataManager.saveSalon(salons[salonIndex]);
                 
                 // 记录操作历史
                 recordOperation(
@@ -3779,8 +3452,8 @@
         }
         
         // 删除交易记录
-        function deleteTransaction(salonId, transactionId) {
-            const salons = getSalons();
+        async function deleteTransaction(salonId, transactionId) {
+            const salons = await getSalons();
             const salon = salons.find(s => s.id === salonId);
             if (!salon) return false;
             
@@ -3799,8 +3472,8 @@
                 delete salon.lastTransactionDate; // 如果没有交易记录了，删除最后交易日期
             }
             
-            // 保存数据
-            saveSalons(salons);
+            // 直接保存到云端
+            await cloudDataManager.saveSalon(salon);
             
             // 记录操作历史
             recordOperation(
@@ -3855,20 +3528,14 @@
         }
         
         // 显示职员列表
-        function displayEmployeeList() {
+        async function displayEmployeeList() {
             const employeeListContainer = document.getElementById('employee-list-content');
-            const employees = getEmployees();
+            const employees = await getEmployees();
             
             if (employees.length === 0) {
                 employeeListContainer.innerHTML = `<div style="text-align: center; color: #cccccc; padding: 40px;"><p>暂无职员信息</p><p style="font-size: 0.9em;">请前往"新增职员"页面添加职员信息</p></div>`;
                 return;
             }
-            
-            // 按权限等级排序：admin > manager > salesperson
-            const positionOrder = { 'admin': 1, 'manager': 2, 'salesperson': 3 };
-            employees.sort((a, b) => {
-                return positionOrder[a.position] - positionOrder[b.position];
-            });
             
             let html = '';
             employees.forEach((employee, index) => {
@@ -3876,20 +3543,16 @@
                 let canView = false;
                 let canEdit = false;
                 
-                // 确保id比较时都转换为字符串
-                const employeeIdStr = String(employee.id);
-                const currentUserIdStr = String(currentUser.id);
-                
                 if (currentUser.position === 'admin') {
                     canView = true;
                     canEdit = true;
                 } else if (currentUser.position === 'manager') {
                     canView = true; // 经理可以看到所有职员
-                    canEdit = employee.position === 'salesperson' || employeeIdStr === currentUserIdStr;
+                    canEdit = employee.position === 'salesperson' || employee.id === currentUser.id;
                 } else {
                     // 业务员可以看到所有职员信息，但只能编辑自己的
                     canView = true;
-                    canEdit = employeeIdStr === currentUserIdStr;
+                    canEdit = employee.id === currentUser.id;
                 }
                 
                 if (!canView) return;
@@ -3905,7 +3568,7 @@
                             <h3 style="color: var(--gold-light); margin: 0; flex-grow: 1;">${employee.name}</h3>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <span style="background: var(--gold); color: var(--black); padding: 3px 8px; border-radius: 15px; font-size: 0.8em;">${positionText}</span>
-                                ${canEdit ? `<button onclick="showEditEmployeeModal(${employee.id})" style="background: var(--gold); color: var(--black); border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8em;" data-employee-id="${employee.id}">${getText('edit-btn')}</button>` : ''}
+                                ${canEdit ? `<button onclick="showEditEmployeeModal(${employee.id})" style="background: var(--gold); color: var(--black); border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8em;">${getText('edit-btn')}</button>` : ''}
                             </div>
                         </div>
                         
@@ -3962,20 +3625,16 @@
         }
         
         // 更新删除职员页面的选项
-        function updateDeleteEmployeeOptions() {
+        async function updateDeleteEmployeeOptions() {
             const selectElement = document.getElementById('deleteEmployeeSelect');
             if (!selectElement) return;
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
             
             employees.forEach(employee => {
                 // 只有管理员可以看到删除选项，且不能删除自己
-                // 确保id比较时都转换为字符串
-                const employeeIdStr = String(employee.id);
-                const currentUserIdStr = String(currentUser.id);
-                
-                if (currentUser && currentUser.position === 'admin' && employeeIdStr !== currentUserIdStr) {
+                if (currentUser && currentUser.position === 'admin' && employee.id !== currentUser.id) {
                     const positionText = getPositionText(employee.position);
                     optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
                 }
@@ -4133,10 +3792,10 @@
         }
         
         // 处理上传的文件
-        function processSalonFile() {
+        async function processSalonFile() {
             // 检查SheetJS库是否已加载
             if (typeof XLSX === 'undefined') {
-                alert(getText('excel-library-loading'));
+                alert('Excel处理库尚未加载完成，请稍后再试！');
                 return;
             }
             
@@ -4156,7 +3815,7 @@
             }
             
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const data = e.target.result;
                     const workbook = XLSX.read(data, { type: 'binary' });
@@ -4169,7 +3828,7 @@
                     }
                     
                     // 显示预览
-                    displayBatchPreview();
+                    await displayBatchPreview();
                     alert(getText('file-processed-success').replace('{count}', batchSalonData.length));
                     
                 } catch (error) {
@@ -4181,42 +3840,62 @@
         }
         
         // 显示批量数据预览
-        function displayBatchPreview() {
+        async function displayBatchPreview() {
             const previewDiv = document.getElementById('file-preview');
             const tableDiv = document.getElementById('preview-table');
             
-            // 批量分配功能HTML
-            let batchAssignHTML = `
-                <div style="margin-bottom: 20px; padding: 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
-                    <h4 style="color: #87CEEB; margin: 0 0 15px 0;">${getText('batch-assign-responsible')}</h4>
-                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <input type="checkbox" id="selectAllBatchSalons" onchange="toggleSelectAllBatchSalons()" style="cursor: pointer;">
-                            <label for="selectAllBatchSalons" style="color: #87CEEB; cursor: pointer;">${getText('select-all')}</label>
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <label style="color: #87CEEB;">${getText('assign-to')}：</label>
-                            <select id="batchResponsibleSelect" style="padding: 8px; background: var(--dark-gray); border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px;">
-                                <option value="">${getText('please-select-employee')}</option>
+            // 获取职员列表用于负责人选择
+            const employees = await getEmployees();
+            let employeeOptions = `<option value="">未分配</option>`;
+            employees.forEach(employee => {
+                if (currentUser) {
+                    if (currentUser.position === 'admin') {
+                        // 管理员可以选择所有人
+                        const positionText = getPositionText(employee.position);
+                        employeeOptions += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
+                    } else if (currentUser.position === 'manager') {
+                        // 经理可以选择业务员
+                        if (employee.position === 'salesperson') {
+                            const positionText = getPositionText(employee.position);
+                            employeeOptions += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
+                        }
+                    } else if (currentUser.position === 'salesperson' && employee.id === currentUser.id) {
+                        // 业务员只能选择自己
+                        const positionText = getPositionText(employee.position);
+                        employeeOptions += `<option value="${employee.id}" selected>${employee.name} - ${positionText}</option>`;
+                    }
+                }
+            });
+
+            let tableHTML = `
+                <!-- 批量操作控制区 -->
+                <div style="margin-bottom: 15px; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 5px; color: var(--gold);">
+                            <input type="checkbox" id="batch-select-all" onchange="toggleBatchSelectAll()">
+                            全选
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: var(--text-light);">批量分配负责人：</span>
+                            <select id="batch-responsible-select" style="padding: 5px; background: var(--dark-gray); color: var(--text-light); border: 1px solid var(--gold); border-radius: 3px;">
+                                ${employeeOptions}
                             </select>
+                            <button onclick="applyBatchResponsible()" style="background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;">
+                                应用到选中项
+                            </button>
                         </div>
-                        <button onclick="executeBatchAssignSalons()" style="background: #87CEEB; color: var(--black); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">${getText('assign-selected')}</button>
                     </div>
                 </div>
-            `;
-            
-            let tableHTML = `
+                
                 <table style="width: 100%; border-collapse: collapse; color: var(--text-light);">
                     <thead>
                         <tr style="background: rgba(212, 175, 55, 0.2);">
-                            <th style="border: 1px solid #555; padding: 8px; width: 40px;">
-                                <input type="checkbox" id="headerCheckbox" onchange="toggleSelectAllBatchSalons()" style="cursor: pointer;">
-                            </th>
+                            <th style="border: 1px solid #555; padding: 8px; width: 40px;">选择</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('salon-name').replace('：', '')}</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('salon-address').replace('：', '')}</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('salon-district').replace('：', '')}</th>
                             <th style="border: 1px solid #555; padding: 8px;">${getText('director-name').replace('：', '')}</th>
-                            <th style="border: 1px solid #555; padding: 8px;">${getText('responsible-employee')}</th>
+                            <th style="border: 1px solid #555; padding: 8px;">负责人</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -4224,149 +3903,207 @@
             
             batchSalonData.forEach((salon, index) => {
                 const districtText = getText(salon.district + '-district');
-                const responsibleName = salon.responsibleEmployeeId ? getEmployeeName(salon.responsibleEmployeeId) : getText('unassigned');
+                // 设置默认负责人为当前用户（如果是业务员）
+                const defaultResponsibleId = (currentUser && currentUser.position === 'salesperson') ? currentUser.id : '';
+                
                 tableHTML += `
                     <tr>
                         <td style="border: 1px solid #555; padding: 8px; text-align: center;">
-                            <input type="checkbox" class="batch-salon-checkbox" data-index="${index}" style="cursor: pointer;">
+                            <input type="checkbox" class="batch-salon-checkbox" data-index="${index}">
                         </td>
                         <td style="border: 1px solid #555; padding: 8px;">${salon.name}</td>
                         <td style="border: 1px solid #555; padding: 8px;">${salon.address}</td>
                         <td style="border: 1px solid #555; padding: 8px;">${districtText}</td>
                         <td style="border: 1px solid #555; padding: 8px;">${salon.directorName}</td>
-                        <td style="border: 1px solid #555; padding: 8px;" id="responsible-${index}">${responsibleName}</td>
+                        <td style="border: 1px solid #555; padding: 8px;">
+                            <select class="salon-responsible-select" data-index="${index}" style="width: 100%; padding: 4px; background: var(--dark-gray); color: var(--text-light); border: 1px solid #666; border-radius: 3px;" onchange="updateSalonResponsible(${index}, this.value)">
+                                ${employeeOptions}
+                            </select>
+                        </td>
                     </tr>
                 `;
+                
+                // 设置默认负责人
+                if (defaultResponsibleId) {
+                    salon.responsibleEmployeeId = defaultResponsibleId;
+                }
             });
             
             tableHTML += '</tbody></table>';
+            tableDiv.innerHTML = tableHTML;
             
-            tableDiv.innerHTML = batchAssignHTML + tableHTML;
-            
-            // 在DOM更新后立即更新负责人员选项
-            updateBatchResponsibleOptions();
-            
-            // 确保选项加载完成
-            setTimeout(() => {
-                updateBatchResponsibleOptions();
-            }, 100);
+            // 设置默认选中的负责人
+            if (currentUser && currentUser.position === 'salesperson') {
+                batchSalonData.forEach((salon, index) => {
+                    const selectElement = document.querySelector(`.salon-responsible-select[data-index="${index}"]`);
+                    if (selectElement) {
+                        selectElement.value = currentUser.id;
+                    }
+                });
+            }
             
             previewDiv.style.display = 'block';
         }
         
+        // 更新批量创建进度条
+        function updateBatchProgress(current, total, status, isComplete = false) {
+            const progressContainer = document.getElementById('batch-progress-container');
+            const progressText = document.getElementById('batch-progress-text');
+            const progressCount = document.getElementById('batch-progress-count');
+            const progressBar = document.getElementById('batch-progress-bar');
+            const progressPercent = document.getElementById('batch-progress-percent');
+            const progressStatus = document.getElementById('batch-progress-status');
+            
+            if (!progressContainer) return;
+            
+            const percentage = Math.round((current / total) * 100);
+            
+            progressContainer.style.display = 'block';
+            progressCount.textContent = `${current}/${total}`;
+            progressBar.style.width = `${percentage}%`;
+            progressPercent.textContent = `${percentage}%`;
+            progressStatus.textContent = status;
+            
+            if (isComplete) {
+                progressText.textContent = '批量创建完成！';
+                progressBar.style.background = current === total 
+                    ? 'linear-gradient(90deg, #4CAF50, #8BC34A)' 
+                    : 'linear-gradient(90deg, #FF9800, #FFC107)';
+            } else {
+                progressText.textContent = '正在创建沙龙...';
+            }
+        }
+        
         // 确认批量创建
-        function confirmBatchCreate() {
-            if (batchSalonData.length === 0) {
-                alert(getText('no-valid-data'));
-                return;
-            }
+        async function confirmBatchCreate() {
+            console.log('confirmBatchCreate 函数被调用');
+            console.log('batchSalonData:', batchSalonData);
+            console.log('batchSalonData.length:', batchSalonData ? batchSalonData.length : 'undefined');
             
-            // 获取当前用户作为默认负责人（如果没有设置的话）
-            const defaultEmployeeId = currentUser ? currentUser.id : '';
-            
-            let successCount = 0;
-            batchSalonData.forEach(salonData => {
-                // 设置默认负责人（如果没有设置）
-                if (!salonData.responsibleEmployeeId) {
-                    salonData.responsibleEmployeeId = defaultEmployeeId;
+            try {
+                if (!batchSalonData || batchSalonData.length === 0) {
+                    console.log('没有有效数据，显示提示');
+                    alert('没有有效的数据可以创建，请先上传文件！');
+                    return;
                 }
                 
-                // 创建沙龙
-                if (addSalon(salonData)) {
-                    successCount++;
+                console.log('开始批量创建，数据量:', batchSalonData.length);
+                
+                // 如果数据量太大，提醒用户
+                if (batchSalonData.length > 100) {
+                    const confirm = window.confirm(`您准备创建 ${batchSalonData.length} 个沙龙，数据量较大可能需要较长时间。\n\n建议：\n1. 少于100个为佳\n2. 确保网络稳定\n3. 请耐心等待\n\n是否继续？`);
+                    if (!confirm) {
+                        return;
+                    }
                 }
-            });
-            
-            alert(getText('batch-create-success').replace('{count}', successCount));
-            
-            // 清理数据和界面
-            cancelBatchUpload();
-            
-            // 刷新沙龙列表（如果当前在沙龙信息页面）
-            const salonInfoPage = document.getElementById('salon-info');
-            if (salonInfoPage && salonInfoPage.classList.contains('active')) {
-                displaySalonList();
-            }
-        }
-        
-        // 更新批量负责人员选项
-        function updateBatchResponsibleOptions() {
-            const selectElement = document.getElementById('batchResponsibleSelect');
-            if (!selectElement) return;
-            
-            const employees = getEmployees();
-            let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
-            optionsHtml += `<option value="unassigned">${getText('unassigned')}</option>`;
-            
-            if (currentUser) {
-                if (currentUser.position === 'admin') {
-                    // 管理员可以选择所有人
-                    employees.forEach(employee => {
-                        const positionText = getPositionText(employee.position);
-                        optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
-                    });
-                } else if (currentUser.position === 'manager') {
-                    // 经理可以选择业务员
-                    employees.forEach(employee => {
-                        if (employee.position === 'salesperson') {
-                            const positionText = getPositionText(employee.position);
-                            optionsHtml += `<option value="${employee.id}">${employee.name} - ${positionText}</option>`;
+                
+                // 禁用创建按钮，防止重复点击
+                const confirmBtn = document.getElementById('confirm-batch-btn');
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = '创建中...';
+                    confirmBtn.style.opacity = '0.6';
+                    confirmBtn.style.cursor = 'not-allowed';
+                }
+                
+                // 获取当前用户作为默认负责人（如果没有设置的话）
+                const defaultEmployeeId = currentUser ? currentUser.id : '';
+                console.log('默认负责人ID:', defaultEmployeeId);
+                
+                let successCount = 0;
+                const batchSize = 5; // 减少每批数量，提高响应性
+                
+                // 初始化进度条
+                updateBatchProgress(0, batchSalonData.length, '准备开始...');
+                
+                console.log('🚀 开始批量创建沙龙...');
+                
+                for (let i = 0; i < batchSalonData.length; i++) {
+                    const salonData = batchSalonData[i];
+                    
+                    // 更新进度条
+                    updateBatchProgress(i, batchSalonData.length, `正在处理: ${salonData.name}`);
+                    
+                    // 每处理N个暂停一下，避免过快请求
+                    if (i > 0 && i % batchSize === 0) {
+                        const progress = Math.round((i / batchSalonData.length) * 100);
+                        console.log(`🔄 进度: ${progress}% (${i}/${batchSalonData.length}) - 暂停 50ms...`);
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                    
+                    console.log(`📝 处理第${i+1}/${batchSalonData.length}个沙龙: ${salonData.name}`);
+                    
+                    // 设置默认负责人（如果没有设置）
+                    if (!salonData.responsibleEmployeeId) {
+                        salonData.responsibleEmployeeId = defaultEmployeeId;
+                    }
+                    
+                    // 创建沙龙
+                    try {
+                        const result = await addSalon(salonData);
+                        if (result) {
+                            successCount++;
+                            console.log(`✅ 第${i+1}个沙龙创建成功: ${salonData.name}`);
+                        } else {
+                            console.log(`❌ 第${i+1}个沙龙创建失败: ${salonData.name}`);
                         }
-                    });
-                } else if (currentUser.position === 'salesperson') {
-                    // 业务员只能选择自己
-                    const positionText = getPositionText(currentUser.position);
-                    optionsHtml += `<option value="${currentUser.id}">${currentUser.name} - ${positionText}</option>`;
+                    } catch (error) {
+                        console.error(`❌ 第${i+1}个沙龙云端创建失败: ${salonData.name}`, error);
+                        // Firebase失败时，尝试本地存储
+                        try {
+                            const localResult = addSalonToLocalStorage(salonData);
+                            if (localResult) {
+                                successCount++;
+                                console.log(`💾 第${i+1}个沙龙已保存到本地存储: ${salonData.name}`);
+                            }
+                        } catch (localError) {
+                            console.error(`💥 第${i+1}个沙龙本地存储也失败: ${salonData.name}`, localError);
+                        }
+                    }
                 }
-            }
-            
-            selectElement.innerHTML = optionsHtml;
-        }
-        
-        // 切换选择所有批量沙龙
-        function toggleSelectAllBatchSalons() {
-            const selectAllCheckbox = document.getElementById('selectAllBatchSalons') || document.getElementById('headerCheckbox');
-            const checkboxes = document.querySelectorAll('.batch-salon-checkbox');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
-            });
-        }
-        
-        // 执行批量分配沙龙负责人
-        function executeBatchAssignSalons() {
-            const selectedEmployee = document.getElementById('batchResponsibleSelect').value;
-            const checkboxes = document.querySelectorAll('.batch-salon-checkbox:checked');
-            
-            if (!selectedEmployee) {
-                alert(getText('please-select-employee'));
-                return;
-            }
-            
-            if (checkboxes.length === 0) {
-                alert(getText('please-select-items'));
-                return;
-            }
-            
-            checkboxes.forEach(checkbox => {
-                const index = parseInt(checkbox.dataset.index);
-                batchSalonData[index].responsibleEmployeeId = selectedEmployee === 'unassigned' ? '' : selectedEmployee;
                 
-                // 更新显示
-                const employeeName = selectedEmployee === 'unassigned' ? getText('unassigned') : getEmployeeName(selectedEmployee);
-                const responsibleCell = document.getElementById(`responsible-${index}`);
-                if (responsibleCell) {
-                    responsibleCell.textContent = employeeName;
+                // 最终进度条更新
+                const finalStatus = successCount === batchSalonData.length 
+                    ? `✅ 全部完成！成功创建 ${successCount} 个沙龙`
+                    : `⚠️ 部分成功：${successCount}/${batchSalonData.length} 个沙龙创建成功`;
+                
+                updateBatchProgress(batchSalonData.length, batchSalonData.length, finalStatus, true);
+                
+                console.log('🎉 批量创建完成！');
+                console.log(`📊 总数据: ${batchSalonData.length} 个`);
+                console.log(`✅ 成功: ${successCount} 个`);
+                console.log(`❌ 失败: ${batchSalonData.length - successCount} 个`);
+                
+                // 恢复按钮状态
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = '确认批量创建';
+                    confirmBtn.style.opacity = '1';
+                    confirmBtn.style.cursor = 'pointer';
                 }
-            });
-            
-            alert(getText('batch-assign-success').replace('{count}', checkboxes.length));
-            
-            // 清空选择
-            checkboxes.forEach(checkbox => checkbox.checked = false);
-            document.getElementById('selectAllBatchSalons').checked = false;
-            if (document.getElementById('headerCheckbox')) {
-                document.getElementById('headerCheckbox').checked = false;
+                
+                if (successCount > 0) {
+                    const message = successCount === batchSalonData.length 
+                        ? `🎉 批量创建完成！全部 ${successCount} 个沙龙创建成功！`
+                        : `⚠️ 批量创建完成！成功创建 ${successCount}/${batchSalonData.length} 个沙龙。\n\n注意：如果Firebase连接失败，数据已保存到本地存储。`;
+                    
+                    alert(message);
+                    
+                    // 3秒后自动清理界面并跳转
+                    setTimeout(async () => {
+                        // 清理数据和界面
+                        cancelBatchUpload();
+                        
+                        // 跳转到沙龙列表页面
+                        await showContent('salon-info');
+                    }, 3000);
+                } else {
+                    alert('❌ 批量创建失败！没有成功创建任何沙龙。\n\n可能原因：\n1. 网络连接问题\n2. Firebase配额超出\n3. 数据格式错误\n\n请检查控制台信息或稍后重试。');
+                }
+                
+            } catch (error) {
+                console.error('confirmBatchCreate 执行出错:', error);
+                alert('批量创建时发生错误: ' + error.message);
             }
         }
         
@@ -4375,13 +4112,103 @@
             batchSalonData = [];
             document.getElementById('file-preview').style.display = 'none';
             document.getElementById('salon-file-upload').value = '';
+            
+            // 隐藏进度条
+            const progressContainer = document.getElementById('batch-progress-container');
+            if (progressContainer) {
+                progressContainer.style.display = 'none';
+            }
+            
+            // 恢复按钮状态
+            const confirmBtn = document.getElementById('confirm-batch-btn');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = '确认批量创建';
+                confirmBtn.style.opacity = '1';
+                confirmBtn.style.cursor = 'pointer';
+            }
+        }
+        
+        // 本地存储备用函数
+        function addSalonToLocalStorage(salonData) {
+            try {
+                const salons = JSON.parse(localStorage.getItem('salons')) || [];
+                const newSalon = {
+                    id: Date.now() + Math.random(),
+                    name: salonData.name,
+                    address: salonData.address,
+                    businessLicense: salonData.businessLicense || '',
+                    district: salonData.district || '',
+                    phone: salonData.phone || '',
+                    directorName: salonData.directorName || '未指定',
+                    directorMobile: salonData.directorMobile || '',
+                    responsibleEmployeeId: salonData.responsibleEmployeeId || '',
+                    addTime: new Date().toLocaleString('zh-CN'),
+                    joinDate: new Date().toISOString(),
+                    transactions: [],
+                    lastTransactionDate: null
+                };
+                
+                salons.push(newSalon);
+                localStorage.setItem('salons', JSON.stringify(salons));
+                return true;
+            } catch (error) {
+                console.error('本地存储失败:', error);
+                return false;
+            }
+        }
+        
+        // 切换全选状态
+        function toggleBatchSelectAll() {
+            const selectAllCheckbox = document.getElementById('batch-select-all');
+            const salonCheckboxes = document.querySelectorAll('.batch-salon-checkbox');
+            
+            salonCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+        
+        // 批量应用负责人
+        function applyBatchResponsible() {
+            const selectedResponsibleId = document.getElementById('batch-responsible-select').value;
+            const checkedCheckboxes = document.querySelectorAll('.batch-salon-checkbox:checked');
+            
+            if (checkedCheckboxes.length === 0) {
+                alert('请先选择要分配负责人的沙龙');
+                return;
+            }
+            
+            if (!selectedResponsibleId) {
+                alert('请选择要分配的负责人');
+                return;
+            }
+            
+            checkedCheckboxes.forEach(checkbox => {
+                const index = parseInt(checkbox.dataset.index);
+                const selectElement = document.querySelector(`.salon-responsible-select[data-index="${index}"]`);
+                
+                if (selectElement) {
+                    selectElement.value = selectedResponsibleId;
+                    // 更新数据
+                    updateSalonResponsible(index, selectedResponsibleId);
+                }
+            });
+            
+            alert(`已为 ${checkedCheckboxes.length} 个沙龙分配负责人`);
+        }
+        
+        // 更新单个沙龙的负责人
+        function updateSalonResponsible(index, responsibleId) {
+            if (batchSalonData[index]) {
+                batchSalonData[index].responsibleEmployeeId = responsibleId;
+            }
         }
         
         // 下载样例模板文件
         function downloadSampleFile() {
             // 检查SheetJS库是否已加载
             if (typeof XLSX === 'undefined') {
-                alert(getText('excel-library-loading'));
+                alert('Excel处理库尚未加载完成，请稍后再试！');
                 return;
             }
             
@@ -4421,11 +4248,11 @@
         }
         
         // 更新业务员选择下拉框
-        function updateSalespersonOptions() {
+        async function updateSalespersonOptions() {
             const selectElement = document.getElementById('salespersonSelect');
             if (!selectElement) return;
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             let optionsHtml = `<option value="">${getText('please-select-salesperson')}</option>`;
             
             employees.forEach(employee => {
@@ -4458,9 +4285,9 @@
         }
         
         // 显示编辑职员模态框
-        function showEditEmployeeModal(employeeId) {
-            const employees = getEmployees();
-            const employee = employees.find(emp => String(emp.id) === String(employeeId));
+        async function showEditEmployeeModal(employeeId) {
+            const employees = await getEmployees();
+            const employee = employees.find(emp => emp.id === employeeId);
             
             if (!employee) return;
             
@@ -4481,11 +4308,6 @@
             
             // 权限控制：经理不能修改管理员权限，业务员不能修改自己的权限，管理员不能调低自己的权限
             const positionSelect = document.getElementById('editEmployeePosition');
-            
-            // 确保id比较时都转换为字符串
-            const employeeIdStr = String(employee.id);
-            const currentUserIdStr = String(currentUser.id);
-            
             if (currentUser.position === 'manager' && employee.position === 'admin') {
                 positionSelect.disabled = true;
             } else if (currentUser.position === 'manager') {
@@ -4494,10 +4316,10 @@
                     <option value="salesperson" data-i18n="salesperson">业务员</option>
                 `;
                 updateTexts(); // 更新翻译
-            } else if (currentUser.position === 'salesperson' && employeeIdStr === currentUserIdStr) {
+            } else if (currentUser.position === 'salesperson' && employee.id === currentUser.id) {
                 // 业务员不能修改自己的权限等级
                 positionSelect.disabled = true;
-            } else if (currentUser.position === 'admin' && employeeIdStr === currentUserIdStr) {
+            } else if (currentUser.position === 'admin' && employee.id === currentUser.id) {
                 // 管理员不能调低自己的权限，只能保持管理员
                 positionSelect.innerHTML = `
                     <option value="admin" data-i18n="admin" selected>管理员</option>
@@ -4532,7 +4354,6 @@
             // 显示模态框
             const modal = document.getElementById('editEmployeeModal');
             modal.style.display = 'flex';
-            updateTexts(); // 更新翻译
         }
         
         // 关闭编辑职员模态框
@@ -4864,10 +4685,10 @@
         let currentComparisonOperation = null; // 当前显示的操作记录
 
         // 显示沙龙列表（优化版本 - 支持分页和排序）
-        function displaySalonList(filteredByDistrict = null, page = 1) {
+        async function displaySalonList(filteredByDistrict = null, page = 1) {
             const salonListContainer = document.getElementById('salon-list');
             const salonCountText = document.getElementById('salon-count-text');
-            let salons = getSalons();
+            let salons = await getSalons();
             
             // 根据权限筛选沙龙列表
             if (currentUser && currentUser.position === 'salesperson') {
@@ -5586,26 +5407,20 @@
         // 显示添加交易记录模态框
         function showAddTransactionModal(salonId) {
             currentSalonId = salonId;
+            updateSalespersonOptions(); // 加载业务员选项
             
-            // 确保模态框内容完全清空
-            closeTransactionModal();
+            // 隐藏产品历史记录区域
+            const historySection = document.getElementById('product-history-section');
+            if (historySection) {
+                historySection.style.display = 'none';
+            }
             
-            // 重新加载业务员选项
-            updateSalespersonOptions();
-            
-            // 显示模态框
             const modal = document.getElementById('transactionModal');
             modal.style.display = 'flex';
-            
-            // 如果业务员只能选择自己，则自动选择，但不填入其他任何预设值
+            // 如果业务员只能选择自己，则自动聚焦到产品输入
             const salespersonSelect = document.getElementById('salespersonSelect');
             if (salespersonSelect.options.length === 2) { // 只有默认选项和当前用户
                 salespersonSelect.selectedIndex = 1;
-            }
-            
-            // 确保有一个空的产品行
-            if (!document.querySelector('#productTableBody tr')) {
-                addProductRow();
             }
         }
         
@@ -5613,33 +5428,12 @@
         function closeTransactionModal() {
             const modal = document.getElementById('transactionModal');
             modal.style.display = 'none';
-            
-            // 彻底清除表单，不保留任何记忆
             document.getElementById('transactionForm').reset();
             
-            // 清空所有输入框
-            document.getElementById('receivedAmount').value = '';
-            document.getElementById('currentOutstanding').value = '';
-            document.getElementById('transactionNotes').value = '';
-            
-            // 重置业务员选择
-            const salespersonSelect = document.getElementById('salespersonSelect');
-            if (salespersonSelect) {
-                salespersonSelect.selectedIndex = 0;
-            }
-            
-            // 清空产品表格并重新添加一个空行
-            const productTableBody = document.getElementById('productTableBody');
-            if (productTableBody) {
-                productTableBody.innerHTML = '';
-                productRowCounter = 0;
-                addProductRow(); // 重新添加一个干净的空行
-            }
-            
-            // 重置总金额显示
-            const totalProductsAmount = document.getElementById('totalProductsAmount');
-            if (totalProductsAmount) {
-                totalProductsAmount.textContent = formatCurrency(0);
+            // 隐藏产品历史记录区域
+            const historySection = document.getElementById('product-history-section');
+            if (historySection) {
+                historySection.style.display = 'none';
             }
             
             currentSalonId = null;
@@ -5726,7 +5520,7 @@
             row.id = `editProductRow_${editProductRowCounter}`;
             row.innerHTML = `
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                    <input type="text" placeholder="${getText('product-name-placeholder')}" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
+                    <input type="text" placeholder="产品名称" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
                 </td>
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
                     <input type="text" placeholder="1,000" oninput="formatEditInputAndCalculate(this, ${editProductRowCounter})" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box; text-align: center;">
@@ -6026,11 +5820,11 @@
                 transaction.products.forEach(product => {
                     productsTable += `
                         <tr>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light);">${product.name}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${formatCurrency(product.unitPrice)}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${product.quantity || 0}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${product.giftQuantity || 0}</td>
-                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-light); text-align: center;">${formatCurrency(product.totalAmount)}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white;">${product.name}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${formatCurrency(product.unitPrice)}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${product.quantity || 0}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${product.giftQuantity || 0}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(212, 175, 55, 0.3); color: white; text-align: center;">${formatCurrency(product.totalAmount)}</td>
                         </tr>`;
                 });
                 
@@ -6049,7 +5843,7 @@
                 productsTable = `
                     <div style="margin-bottom: 20px;">
                         <h4 style="color: var(--gold-light); margin-bottom: 10px;">${getText('products')}</h4>
-                        <p style="color: var(--text-light); padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px;">${transaction.products}</p>
+                        <p style="color: white; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px;">${transaction.products}</p>
                     </div>`;
             }
             
@@ -6445,7 +6239,7 @@
             row.id = `productRow_${productRowCounter}`;
             row.innerHTML = `
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                    <input type="text" placeholder="${getText('product-name-placeholder')}" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
+                    <input type="text" placeholder="产品名称" oninput="checkProductHistory(this)" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box;">
                 </td>
                 <td style="padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
                     <input type="text" placeholder="1,000" oninput="formatInputAndCalculate(this, ${productRowCounter})" style="width: 100%; padding: 5px; background: transparent; border: 1px solid rgba(212, 175, 55, 0.5); color: var(--text-light); border-radius: 3px; box-sizing: border-box; text-align: center;">
@@ -6613,13 +6407,6 @@
         
         // 处理交易记录表单提交
         document.addEventListener('DOMContentLoaded', async function() {
-            // 立即检查登录状态，这是最高优先级的检查
-            if (!getCurrentUser()) {
-                console.log('页面加载检查：没有登录用户，跳转到登录页面');
-                window.location.href = 'login.html';
-                return;
-            }
-            
             // 初始化系统，创建默认管理员账号
             await initializeSystem();
             
@@ -6636,12 +6423,12 @@
                 const notes = document.getElementById('transactionNotes').value.trim();
                 
                 if (!salespersonId) {
-                    alert(getText('please-select-salesperson'));
+                    alert(translations[currentLanguage]['please-select-salesperson']);
                     return;
                 }
                 
                 if (products.length === 0) {
-                    alert(getText('add-at-least-one-product'));
+                    alert(translations[currentLanguage]['add-at-least-one-product']);
                     return;
                 }
                 
@@ -6678,10 +6465,17 @@
                     addProductRow(); // 重新添加一行
                     updateSalespersonOptions(); // 重新加载业务员选项
                     
+                    // 隐藏产品历史记录区域
+                    const historySection = document.getElementById('product-history-section');
+                    if (historySection) {
+                        historySection.style.display = 'none';
+                    }
+                    
                     displaySalonList(currentFilter, currentPage); // 保持当前筛选和页面
                     closeTransactionModal();
                     alert(getText('transaction-added-success'));
-                    // 跳转到对应沙龙的交易记录
+                    
+                    // 跳转到历史交易记录页面
                     viewAllTransactions(currentSalonId);
                 }
             });
@@ -6704,12 +6498,12 @@
                 const notes = document.getElementById('editTransactionNotes').value.trim();
                 
                 if (!salespersonId) {
-                    alert(getText('please-select-salesperson'));
+                    alert(translations[currentLanguage]['please-select-salesperson']);
                     return;
                 }
                 
                 if (products.length === 0) {
-                    alert(getText('add-at-least-one-product'));
+                    alert(translations[currentLanguage]['add-at-least-one-product']);
                     return;
                 }
                 
@@ -6774,11 +6568,11 @@
         }
         
         // 更新负责职员选项
-        function updateResponsibleEmployeeOptions() {
+        async function updateResponsibleEmployeeOptions() {
             const selectElement = document.getElementById('responsibleEmployee');
             if (!selectElement) return;
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
             optionsHtml += `<option value="unassigned">${getText('unassigned')}</option>`;
             
@@ -6810,11 +6604,11 @@
         }
         
         // 更新编辑沙龙的负责职员选项
-        function updateEditResponsibleEmployeeOptions() {
+        async function updateEditResponsibleEmployeeOptions() {
             const selectElement = document.getElementById('editResponsibleEmployee');
             if (!selectElement) return;
             
-            const employees = getEmployees();
+            const employees = await getEmployees();
             let optionsHtml = `<option value="">${getText('please-select-employee')}</option>`;
             optionsHtml += `<option value="unassigned">${getText('unassigned')}</option>`;
             
@@ -6846,7 +6640,7 @@
         }
         
         // 显示内容区域
-        function showContent(contentId, event) {
+        async function showContent(contentId, event) {
             if (event) {
                 event.stopPropagation(); // 阻止事件冒泡
             }
@@ -6878,24 +6672,24 @@
                     // 重置排序状态为默认
                     currentSortField = 'default';
                     currentSortOrder = '';
-                    updateResponsibleFilterOptions();
-                    displaySalonList(null, 1); // 初始化时显示第一页
+                    await updateResponsibleFilterOptions();
+                    await displaySalonList(null, 1); // 初始化时显示第一页
                 }
                 
                 // 如果是新增沙龙页面，更新负责职员选项
                 if (contentId === 'new-salon') {
-                    updateResponsibleEmployeeOptions();
+                    await updateResponsibleEmployeeOptions();
                     checkBatchUploadPermission();
                 }
                 
                 // 如果是删除沙龙页面，更新选项
                 if (contentId === 'delete-salon') {
-                    updateDeleteSalonOptions();
+                    await updateDeleteSalonOptions();
                 }
                 
                 // 如果是职员列表页面，刷新列表
                 if (contentId === 'employee-list') {
-                    displayEmployeeList();
+                    await displayEmployeeList();
                 }
                 
                 // 如果是新增职员页面，根据权限设置职位选项
@@ -6917,7 +6711,7 @@
                 
                 // 如果是删除职员页面，更新选项
                 if (contentId === 'delete-employee') {
-                    updateDeleteEmployeeOptions();
+                    await updateDeleteEmployeeOptions();
                 }
                 
                 // 如果是操作历史页面，加载历史记录
@@ -6998,16 +6792,16 @@
         }
         
         // 处理新增沙龙表单提交
-        document.getElementById('newSalonForm').addEventListener('submit', function(e) {
+        document.getElementById('newSalonForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const salonName = document.getElementById('salonName').value;
             const salonAddress = document.getElementById('salonAddress').value;
+            const businessLicense = document.getElementById('businessLicense').value;
             const salonDistrict = document.getElementById('salonDistrict').value;
             const salonPhone = document.getElementById('salonPhone').value;
             const directorName = document.getElementById('directorName').value;
             const directorMobile = document.getElementById('directorMobile').value;
             const responsibleEmployeeId = document.getElementById('responsibleEmployee').value;
-            const businessLicense = document.getElementById('businessLicense').value;
             
             // 所有字段都改为可选填，只需要有沙龙名称即可
             if (salonName) {
@@ -7015,30 +6809,34 @@
                 const newSalon = {
                     name: salonName,
                     address: salonAddress,
+                    businessLicense: businessLicense,
                     district: salonDistrict,
                     phone: salonPhone,
                     directorName: directorName,
                     directorMobile: directorMobile,
-                    responsibleEmployeeId: responsibleEmployeeId,
-                    businessLicense: businessLicense
+                    responsibleEmployeeId: responsibleEmployeeId
                 };
                 
                 // 检查是否需要审批
                 if (currentUser.position === 'admin') {
                     // 管理员直接添加
-                addSalon(newSalon);
-                
-                let alertMessage = getText('salon-added-success') + '\n\n' + getText('salon-name-text') + '：' + salonName + '\n' + getText('salon-address-text') + '：' + salonAddress;
-                if (salonPhone) {
-                    alertMessage += '\n' + getText('salon-phone-text') + '：' + salonPhone;
-                }
-                alertMessage += '\n' + getText('director-name-text') + '：' + directorName + '\n' + getText('director-mobile-text') + '：' + directorMobile;
-                alert(alertMessage);
-                // 清空表单
-                this.reset();
-                updateResponsibleEmployeeOptions(); // 重置负责职员选项
-                // 跳转到沙龙列表
-                showContent('salon-info');
+                    const addResult = await addSalon(newSalon);
+                    
+                    if (addResult) {
+                        let alertMessage = getText('salon-added-success') + '\n\n' + getText('salon-name-text') + '：' + salonName + '\n' + getText('salon-address-text') + '：' + salonAddress;
+                        if (salonPhone) {
+                            alertMessage += '\n' + getText('salon-phone-text') + '：' + salonPhone;
+                        }
+                        alertMessage += '\n' + getText('director-name-text') + '：' + directorName + '\n' + getText('director-mobile-text') + '：' + directorMobile;
+                        alert(alertMessage);
+                        // 清空表单
+                        this.reset();
+                        await updateResponsibleEmployeeOptions(); // 重置负责职员选项
+                        // 跳转到沙龙列表页面
+                        await showContent('salon-info');
+                    } else {
+                        alert('添加沙龙失败，请稍后重试！');
+                    }
                 } else {
                     // 经理和业务员需要审批
                     const description = `新增沙龙：${salonName} (${salonAddress})`;
@@ -7047,27 +6845,27 @@
                     alert(getText('approval-submitted'));
                     // 清空表单
                     this.reset();
-                    updateResponsibleEmployeeOptions(); // 重置负责职员选项
-                    // 跳转到沙龙列表
-                    showContent('salon-info');
+                    await updateResponsibleEmployeeOptions(); // 重置负责职员选项
+                    // 跳转到沙龙列表页面
+                    await showContent('salon-info');
                 }
             } else {
                 alert(getText('salon-name-required'));
             }
         });
         
-        // 移除新增职员姓名自动填充到账户持有人的功能
-        // document.getElementById('employeeName').addEventListener('input', function(e) {
-        //     const accountHolderField = document.getElementById('employeeAccountHolder');
-        //     if (!accountHolderField.value.trim()) {
-        //         accountHolderField.value = e.target.value.trim();
-        //     }
-        // });
+        // 新增职员姓名自动填充到账户持有人
+        document.getElementById('employeeName').addEventListener('input', function(e) {
+            const accountHolderField = document.getElementById('employeeAccountHolder');
+            if (!accountHolderField.value.trim()) {
+                accountHolderField.value = e.target.value.trim();
+            }
+        });
         
 
         
         // 处理新增职员表单提交
-        document.getElementById('newEmployeeForm').addEventListener('submit', function(e) {
+        document.getElementById('newEmployeeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const employeeName = document.getElementById('employeeName').value.trim();
             const employeePosition = document.getElementById('employeePosition').value;
@@ -7102,11 +6900,11 @@
                     }
                 };
                 
-                if (addEmployee(newEmployee)) {
+                if (await addEmployee(newEmployee)) {
                     alert(getText('employee-added-success'));
                     this.reset();
-                    // 跳转到职员列表
-                    showContent('employee-list');
+                    // 跳转到职员列表页面
+                    await showContent('employee-list');
                 } else {
                     alert(getText('username-already-exists'));
                 }
@@ -7116,7 +6914,7 @@
         });
 
         // 编辑职员表单提交处理
-        document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
+        document.getElementById('editEmployeeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const employeeId = parseInt(document.getElementById('editEmployeeId').value);
@@ -7159,14 +6957,14 @@
                 }
             };
             
-            if (updateEmployee(updatedEmployee)) {
+            if (await updateEmployee(updatedEmployee)) {
                 alert(getText('employee-updated-success'));
                 closeEditEmployeeModal();
                 
                 // 刷新职员列表（如果当前在职员列表页面）
                 const employeeListPage = document.getElementById('employee-list');
                 if (employeeListPage && employeeListPage.classList.contains('active')) {
-                    displayEmployeeList();
+                    await displayEmployeeList();
                 }
             } else {
                 alert(getText('username-already-exists-edit'));
@@ -7392,71 +7190,43 @@
         // ==================== 操作历史记录功能 ====================
         
         // 获取操作历史记录
-        async function getOperationHistory() {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    return await dataManager.getOperations();
-                } else {
-                    return JSON.parse(localStorage.getItem('operationHistory')) || [];
-                }
-            } catch (error) {
-                console.error('获取操作历史失败:', error);
-                return JSON.parse(localStorage.getItem('operationHistory')) || [];
-            }
+        function getOperationHistory() {
+            return JSON.parse(localStorage.getItem('operationHistory')) || [];
         }
         
         // 保存操作历史记录
-        async function saveOperationHistory(history) {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    // Firebase模式下，每个操作都是单独保存的，不需要批量保存
-                    console.log('Firebase模式下不需要批量保存操作历史');
-                } else {
-                    localStorage.setItem('operationHistory', JSON.stringify(history));
-                }
-            } catch (error) {
-                console.error('保存操作历史失败:', error);
-                localStorage.setItem('operationHistory', JSON.stringify(history));
-            }
+        function saveOperationHistory(history) {
+            localStorage.setItem('operationHistory', JSON.stringify(history));
         }
         
         // 记录操作历史
-        async function recordOperation(operationType, objectType, objectId, objectName, description, beforeData = null, afterData = null) {
-            try {
-                const operation = {
-                    id: Date.now() + Math.random(),
-                    timestamp: new Date().toISOString(),
-                    userId: currentUser ? currentUser.id : null,
-                    userName: currentUser ? currentUser.name : '系统',
-                    userPosition: currentUser ? currentUser.position : 'system',
-                    operationType: operationType, // create, edit, delete, login, logout
-                    objectType: objectType, // salon, transaction, employee, system
-                    objectId: objectId,
-                    objectName: objectName,
-                    description: description,
-                    beforeData: beforeData ? JSON.parse(JSON.stringify(beforeData)) : null,
-                    afterData: afterData ? JSON.parse(JSON.stringify(afterData)) : null,
-                    ipAddress: '127.0.0.1', // 在真实环境中可以获取真实IP
-                    browserInfo: navigator.userAgent
-                };
-                
-                if (window.dataManager && window.dataManager.db) {
-                    await dataManager.saveOperation(operation);
-                } else {
-                    const history = await getOperationHistory();
-                    history.unshift(operation); // 添加到开头，最新的在前面
-                    
-                    // 保留最近1000条记录
-                    if (history.length > 1000) {
-                        history.splice(1000);
-                    }
-                    
-                    await saveOperationHistory(history);
-                }
-            } catch (error) {
-                console.error('记录操作历史失败:', error);
-                // 不抛出错误，避免影响主业务流程
+        function recordOperation(operationType, objectType, objectId, objectName, description, beforeData = null, afterData = null) {
+            const history = getOperationHistory();
+            const operation = {
+                id: Date.now() + Math.random(),
+                timestamp: new Date().toISOString(),
+                userId: currentUser ? currentUser.id : null,
+                userName: currentUser ? currentUser.name : '系统',
+                userPosition: currentUser ? currentUser.position : 'system',
+                operationType: operationType, // create, edit, delete, login, logout
+                objectType: objectType, // salon, transaction, employee, system
+                objectId: objectId,
+                objectName: objectName,
+                description: description,
+                beforeData: beforeData ? JSON.parse(JSON.stringify(beforeData)) : null,
+                afterData: afterData ? JSON.parse(JSON.stringify(afterData)) : null,
+                ipAddress: '127.0.0.1', // 在真实环境中可以获取真实IP
+                browserInfo: navigator.userAgent
+            };
+            
+            history.unshift(operation); // 添加到开头，最新的在前面
+            
+            // 保留最近1000条记录
+            if (history.length > 1000) {
+                history.splice(1000);
             }
+            
+            saveOperationHistory(history);
         }
         
         // 显示操作历史记录（支持分页）
@@ -8213,7 +7983,6 @@
             document.getElementById('editSalonId').value = salon.id;
             document.getElementById('editSalonName').value = salon.name;
             document.getElementById('editSalonAddress').value = salon.address;
-            document.getElementById('editBusinessLicense').value = salon.businessLicense || '';
             document.getElementById('editSalonDistrict').value = salon.district;
             document.getElementById('editSalonPhone').value = salon.phone || '';
             document.getElementById('editDirectorName').value = salon.directorName;
@@ -8246,7 +8015,6 @@
             const salonId = parseInt(document.getElementById('editSalonId').value);
             const salonName = document.getElementById('editSalonName').value.trim();
             const salonAddress = document.getElementById('editSalonAddress').value.trim();
-            const businessLicense = document.getElementById('editBusinessLicense').value.trim();
             const salonDistrict = document.getElementById('editSalonDistrict').value;
             const salonPhone = document.getElementById('editSalonPhone').value.trim();
             const directorName = document.getElementById('editDirectorName').value.trim();
@@ -8267,8 +8035,7 @@
                 phone: salonPhone,
                 directorName: directorName,
                 directorMobile: directorMobile,
-                responsibleEmployeeId: responsibleEmployeeId,
-                businessLicense: businessLicense
+                responsibleEmployeeId: responsibleEmployeeId
             };
             
             if (updateSalon(updatedSalon)) {
@@ -8767,6 +8534,396 @@
             };
             return positionTexts[position] || position;
         }
+        
+        // ==================== 🔥 Firebase 云端数据同步功能 ====================
+        
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcLyCy4FIL34AUd6vKrE_EqHV69qcFDYQ",
+            authDomain: "mesiahair.firebaseapp.com",
+            projectId: "mesiahair",
+            storageBucket: "mesiahair.firebasestorage.app",
+            messagingSenderId: "538029419112",
+            appId: "1:538029419112:web:e2bb82a5fe0356e8d769dd"
+        };
+        
+        // Firebase数据管理器
+        class CloudDataManager {
+            constructor() {
+                this.db = null;
+                this.isOnline = navigator.onLine;
+                this.syncQueue = [];
+                this.isInitialized = false;
+                
+                // 监听网络状态
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.updateSyncStatus();
+                    this.processSyncQueue();
+                });
+                
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    this.updateSyncStatus();
+                });
+            }
+            
+            // 初始化Firebase
+            async initialize() {
+                try {
+                    firebase.initializeApp(firebaseConfig);
+                    this.db = firebase.firestore();
+                    this.isInitialized = true;
+                    console.log('🔥 Firebase已初始化，云端同步功能已启用');
+                    
+                    // 检查并迁移本地数据
+                    await this.migrateLocalData();
+                    
+                    this.updateSyncStatus();
+                    return true;
+                } catch (error) {
+                    console.error('❌ Firebase初始化失败:', error);
+                    this.isInitialized = false;
+                    this.updateSyncStatus();
+                    return false;
+                }
+            }
+            
+            // 迁移本地数据到云端
+            async migrateLocalData() {
+                try {
+                    const localEmployees = JSON.parse(localStorage.getItem('employees') || '[]');
+                    const localSalons = JSON.parse(localStorage.getItem('salons') || '[]');
+                    
+                    if (localEmployees.length > 0) {
+                        console.log('🔄 发现本地员工数据，开始迁移...');
+                        for (const employee of localEmployees) {
+                            await this.saveEmployee(employee);
+                        }
+                        console.log('✅ 员工数据迁移完成');
+                    }
+                    
+                    if (localSalons.length > 0) {
+                        console.log('🔄 发现本地沙龙数据，开始迁移...');
+                        for (const salon of localSalons) {
+                            await this.saveSalon(salon);
+                        }
+                        console.log('✅ 沙龙数据迁移完成');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ 数据迁移失败:', error);
+                }
+            }
+            
+            // 保存员工数据
+            async saveEmployee(employee) {
+                try {
+                    if (this.isInitialized && this.isOnline) {
+                        await this.db.collection('employees').doc(employee.id.toString()).set(employee);
+                        console.log('☁️ 员工数据已同步到云端:', employee.name);
+                        return true;
+                    } else {
+                        // 离线时存储到本地
+                        this.addToSyncQueue(() => this.saveEmployee(employee));
+                        const employees = JSON.parse(localStorage.getItem('employees') || '[]');
+                        const index = employees.findIndex(emp => emp.id === employee.id);
+                        if (index >= 0) {
+                            employees[index] = employee;
+                        } else {
+                            employees.push(employee);
+                        }
+                        localStorage.setItem('employees', JSON.stringify(employees));
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('❌ 保存员工数据失败:', error);
+                    // 回退到本地存储
+                    const employees = JSON.parse(localStorage.getItem('employees') || '[]');
+                    const index = employees.findIndex(emp => emp.id === employee.id);
+                    if (index >= 0) {
+                        employees[index] = employee;
+                    } else {
+                        employees.push(employee);
+                    }
+                    localStorage.setItem('employees', JSON.stringify(employees));
+                    return true;
+                }
+            }
+            
+            // 获取员工数据
+            async getEmployees() {
+                try {
+                    if (this.isInitialized && this.isOnline) {
+                        const snapshot = await this.db.collection('employees').get();
+                        const employees = [];
+                        snapshot.forEach(doc => {
+                            employees.push(doc.data());
+                        });
+                        // 同步到本地缓存
+                        localStorage.setItem('employees', JSON.stringify(employees));
+                        return employees;
+                    } else {
+                        // 离线时使用本地数据
+                        return JSON.parse(localStorage.getItem('employees') || '[]');
+                    }
+                } catch (error) {
+                    console.error('❌ 获取员工数据失败:', error);
+                    return JSON.parse(localStorage.getItem('employees') || '[]');
+                }
+            }
+            
+            // 保存沙龙数据
+            async saveSalon(salon) {
+                try {
+                    if (this.isInitialized && this.isOnline) {
+                        await this.db.collection('salons').doc(salon.id.toString()).set(salon);
+                        console.log('☁️ 沙龙数据已同步到云端:', salon.name);
+                        return true;
+                    } else {
+                        // 离线时存储到本地
+                        this.addToSyncQueue(() => this.saveSalon(salon));
+                        const salons = JSON.parse(localStorage.getItem('salons') || '[]');
+                        const index = salons.findIndex(s => s.id === salon.id);
+                        if (index >= 0) {
+                            salons[index] = salon;
+                        } else {
+                            salons.push(salon);
+                        }
+                        localStorage.setItem('salons', JSON.stringify(salons));
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('❌ 保存沙龙数据失败:', error);
+                    // 回退到本地存储
+                    const salons = JSON.parse(localStorage.getItem('salons') || '[]');
+                    const index = salons.findIndex(s => s.id === salon.id);
+                    if (index >= 0) {
+                        salons[index] = salon;
+                    } else {
+                        salons.push(salon);
+                    }
+                    localStorage.setItem('salons', JSON.stringify(salons));
+                    return true;
+                }
+            }
+            
+            // 获取沙龙数据
+            async getSalons() {
+                try {
+                    if (this.isInitialized && this.isOnline) {
+                        const snapshot = await this.db.collection('salons').get();
+                        const salons = [];
+                        snapshot.forEach(doc => {
+                            salons.push(doc.data());
+                        });
+                        // 同步到本地缓存
+                        localStorage.setItem('salons', JSON.stringify(salons));
+                        return salons;
+                    } else {
+                        // 离线时使用本地数据
+                        return JSON.parse(localStorage.getItem('salons') || '[]');
+                    }
+                } catch (error) {
+                    console.error('❌ 获取沙龙数据失败:', error);
+                    return JSON.parse(localStorage.getItem('salons') || '[]');
+                }
+            }
+            
+            // 删除员工数据
+            async deleteEmployee(employeeId) {
+                try {
+                    if (this.isInitialized && this.isOnline) {
+                        await this.db.collection('employees').doc(employeeId.toString()).delete();
+                        console.log('☁️ 员工数据已从云端删除:', employeeId);
+                    } else {
+                        this.addToSyncQueue(() => this.deleteEmployee(employeeId));
+                    }
+                    
+                    // 同时删除本地数据
+                    const employees = JSON.parse(localStorage.getItem('employees') || '[]');
+                    const filteredEmployees = employees.filter(emp => emp.id !== employeeId);
+                    localStorage.setItem('employees', JSON.stringify(filteredEmployees));
+                    return true;
+                } catch (error) {
+                    console.error('❌ 删除员工数据失败:', error);
+                    return false;
+                }
+            }
+            
+            // 删除沙龙数据
+            async deleteSalon(salonId) {
+                try {
+                    if (this.isInitialized && this.isOnline) {
+                        await this.db.collection('salons').doc(salonId.toString()).delete();
+                        console.log('☁️ 沙龙数据已从云端删除:', salonId);
+                    } else {
+                        this.addToSyncQueue(() => this.deleteSalon(salonId));
+                    }
+                    
+                    // 同时删除本地数据
+                    const salons = JSON.parse(localStorage.getItem('salons') || '[]');
+                    const filteredSalons = salons.filter(salon => salon.id !== salonId);
+                    localStorage.setItem('salons', JSON.stringify(filteredSalons));
+                    return true;
+                } catch (error) {
+                    console.error('❌ 删除沙龙数据失败:', error);
+                    return false;
+                }
+            }
+            
+            // 添加到同步队列
+            addToSyncQueue(operation) {
+                this.syncQueue.push(operation);
+                this.updateSyncStatus();
+            }
+            
+            // 处理同步队列
+            async processSyncQueue() {
+                if (!this.isInitialized || !this.isOnline) return;
+                
+                while (this.syncQueue.length > 0) {
+                    const operation = this.syncQueue.shift();
+                    try {
+                        await operation();
+                        console.log('✅ 队列操作同步成功');
+                    } catch (error) {
+                        console.error('❌ 队列操作同步失败:', error);
+                        this.syncQueue.unshift(operation); // 重新加入队列
+                        break;
+                    }
+                }
+                this.updateSyncStatus();
+            }
+            
+            // 更新同步状态显示
+            updateSyncStatus() {
+                const indicator = document.getElementById('sync-status-indicator');
+                if (!indicator) return;
+                
+                const status = this.getSyncStatus();
+                indicator.textContent = status.message;
+                indicator.className = `sync-status ${status.type}`;
+            }
+            
+            // 获取同步状态
+            getSyncStatus() {
+                if (!this.isInitialized) {
+                    return { type: 'error', message: '云端同步未启用' };
+                }
+                
+                if (!this.isOnline) {
+                    return { 
+                        type: 'offline', 
+                        message: this.syncQueue.length > 0 ? 
+                            `离线模式 (${this.syncQueue.length}项待同步)` : 
+                            '离线模式'
+                    };
+                }
+                
+                if (this.syncQueue.length > 0) {
+                    return { type: 'syncing', message: `同步中... (${this.syncQueue.length}项)` };
+                }
+                
+                return { type: 'online', message: '云端已同步' };
+            }
+        }
+        
+        // 创建全局云端数据管理器
+        const cloudDataManager = new CloudDataManager();
+        
+        // 云端同步功能已集成到上述函数中
+        
+        // 添加同步状态指示器
+        function addSyncStatusIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'sync-status-indicator';
+            indicator.className = 'sync-status offline';
+            indicator.textContent = '初始化中...';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                padding: 6px 12px;
+                border-radius: 15px;
+                font-size: 0.8em;
+                font-weight: bold;
+                z-index: 1001;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            `;
+            
+            // 添加样式
+            const style = document.createElement('style');
+            style.textContent = `
+                .sync-status.online {
+                    background: #4CAF50;
+                    color: white;
+                    border: 1px solid #45a049;
+                }
+                .sync-status.offline {
+                    background: #ff9800;
+                    color: white;
+                    border: 1px solid #f57c00;
+                }
+                .sync-status.syncing {
+                    background: #2196F3;
+                    color: white;
+                    border: 1px solid #1976D2;
+                    animation: pulse 1.5s infinite;
+                }
+                .sync-status.error {
+                    background: #f44336;
+                    color: white;
+                    border: 1px solid #d32f2f;
+                }
+                @keyframes pulse {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                    100% { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // 点击显示详细状态
+            indicator.addEventListener('click', () => {
+                const status = cloudDataManager.getSyncStatus();
+                alert(`云端同步状态：${status.message}\n\n` +
+                      `Firebase连接：${cloudDataManager.isInitialized ? '已连接' : '未连接'}\n` +
+                      `网络状态：${cloudDataManager.isOnline ? '在线' : '离线'}\n` +
+                      `待同步项目：${cloudDataManager.syncQueue.length}项`);
+            });
+            
+            document.body.appendChild(indicator);
+        }
+        
+        // 在页面加载完成后初始化云端同步
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 添加同步状态指示器
+            addSyncStatusIndicator();
+            
+            // 立即尝试初始化Firebase
+            try {
+                console.log('🔄 开始初始化云端同步...');
+                const success = await cloudDataManager.initialize();
+                if (success) {
+                    console.log('🎉 云端数据同步功能已启用！');
+                    cloudDataManager.updateSyncStatus();
+                    // 定期更新状态
+                    setInterval(() => {
+                        cloudDataManager.updateSyncStatus();
+                    }, 3000);
+                } else {
+                    console.log('⚠️ 云端同步初始化失败，将使用本地存储模式');
+                    cloudDataManager.updateSyncStatus();
+                }
+            } catch (error) {
+                console.error('❌ 云端同步初始化出错:', error);
+                cloudDataManager.isInitialized = false;
+                cloudDataManager.updateSyncStatus();
+            }
+        });
         
     </script>
 </body>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品添加功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+        }
+        button {
+            background: #d4af37;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #d4af37;
+            padding: 8px;
+            text-align: center;
+        }
+        input {
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: white;
+            padding: 5px;
+            border-radius: 3px;
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>产品添加功能测试</h1>
+        <button onclick="addProductRow()">添加产品</button>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>产品名称</th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let productRowCounter = 0;
+        
+        function addProductRow() {
+            console.log('添加产品行被调用');
+            alert('添加产品行功能正常！');
+            productRowCounter++;
+            const tbody = document.getElementById('productTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" placeholder="产品名称"></td>
+                <td><input type="text" placeholder="1,000"></td>
+                <td><input type="number" placeholder="1"></td>
+                <td><button onclick="alert('删除功能')">删除</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+    </script>
+</body>
+</html> 

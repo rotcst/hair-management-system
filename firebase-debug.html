@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase诊断工具</title>
+    <style>
+        body { font-family: Arial; background: #1a1a1a; color: #fff; padding: 20px; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .warning { background: #ff9800; }
+        button { background: #D4AF37; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        #log { background: #333; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Firebase诊断工具</h1>
+    
+    <div id="mainStatus" class="status warning">正在检查...</div>
+    
+    <button onclick="checkFirestoreEnabled()">检查Firestore是否启用</button>
+    <button onclick="testEmployeeOperations()">测试员工操作</button>
+    <button onclick="forceReset()">强制重置状态</button>
+    
+    <h3>详细日志：</h3>
+    <div id="log"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcLyCy4FIL34AUd6vKrE_EqHV69qcFDYQ",
+            authDomain: "mesiahair.firebaseapp.com",
+            projectId: "mesiahair",
+            storageBucket: "mesiahair.firebasestorage.app",
+            messagingSenderId: "538029419112",
+            appId: "1:538029419112:web:e2bb82a5fe0356e8d769dd"
+        };
+
+        let db;
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            document.getElementById('log').textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        function updateMainStatus(message, type) {
+            const status = document.getElementById('mainStatus');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        // 初始化Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            window.db = db;
+            log('✅ Firebase初始化成功');
+            
+            // 立即检查连接
+            setTimeout(checkFirestoreEnabled, 1000);
+        } catch (error) {
+            log(`❌ Firebase初始化失败: ${error.message}`);
+            updateMainStatus('Firebase初始化失败', 'error');
+        }
+
+        async function checkFirestoreEnabled() {
+            log('🔍 检查Firestore数据库状态...');
+            updateMainStatus('正在检查Firestore...', 'warning');
+            
+            try {
+                // 尝试获取一个简单的集合信息
+                const snapshot = await db.collection('_test_connection').limit(1).get();
+                log('✅ Firestore数据库已启用并可访问');
+                updateMainStatus('Firestore正常！现在检查主页面...', 'success');
+                
+                // 检查主页面状态
+                checkMainPageStatus();
+                
+            } catch (error) {
+                log(`❌ Firestore访问失败: ${error.code} - ${error.message}`);
+                
+                if (error.code === 'failed-precondition') {
+                    updateMainStatus('Firestore数据库未启用！', 'error');
+                    log('💡 解决方案：在Firebase控制台启用Firestore数据库');
+                } else if (error.code === 'permission-denied') {
+                    updateMainStatus('安全规则阻止访问', 'error');
+                    log('💡 解决方案：检查Firestore安全规则设置');
+                } else {
+                    updateMainStatus('Firestore连接失败', 'error');
+                }
+            }
+        }
+
+        function checkMainPageStatus() {
+            log('🔍 检查主页面Firebase状态...');
+            
+            // 模拟主页面的状态检查逻辑
+            const isOnline = navigator.onLine;
+            const hasDb = window.db !== undefined;
+            const hasFirebase = window.firebase !== undefined;
+            
+            log(`网络状态: ${isOnline ? '在线' : '离线'}`);
+            log(`Firebase对象: ${hasFirebase ? '存在' : '不存在'}`);
+            log(`Firestore数据库: ${hasDb ? '存在' : '不存在'}`);
+            
+            if (isOnline && hasDb && hasFirebase) {
+                log('✅ 主页面应该显示"已连接云端数据库"');
+                updateMainStatus('所有检查通过！主页面应该正常', 'success');
+            } else {
+                log('❌ 主页面状态检查失败');
+                updateMainStatus('主页面状态异常', 'error');
+            }
+        }
+
+        async function testEmployeeOperations() {
+            log('🔄 测试员工数据操作...');
+            
+            const testEmployee = {
+                name: '测试员工_' + Date.now(),
+                position: 'salesperson',
+                username: 'test_' + Date.now(),
+                password: 'test123',
+                mobile: '010-1234-5678',
+                createTime: new Date().toLocaleString('zh-CN'),
+                id: Date.now().toString()
+            };
+            
+            try {
+                // 添加员工
+                await db.collection('employees').doc(testEmployee.id).set(testEmployee);
+                log(`✅ 成功添加测试员工: ${testEmployee.name}`);
+                
+                // 读取员工
+                const doc = await db.collection('employees').doc(testEmployee.id).get();
+                if (doc.exists) {
+                    log(`✅ 成功读取员工数据: ${JSON.stringify(doc.data())}`);
+                    
+                    // 删除测试员工
+                    await db.collection('employees').doc(testEmployee.id).delete();
+                    log('✅ 成功删除测试员工');
+                    
+                    updateMainStatus('员工操作测试全部通过！', 'success');
+                    
+                } else {
+                    log('❌ 员工数据写入成功但读取失败');
+                }
+                
+            } catch (error) {
+                log(`❌ 员工操作失败: ${error.code} - ${error.message}`);
+                updateMainStatus('员工操作测试失败', 'error');
+            }
+        }
+
+        function forceReset() {
+            log('🔄 强制重置本地状态...');
+            
+            // 清除本地存储
+            localStorage.clear();
+            log('✅ 已清除localStorage');
+            
+            // 重新加载页面
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 

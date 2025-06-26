@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase连接测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .warning { background: #ff9800; }
+        .info { background: #2196F3; }
+        button {
+            background: #D4AF37;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #log {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase连接测试</h1>
+    
+    <div id="status" class="status info">正在初始化Firebase...</div>
+    
+    <div>
+        <button onclick="testConnection()">测试连接</button>
+        <button onclick="testEmployeeAdd()">测试添加员工</button>
+        <button onclick="testEmployeeRead()">测试读取员工</button>
+        <button onclick="clearLog()">清空日志</button>
+    </div>
+    
+    <h3>操作日志：</h3>
+    <div id="log"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcLyCy4FIL34AUd6vKrE_EqHV69qcFDYQ",
+            authDomain: "mesiahair.firebaseapp.com",
+            projectId: "mesiahair",
+            storageBucket: "mesiahair.firebasestorage.app",
+            messagingSenderId: "538029419112",
+            appId: "1:538029419112:web:e2bb82a5fe0356e8d769dd"
+        };
+
+        let db;
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById('log');
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        // 初始化Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            log('✅ Firebase应用初始化成功');
+            updateStatus('Firebase已初始化，准备测试连接...', 'success');
+        } catch (error) {
+            log(`❌ Firebase初始化失败: ${error.message}`, 'error');
+            updateStatus('Firebase初始化失败', 'error');
+        }
+
+        // 测试连接
+        async function testConnection() {
+            log('🔄 开始测试Firebase连接...');
+            updateStatus('正在测试连接...', 'warning');
+            
+            try {
+                // 尝试写入测试数据
+                const testDoc = await db.collection('test').add({
+                    message: 'Firebase连接测试',
+                    timestamp: new Date(),
+                    browser: navigator.userAgent
+                });
+                
+                log(`✅ 连接成功！文档ID: ${testDoc.id}`);
+                updateStatus('Firebase连接正常！', 'success');
+                
+                // 立即读取刚写入的数据
+                const doc = await db.collection('test').doc(testDoc.id).get();
+                if (doc.exists) {
+                    log(`✅ 数据读取成功: ${JSON.stringify(doc.data())}`);
+                } else {
+                    log('⚠️ 数据写入成功但读取失败');
+                }
+                
+            } catch (error) {
+                log(`❌ 连接失败: ${error.code} - ${error.message}`);
+                updateStatus('Firebase连接失败！', 'error');
+                
+                if (error.code === 'permission-denied') {
+                    log('💡 提示：这可能是Firestore安全规则问题');
+                    log('请检查Firebase控制台的Firestore安全规则设置');
+                }
+            }
+        }
+
+        // 测试添加员工
+        async function testEmployeeAdd() {
+            log('🔄 测试添加员工数据...');
+            
+            const testEmployee = {
+                name: '测试员工',
+                position: 'salesperson',
+                username: 'test_' + Date.now(),
+                password: 'test123',
+                mobile: '010-1234-5678',
+                createTime: new Date().toLocaleString('zh-CN'),
+                id: Date.now().toString()
+            };
+            
+            try {
+                await db.collection('employees').doc(testEmployee.id).set(testEmployee);
+                log(`✅ 员工添加成功: ${testEmployee.name} (ID: ${testEmployee.id})`);
+            } catch (error) {
+                log(`❌ 员工添加失败: ${error.code} - ${error.message}`);
+            }
+        }
+
+        // 测试读取员工
+        async function testEmployeeRead() {
+            log('🔄 测试读取员工数据...');
+            
+            try {
+                const snapshot = await db.collection('employees').limit(5).get();
+                
+                if (snapshot.empty) {
+                    log('📝 员工集合为空');
+                } else {
+                    log(`📋 找到 ${snapshot.size} 个员工:`);
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        log(`  - ${data.name} (${data.position}) - ID: ${doc.id}`);
+                    });
+                }
+            } catch (error) {
+                log(`❌ 读取员工失败: ${error.code} - ${error.message}`);
+            }
+        }
+
+        // 页面加载完成后自动测试连接
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+        
+        // 监听网络状态
+        window.addEventListener('online', () => {
+            log('🌐 网络已连接');
+            updateStatus('网络已连接，可以测试Firebase', 'success');
+        });
+        
+        window.addEventListener('offline', () => {
+            log('🚫 网络已断开');
+            updateStatus('网络已断开', 'warning');
+        });
+    </script>
+</body>
+</html> 
