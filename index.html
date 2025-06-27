@@ -1,83 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <title>MAKE IT HAIR Professional - 管理系统</title>
+    <!-- 字体/粒子/动效CDN -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400|Poppins:400,700|Source+Han+Sans+SC:400,700&display=swap" rel="stylesheet">
     <!-- SheetJS库用于处理Excel文件 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
     <style>
         :root {
             --gold: #D4AF37;
             --gold-light: #FFD700;
             --black: #000000;
             --dark-gray: #1a1a1a;
-            --text-light: #ffffff;
+            --text-light: #fff;
+            --shadow: 0 10px 32px 0 rgba(212,175,55,0.13), 0 2px 4px rgba(0,0,0,0.23);
+            --glass: rgba(24,24,24,0.76);
+            --glass-blur: blur(20px) saturate(180%);
+        }
+        
+        #tsparticles {
+            position: fixed; left:0; top:0; width:100vw; height:100vh;
+            pointer-events: none; z-index: 0;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Montserrat', 'Poppins', 'Source Han Sans SC', 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: var(--black);
+            padding: 0;
+            background: linear-gradient(135deg, #191919 0%, #232323 100%);
             color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container, .content-area, .header, .top-nav, .menu-item, .submenu-item, .footer {
+            background: var(--glass);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            border: 1.5px solid rgba(212,175,55,0.08);
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1220px;
+            margin: 40px auto 0 auto;
+            padding: 38px 32px 45px 32px;
+            position: relative;
+            z-index: 1;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 50px;
-            padding: 20px;
+            margin-bottom: 44px;
+            padding: 28px 0 18px 0;
             border-bottom: 2px solid var(--gold);
         }
         
         .logo {
-            font-size: 2.5em;
+            font-size: 2.9em;
             color: var(--gold);
             margin-bottom: 10px;
-            font-weight: bold;
+            font-family: 'Montserrat', cursive;
+            font-weight: 900;
             cursor: pointer;
-            transition: all 0.3s ease;
             user-select: none;
+            letter-spacing: 1px;
+            transition: all .36s cubic-bezier(.23,1.13,.32,1.2);
+            text-shadow: 0 0 22px rgba(212,175,55,0.28);
+            filter: drop-shadow(0 2px 12px #1a1a1a77);
         }
         
         .logo:hover {
             color: var(--gold-light);
-            transform: scale(1.1);
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            transform: scale(1.11) rotate(-1deg);
+            text-shadow: 0 0 34px rgba(212,175,55,0.53);
         }
         
         .subtitle {
             color: var(--gold-light);
             font-style: italic;
-            font-size: 1.2em;
+            font-size: 1.22em;
+            opacity: 0.84;
+            font-weight: 400;
         }
         
         .menu {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 36px;
+            margin-bottom: 38px;
         }
         
         .menu-item {
-            background: var(--dark-gray);
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid var(--gold);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all .32s cubic-bezier(.23,1.13,.32,1.2);
             position: relative;
             overflow: hidden;
+            border-radius: 18px;
+            cursor: pointer;
+            padding: 36px 34px 32px 34px;
+            border: 1.5px solid var(--gold);
+            background: linear-gradient(120deg, rgba(24,24,24,0.78) 70%, rgba(212,175,55,0.08));
         }
         
         .menu-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+            transform: translateY(-9px) scale(1.04) rotate(-0.5deg);
+            box-shadow: 0 18px 48px rgba(212,175,55,0.21);
             border-color: var(--gold-light);
+            z-index: 1;
         }
         
         .menu-item:hover h2 {
@@ -86,46 +118,132 @@
         
         .menu-item::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(212,175,55,0.17), transparent);
             transform: translateX(-100%);
-            transition: 0.5s;
+            transition: .56s cubic-bezier(.19,1.01,.38,1.13);
+            pointer-events: none;
+            z-index: 0;
         }
         
-        .menu-item:hover::before {
-            transform: translateX(100%);
+        .menu-item:hover::before { 
+            transform: translateX(100%); 
         }
         
-        h1 {
-            color: var(--gold);
-            font-size: 2.5em;
-            margin-bottom: 20px;
+        h1, h2, h3 {
+            font-family: 'Montserrat', 'Poppins', 'Source Han Sans SC', Arial, sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.03em;
         }
         
-        h2 {
-            color: var(--gold);
-            margin: 0 0 15px 0;
-            font-size: 1.5em;
-            transition: color 0.3s ease;
+        h1 { 
+            color: var(--gold); 
+            font-size: 2.6em; 
+            margin-bottom: 18px;
         }
         
-        p {
-            color: var(--text-light);
-            margin: 0;
-            line-height: 1.6;
-            font-size: 1.1em;
+        h2 { 
+            color: var(--gold); 
+            margin: 0 0 13px 0; 
+            font-size: 1.44em; 
+            transition: color .24s;
+        }
+        
+        p { 
+            color: var(--text-light); 
+            margin: 0; 
+            line-height: 1.6; 
+            font-size: 1.08em;
         }
         
         .footer {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 54px;
             padding-top: 20px;
             border-top: 2px solid var(--gold);
             color: var(--gold-light);
+            background: rgba(30,30,30,0.60);
+            font-size: 1.02em;
+            opacity: .85;
+        }
+        
+        /* 自定义滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 12px; 
+            background: #1a1a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(120deg, #d4af37 55%, #1a1a1a 100%);
+            border-radius: 7px;
+            box-shadow: 0 2px 10px rgba(212,175,55,0.13);
+            border: 2px solid #232323;
+        }
+        
+        ::-webkit-scrollbar-corner { 
+            background: #191919;
+        }
+        
+        /* 渐入动画 */
+        .fade-in {
+            animation: fadeInSlide .68s cubic-bezier(.17,.87,.48,1.35);
+        }
+        
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(30px) scale(0.97);}
+            to   { opacity: 1; transform: none;}
+        }
+        
+        /* 按钮优化 */
+        button, .language-btn, .back-button {
+            font-family: inherit;
+            font-size: 1em;
+            border-radius: 7px;
+            transition: background .18s, color .18s, transform .13s;
+            box-shadow: 0 2px 8px rgba(212,175,55,0.09);
+        }
+        
+        button:active, .language-btn:active, .back-button:active {
+            transform: scale(0.97);
+            box-shadow: 0 0 0 5px rgba(212,175,55,0.16);
+        }
+        
+        /* 输入框优化 */
+        input, select, textarea {
+            transition: border-color .21s, box-shadow .22s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--gold-light)!important;
+            box-shadow: 0 0 9px 1px rgba(212,175,55,0.22)!important;
+            outline: none;
+            background: rgba(0,0,0,0.24);
+        }
+        
+        /* Toast通知样式 */
+        .popup-toast {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.92); color: var(--gold-light);
+            border: 2px solid var(--gold);
+            padding: 13px 36px; border-radius: 8px; z-index: 99; font-size: 1.1em;
+            box-shadow: 0 4px 18px rgba(212,175,55,0.17);
+            opacity: 0; pointer-events: none;
+            animation: fadeInSlide .45s forwards;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .container { padding: 16px 2vw;}
+            .menu { grid-template-columns: 1fr; gap: 16px;}
+            .top-nav { flex-direction: column; padding: 0 8px;}
+        }
+        
+        @media (max-width: 600px) {
+            .container { padding: 0 2vw;}
+            .menu-item { padding: 20px 8px;}
+            .header { padding: 20px 0 12px;}
+            h1 { font-size: 1.4em;}
+            h2 { font-size: 1.13em;}
         }
         
         /* 子菜单样式 */
@@ -206,23 +324,36 @@
         
         /* 顶部导航栏样式 */
         .top-nav {
-            position: relative;
-            margin: 20px;
-            z-index: 1000;
+            margin: 28px 0 24px 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 26px;
+            border: none;
+            box-shadow: none;
+            background: rgba(0,0,0,0.22);
+            height: 54px;
         }
         
         /* 代理店名称显示样式 */
+        .store-info, .user-info, .language-switcher {
+            box-shadow: 0 2px 6px rgba(212,175,55,0.06);
+            border: 1px solid rgba(212,175,55,0.12);
+            background: rgba(25,25,25,0.70);
+        }
+        
         .store-info {
-            background: var(--dark-gray);
             padding: 8px 15px;
             border-radius: 8px;
             height: 40px;
             display: flex;
             align-items: center;
             box-sizing: border-box;
+        }
+        
+        .store-info span, .user-position, .user-name, .language-btn {
+            font-family: 'Montserrat', 'Source Han Sans SC', Arial, sans-serif;
         }
         
         .store-info span {
@@ -240,7 +371,6 @@
         
         /* 用户信息显示样式 */
         .user-info {
-            background: var(--dark-gray);
             padding: 8px 15px;
             border-radius: 8px;
             height: 40px;
@@ -282,7 +412,6 @@
         .language-switcher {
             display: flex;
             gap: 5px;
-            background: var(--dark-gray);
             padding: 8px 15px;
             border-radius: 8px;
             height: 40px;
@@ -445,6 +574,7 @@
     </style>
 </head>
 <body>
+    <div id="tsparticles"></div>
     <!-- 顶部导航栏 -->
     <div class="top-nav">
         <!-- 代理店名称显示（左侧） -->
@@ -889,7 +1019,21 @@
         <div id="product-category" class="content-area">
             <button class="back-button" onclick="backToMenu()" data-i18n="back-to-main">返回主菜单</button>
             <h1 data-i18n="product-category">产品分类</h1>
-            <p data-i18n="product-category-content">管理产品分类信息...</p>
+            
+            <!-- 添加产品分类按钮 -->
+            <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
+                <p data-i18n="product-category-content">管理产品分类信息</p>
+                <button onclick="openCreateCategoryModal()" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;" data-i18n="create-product-category">创建产品分类</button>
+            </div>
+            
+            <!-- 产品分类列表 -->
+            <div style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-top: 20px;">
+                <h3 style="color: var(--gold); margin: 0 0 15px 0;" data-i18n="category-list">产品分类列表</h3>
+                <div id="categoryList" style="margin-top: 15px;">
+                    <!-- 产品分类列表将在这里动态生成 -->
+                    <div style="text-align: center; color: #cccccc; padding: 20px;" data-i18n="no-categories">暂无产品分类，请点击"创建产品分类"添加</div>
+                </div>
+            </div>
         </div>
         
         <div id="stock-check" class="content-area">
@@ -1432,6 +1576,72 @@
                 </form>
             </div>
         </div>
+        
+        <!-- 创建产品分类模态框 -->
+        <div id="createCategoryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1002; justify-content: center; align-items: center;">
+            <div style="background: var(--dark-gray); padding: 30px; border-radius: 10px; border: 1px solid var(--gold); width: 500px; max-width: 95vw; max-height: 95vh; overflow-y: auto;">
+                <h2 style="color: var(--gold); margin-top: 0;" data-i18n="create-product-category">创建产品分类</h2>
+                <form id="createCategoryForm">
+                    <div style="margin-bottom: 20px;">
+                        <label for="categoryNameCN" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-name-cn">中文分类名称：</label>
+                        <input type="text" id="categoryNameCN" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="请输入中文产品分类名称">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="categoryNameKO" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-name-ko">韩文分类名称：</label>
+                        <input type="text" id="categoryNameKO" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="제품 카테고리 이름을 입력하세요">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="categoryDescription" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-description">分类描述（选填）：</label>
+                        <textarea id="categoryDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 80px; resize: vertical;" placeholder="请输入该分类的详细描述..."></textarea>
+                    </div>
+                    
+                    <div style="background: rgba(212, 175, 55, 0.1); padding: 15px; border-radius: 6px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 20px;">
+                        <p style="color: #cccccc; margin: 0; font-size: 0.9em;" data-i18n="category-create-tip">创建的产品分类将用于对美发产品进行分类管理，便于查找和整理产品信息。</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" onclick="closeCreateCategoryModal()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="cancel">取消</button>
+                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="create">创建</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 编辑产品分类模态框 -->
+        <div id="editCategoryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1003; justify-content: center; align-items: center;">
+            <div style="background: var(--dark-gray); padding: 30px; border-radius: 10px; border: 1px solid var(--gold); width: 500px; max-width: 95vw; max-height: 95vh; overflow-y: auto;">
+                <h2 style="color: var(--gold); margin-top: 0;" data-i18n="edit-product-category">编辑产品分类</h2>
+                <form id="editCategoryForm">
+                    <input type="hidden" id="editCategoryId">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="editCategoryNameCN" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-name-cn">中文分类名称：</label>
+                        <input type="text" id="editCategoryNameCN" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="请输入中文产品分类名称">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="editCategoryNameKO" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-name-ko">韩文分类名称：</label>
+                        <input type="text" id="editCategoryNameKO" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="제품 카테고리 이름을 입력하세요">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="editCategoryDescription" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-description">分类描述（选填）：</label>
+                        <textarea id="editCategoryDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; height: 80px; resize: vertical;" placeholder="请输入该分类的详细描述..."></textarea>
+                    </div>
+                    
+                    <div style="background: rgba(212, 175, 55, 0.1); padding: 15px; border-radius: 6px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 20px;">
+                        <p style="color: #cccccc; margin: 0; font-size: 0.9em;" data-i18n="category-edit-tip">修改产品分类信息后，相关的产品分类将同步更新。</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" onclick="closeEditCategoryModal()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="cancel">取消</button>
+                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="save">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -1470,6 +1680,21 @@
                 'product-list-desc': '查看所有产品信息',
                 'product-category': '产品分类',
                 'product-category-desc': '管理产品分类',
+                'create-product-category': '创建产品分类',
+                'category-list': '产品分类列表',
+                'no-categories': '暂无产品分类，请点击"创建产品分类"添加',
+                'category-name-cn': '中文分类名称：',
+                'category-name-ko': '韩文分类名称：',
+                'category-description': '分类描述（选填）：',
+                'category-create-tip': '创建的产品分类将用于对美发产品进行分类管理，便于查找和整理产品信息。',
+                'create': '创建',
+                'category-created-success': '产品分类创建成功！',
+                'fill-category-names': '请填写中文和韩文分类名称！',
+                'category-name-exists': '该分类名称已存在！',
+                'edit-product-category': '编辑产品分类',
+                'category-edit-tip': '修改产品分类信息后，相关的产品分类将同步更新。',
+                'category-updated-success': '产品分类更新成功！',
+                'category-name-exists-edit': '该分类名称已被其他分类使用，请使用其他名称！',
                 'inventory-management': '库存信息管理',
                 'inventory-management-desc': '跟踪产品库存、补货预警、使用记录等',
                 'stock-check': '库存盘点',
@@ -1898,6 +2123,21 @@
                 'product-list-desc': '모든 제품 정보 조회',
                 'product-category': '제품 분류',
                 'product-category-desc': '제품 분류 관리',
+                'create-product-category': '제품 분류 생성',
+                'category-list': '제품 분류 목록',
+                'no-categories': '제품 분류가 없습니다. "제품 분류 생성"을 클릭하여 추가하세요',
+                'category-name-cn': '중문 분류명：',
+                'category-name-ko': '한국어 분류명：',
+                'category-description': '분류 설명 (선택사항)：',
+                'category-create-tip': '생성된 제품 분류는 헤어 제품의 분류 관리에 사용되어 제품 정보를 쉽게 찾고 정리할 수 있습니다.',
+                'create': '생성',
+                'category-created-success': '제품 분류가 성공적으로 생성되었습니다！',
+                'fill-category-names': '중문과 한국어 분류명을 입력해주세요！',
+                'category-name-exists': '해당 분류명이 이미 존재합니다！',
+                'edit-product-category': '제품 분류 편집',
+                'category-edit-tip': '제품 분류 정보를 수정하면 관련 제품 분류가 동기화됩니다.',
+                'category-updated-success': '제품 분류가 성공적으로 업데이트되었습니다！',
+                'category-name-exists-edit': '해당 분류명이 다른 분류에서 사용 중입니다. 다른 이름을 사용해주세요！',
                 'inventory-management': '재고 정보 관리',
                 'inventory-management-desc': '제품 재고 추적, 보충 알림, 사용 기록 등',
                 'stock-check': '재고 확인',
@@ -5042,6 +5282,249 @@
             document.getElementById('editProductTableBody').innerHTML = '';
             editProductRowCounter = 0;
         }
+
+        // 产品分类相关功能
+        let productCategories = JSON.parse(localStorage.getItem('productCategories') || '[]');
+        
+        // 显示创建产品分类模态框
+        function openCreateCategoryModal() {
+            const modal = document.getElementById('createCategoryModal');
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭创建产品分类模态框
+        function closeCreateCategoryModal() {
+            const modal = document.getElementById('createCategoryModal');
+            modal.style.display = 'none';
+            
+            // 清空表单数据
+            document.getElementById('createCategoryForm').reset();
+        }
+        
+        // 创建产品分类
+        function createProductCategory() {
+            const categoryNameCN = document.getElementById('categoryNameCN').value.trim();
+            const categoryNameKO = document.getElementById('categoryNameKO').value.trim();
+            const categoryDescription = document.getElementById('categoryDescription').value.trim();
+            
+            // 验证输入
+            if (!categoryNameCN || !categoryNameKO) {
+                alert(getText('fill-category-names'));
+                return false;
+            }
+            
+            // 检查是否已存在相同名称的分类
+            const exists = productCategories.some(category => 
+                category.nameCN === categoryNameCN || category.nameKO === categoryNameKO
+            );
+            
+            if (exists) {
+                alert(getText('category-name-exists'));
+                return false;
+            }
+            
+            // 创建新分类
+            const newCategory = {
+                id: Date.now(),
+                nameCN: categoryNameCN,
+                nameKO: categoryNameKO,
+                description: categoryDescription,
+                createTime: new Date().toISOString(),
+                createdBy: currentUser?.name || '系统管理员'
+            };
+            
+            productCategories.push(newCategory);
+            
+            // 保存到本地存储
+            localStorage.setItem('productCategories', JSON.stringify(productCategories));
+            
+            // 记录操作历史
+            if (typeof recordOperation === 'function') {
+                recordOperation('create', 'category', `创建产品分类：${categoryNameCN} (${categoryNameKO})`);
+            }
+            
+            // 刷新分类列表
+            displayProductCategories();
+            
+            // 关闭模态框
+            closeCreateCategoryModal();
+            
+            // 显示成功消息
+            alert(getText('category-created-success'));
+            
+            return false;
+        }
+        
+        // 显示产品分类列表
+        function displayProductCategories() {
+            const categoryList = document.getElementById('categoryList');
+            
+            if (productCategories.length === 0) {
+                categoryList.innerHTML = `
+                    <div style="text-align: center; color: #cccccc; padding: 20px;" data-i18n="no-categories">
+                        ${getText('no-categories')}
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            productCategories.forEach((category, index) => {
+                html += `
+                    <div style="background: rgba(100,100,100,0.2); padding: 15px; margin-bottom: 10px; border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <h4 style="color: var(--gold); margin: 0 0 8px 0; font-size: 1.1em;">
+                                    ${category.nameCN} / ${category.nameKO}
+                                </h4>
+                                ${category.description ? `
+                                    <p style="color: #cccccc; margin: 0 0 8px 0; font-size: 0.9em;">
+                                        ${category.description}
+                                    </p>
+                                ` : ''}
+                                <div style="font-size: 0.8em; color: #aaa;">
+                                    <span>创建时间：${new Date(category.createTime).toLocaleString()}</span>
+                                    <span style="margin-left: 15px;">创建人：${category.createdBy}</span>
+                                    ${category.updateTime ? `
+                                        <br>
+                                        <span style="color: #87CEEB;">最后更新：${new Date(category.updateTime).toLocaleString()}</span>
+                                        <span style="margin-left: 15px; color: #87CEEB;">更新人：${category.updatedBy}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-left: 15px;">
+                                <button onclick="editProductCategory(${category.id})" style="background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8em;">
+                                    ${getText('edit-btn')}
+                                </button>
+                                <button onclick="deleteProductCategory(${category.id}, '${category.nameCN}')" style="background: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8em;">
+                                    ${getText('delete')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            categoryList.innerHTML = html;
+        }
+        
+        // 显示编辑产品分类模态框
+        function editProductCategory(categoryId) {
+            const category = productCategories.find(cat => cat.id === categoryId);
+            if (!category) {
+                alert('未找到该产品分类！');
+                return;
+            }
+            
+            // 填充编辑表单
+            document.getElementById('editCategoryId').value = category.id;
+            document.getElementById('editCategoryNameCN').value = category.nameCN;
+            document.getElementById('editCategoryNameKO').value = category.nameKO;
+            document.getElementById('editCategoryDescription').value = category.description || '';
+            
+            // 显示编辑模态框
+            const modal = document.getElementById('editCategoryModal');
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭编辑产品分类模态框
+        function closeEditCategoryModal() {
+            const modal = document.getElementById('editCategoryModal');
+            modal.style.display = 'none';
+            
+            // 清空表单数据
+            document.getElementById('editCategoryForm').reset();
+        }
+        
+        // 更新产品分类
+        function updateProductCategory() {
+            const categoryId = parseInt(document.getElementById('editCategoryId').value);
+            const categoryNameCN = document.getElementById('editCategoryNameCN').value.trim();
+            const categoryNameKO = document.getElementById('editCategoryNameKO').value.trim();
+            const categoryDescription = document.getElementById('editCategoryDescription').value.trim();
+            
+            // 验证输入
+            if (!categoryNameCN || !categoryNameKO) {
+                alert(getText('fill-category-names'));
+                return false;
+            }
+            
+            // 检查是否已存在相同名称的分类（排除当前分类）
+            const exists = productCategories.some(category => 
+                category.id !== categoryId && 
+                (category.nameCN === categoryNameCN || category.nameKO === categoryNameKO)
+            );
+            
+            if (exists) {
+                alert(getText('category-name-exists-edit'));
+                return false;
+            }
+            
+            // 找到并更新分类
+            const categoryIndex = productCategories.findIndex(cat => cat.id === categoryId);
+            if (categoryIndex === -1) {
+                alert('未找到该产品分类！');
+                return false;
+            }
+            
+            const oldCategory = { ...productCategories[categoryIndex] };
+            
+            // 更新分类信息
+            productCategories[categoryIndex] = {
+                ...productCategories[categoryIndex],
+                nameCN: categoryNameCN,
+                nameKO: categoryNameKO,
+                description: categoryDescription,
+                updateTime: new Date().toISOString(),
+                updatedBy: currentUser?.name || '系统管理员'
+            };
+            
+            // 保存到本地存储
+            localStorage.setItem('productCategories', JSON.stringify(productCategories));
+            
+            // 记录操作历史
+            if (typeof recordOperation === 'function') {
+                recordOperation(
+                    'edit', 
+                    'category', 
+                    `编辑产品分类：${oldCategory.nameCN} (${oldCategory.nameKO}) → ${categoryNameCN} (${categoryNameKO})`
+                );
+            }
+            
+            // 刷新分类列表
+            displayProductCategories();
+            
+            // 关闭模态框
+            closeEditCategoryModal();
+            
+            // 显示成功消息
+            alert(getText('category-updated-success'));
+            
+            return false;
+        }
+        
+        // 删除产品分类
+        function deleteProductCategory(categoryId, categoryName) {
+            if (!confirm(`确定要删除产品分类"${categoryName}"吗？\n此操作无法撤销！`)) {
+                return;
+            }
+            
+            // 从数组中删除
+            productCategories = productCategories.filter(category => category.id !== categoryId);
+            
+            // 更新本地存储
+            localStorage.setItem('productCategories', JSON.stringify(productCategories));
+            
+            // 记录操作历史
+            if (typeof recordOperation === 'function') {
+                recordOperation('delete', 'category', `删除产品分类：${categoryName}`);
+            }
+            
+            // 刷新列表
+            displayProductCategories();
+            
+            alert('产品分类删除成功！');
+        }
         
         // 更新编辑模式的业务员选项
         function updateEditSalespersonOptions() {
@@ -6270,6 +6753,11 @@
                 if (contentId === 'performance-target') {
                     initializePerformanceTargets();
                 }
+                
+                // 如果是产品分类页面，显示产品分类列表
+                if (contentId === 'product-category') {
+                    displayProductCategories();
+                }
             }
         }
         
@@ -6529,6 +7017,18 @@
         //         closeEditEmployeeModal();
         //     }
         // });
+        
+        // 处理创建产品分类表单提交
+        document.getElementById('createCategoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createProductCategory();
+        });
+        
+        // 处理编辑产品分类表单提交
+        document.getElementById('editCategoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateProductCategory();
+        });
         
         // ==================== 审批系统功能 ====================
         
@@ -8087,6 +8587,49 @@
             return positionTexts[position] || position;
         }
         
+        // ==================== 粒子背景和UI优化 ====================
+        
+        // 初始化粒子背景
+        tsParticles.load("tsparticles", {
+            background: { color: "#161616" },
+            particles: {
+                number: { value: 60, density: { enable: true, value_area: 700 } },
+                color: { value: ["#FFD700", "#d4af37", "#FFF4B8"] },
+                opacity: { value: 0.19 },
+                size: { value: 2.9, random: true },
+                move: { enable: true, speed: 0.6, direction: "none", random: true, straight: false, outMode: "out" },
+                links: { enable: true, distance: 85, color: "#FFD700", opacity: 0.12, width: 0.6 }
+            },
+            detectRetina: true
+        });
+        
+        // 初始化渐入动画
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.menu-item, .content-area, .header, .footer').forEach(e=>e.classList.add('fade-in'));
+        });
+        
+        // Toast通知功能
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            if (!el) {
+                // 创建toast元素
+                const toastEl = document.createElement('div');
+                toastEl.id = 'toast';
+                toastEl.className = 'popup-toast';
+                toastEl.style.display = 'none';
+                document.body.appendChild(toastEl);
+            }
+            const toastElement = document.getElementById('toast');
+            toastElement.innerText = msg;
+            toastElement.style.display = '';
+            toastElement.style.opacity = '1';
+            setTimeout(() => {
+                toastElement.style.opacity = '0';
+                setTimeout(()=>toastElement.style.display='none',350);
+            }, 2000);
+        }
+        
     </script>
+    <div id="toast" class="popup-toast" style="display:none"></div>
 </body>
 </html> 

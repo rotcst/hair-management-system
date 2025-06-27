@@ -23,8 +23,7 @@ function createWindow () {
   // 默认加载登录页面
   win.loadFile('login.html')
 
-  // 开发环境下打开开发者工具
-  // win.webContents.openDevTools()
+  // win.webContents.openDevTools() //开发可打开
 }
 
 app.whenReady().then(() => {

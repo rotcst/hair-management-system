@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <title>MAKE IT HAIR Professional - 登录</title>
+    <!-- 引入优化字体 -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400|Poppins:400,700|Source+Han+Sans+SC:400,700&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #D4AF37;
@@ -13,11 +15,11 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Montserrat', 'Source Han Sans SC', 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             height: 100vh;
-            background-color: var(--black);
+            background: linear-gradient(120deg, #181818 0%, #232323 100%);
             color: var(--text-light);
             display: flex;
             justify-content: center;
@@ -25,12 +27,15 @@
         }
         
         .login-container {
-            background: var(--dark-gray);
-            padding: 40px;
-            border-radius: 10px;
-            border: 1px solid var(--gold);
-            width: 320px;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            background: rgba(32, 32, 32, 0.82);
+            backdrop-filter: blur(16px) saturate(175%);
+            -webkit-backdrop-filter: blur(16px) saturate(175%);
+            padding: 48px 32px 36px 32px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(212, 175, 55, 0.13);
+            width: 360px;
+            box-shadow: 0 12px 40px rgba(212, 175, 55, 0.18);
+            transition: all 0.3s cubic-bezier(0.23, 1.13, 0.32, 1.2);
         }
         
         .logo-section {
@@ -39,17 +44,22 @@
         }
         
         .logo {
-            font-size: 3em;
+            font-size: 2.3em;
             color: var(--gold);
+            font-family: 'Montserrat', cursive;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
+            text-shadow: 0 0 18px rgba(212, 175, 55, 0.21);
+            letter-spacing: 2px;
         }
         
         .brand-name {
             color: var(--gold-light);
             font-style: italic;
-            font-size: 1.2em;
-            margin-bottom: 20px;
+            font-size: 1.19em;
+            font-weight: 700;
+            margin-bottom: 28px;
+            opacity: 0.88;
         }
         
         .input-group {
@@ -64,36 +74,44 @@
         
         .input-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid var(--gold);
-            background: transparent;
-            color: var(--text-light);
-            border-radius: 5px;
+            padding: 12px 14px;
+            border: 1.5px solid var(--gold);
+            background: rgba(0, 0, 0, 0.17);
+            color: var(--gold-light);
+            border-radius: 7px;
             outline: none;
             box-sizing: border-box;
-            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 1em;
+            transition: border-color 0.18s, box-shadow 0.16s;
         }
         
         .input-group input:focus {
             border-color: var(--gold-light);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
         }
         
         .login-button {
             width: 100%;
-            padding: 12px;
-            background: var(--gold);
-            color: var(--black);
+            padding: 12px 0;
+            background: linear-gradient(120deg, var(--gold-light) 60%, var(--gold) 100%);
+            color: #111;
             border: none;
-            border-radius: 5px;
+            border-radius: 7px;
             font-size: 1.1em;
+            font-family: inherit;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 14px rgba(212, 175, 55, 0.13);
         }
         
         .login-button:hover {
-            background: var(--gold-light);
             transform: translateY(-2px);
+        }
+        
+        .login-button:active {
+            transform: scale(0.97);
         }
         
         .remember-me {
@@ -158,6 +176,15 @@
             background: var(--gold);
             color: var(--black);
         }
+        
+        /* 新增：页脚样式 */
+        .footer {
+            margin-top: 38px;
+            color: #b7b7b7;
+            font-size: 0.96em;
+            opacity: 0.74;
+            text-align: center;
+        }
     </style>
   </head>
   <body>
@@ -170,19 +197,19 @@
       <div class="login-container">
         <div class="logo-section">
             <div class="logo">M</div>
-            <div class="brand-name">MAKE IT HAIR Professional</div>
+            <div class="brand-name">MAKE IT HAIR Professional<br>管理系统登录</div>
         </div>
                   <form id="loginForm">
               <div class="input-group">
                   <label for="username" data-i18n="username-label">用户名</label>
-                  <input type="text" id="username" name="username" required>
+                  <input type="text" id="username" name="username" required />
               </div>
               <div class="input-group">
                   <label for="password" data-i18n="password-label">密码</label>
-                  <input type="password" id="password" name="password" required>
+                  <input type="password" id="password" name="password" required />
               </div>
               <div class="remember-me">
-                  <input type="checkbox" id="remember" name="remember">
+                  <input type="checkbox" id="remember" name="remember" />
                   <label for="remember" data-i18n="remember-me">记住我</label>
               </div>
               <button type="submit" class="login-button" data-i18n="login-button">登录</button>
@@ -191,6 +218,8 @@
                   <a href="#" data-i18n="forgot-password">忘记密码？</a>
               </div>
           </form>
+          <!-- 新增：页脚 -->
+          <div class="footer">© Mesia 2025</div>
     </div>
           <script>
           // 当前语言设置
