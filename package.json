@@ -1,23 +1,17 @@
 {
   "name": "enterprise-management-system",
   "version": "1.0.0",
-  "description": "企业管理系统 - Web版本",
-  "main": "index.html",
+  "description": "企业管理系统",
+  "main": "main.js",
   "scripts": {
-    "start": "python -m http.server 8080",
-    "start-node": "npx http-server -p 8080 -c-1",
-    "build": "echo 'Web版本无需构建，直接部署HTML文件即可'",
-    "electron": "electron .",
-    "electron-build": "electron-builder"
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "electron": "^28.2.0",
     "electron-builder": "^24.9.1"
-  },
-  "devDependencies": {
-    "http-server": "^14.1.1"
   },
   "build": {
     "appId": "com.company.ems",

@@ -3,14 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>MAKE IT HAIR Professional - 登录</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <!-- Firebase配置 -->
-    <script src="firebase-config.js"></script>
-    <!-- Firebase数据管理器 -->
-    <script src="firebase-data-manager.js"></script>
     <style>
         :root {
             --gold: #D4AF37;
@@ -18,15 +10,6 @@
             --black: #000000;
             --dark-gray: #1a1a1a;
             --text-light: #ffffff;
-        }
-        
-        /* 浅色模式变量 */
-        [data-theme="light"] {
-            --gold: #B8860B;
-            --gold-light: #DAA520;
-            --black: #ffffff;
-            --dark-gray: #f5f5f5;
-            --text-light: #333333;
         }
         
         body {
@@ -37,120 +20,8 @@
             background-color: var(--black);
             color: var(--text-light);
             display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-        }
-        
-        /* 顶部导航栏样式 - 与首页保持一致 */
-        .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: var(--dark-gray);
-            border-bottom: 1px solid var(--gold);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 1000;
-            box-sizing: border-box;
-        }
-        
-        .store-info {
-            color: var(--gold);
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        /* 语言切换样式 - 与首页保持一致 */
-        .language-switcher {
-            display: flex;
-            gap: 5px;
-            background: var(--dark-gray);
-            padding: 8px 15px;
-            border-radius: 8px;
-            height: 40px;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        
-        .language-btn {
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid var(--gold);
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-        
-        .language-btn:hover {
-            background: var(--gold);
-            color: var(--black);
-        }
-        
-        .language-btn.active {
-            background: var(--gold);
-            color: var(--black);
-            font-weight: bold;
-        }
-
-        /* 主题切换样式 - 与首页保持一致 */
-        .theme-switcher {
-            display: flex;
-            gap: 5px;
-            background: var(--dark-gray);
-            padding: 8px 15px;
-            border-radius: 8px;
-            height: 40px;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        
-        .theme-btn {
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid var(--gold);
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-            min-width: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .theme-btn:hover {
-            background: var(--gold);
-            color: var(--black);
-            transform: scale(1.1);
-        }
-        
-        .theme-btn.active {
-            background: var(--gold);
-            color: var(--black);
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
-        }
-        
-        /* 主要内容区域 */
-        .main-content {
-            flex: 1;
-            display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 60px;
         }
         
         .login-container {
@@ -160,7 +31,6 @@
             border: 1px solid var(--gold);
             width: 320px;
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-            transition: all 0.3s ease;
         }
         
         .logo-section {
@@ -257,66 +127,74 @@
             margin-top: 10px;
             display: none;
         }
+        
+        /* 语言切换按钮样式 */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+        }
+        
+        .language-btn {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .language-btn:hover {
+            background: var(--gold);
+            color: var(--black);
+        }
+        
+        .language-btn.active {
+            background: var(--gold);
+            color: var(--black);
+        }
     </style>
   </head>
   <body>
-      <!-- 顶部导航栏 - 与首页保持一致 -->
-      <div class="top-nav">
-          <!-- 代理店名称显示（左侧） -->
-          <div class="store-info">
-              <span data-i18n="store-name">메시아서부지점관리시스템</span>
-          </div>
-          
-          <!-- 右侧信息组 -->
-          <div class="nav-right">
-              <!-- 主题切换器 -->
-              <div class="theme-switcher">
-                  <button class="theme-btn" onclick="switchTheme('light')" id="btn-light" title="白天模式">☀️</button>
-                  <button class="theme-btn" onclick="switchTheme('dark')" id="btn-dark" title="黑夜模式">🌙</button>
-                  <button class="theme-btn active" onclick="switchTheme('auto')" id="btn-auto" title="自动模式">🔄</button>
-              </div>
-              
-              <!-- 语言切换器 -->
-              <div class="language-switcher">
-                  <button class="language-btn active" onclick="switchLanguage('zh')" id="btn-zh">中文</button>
-                  <button class="language-btn" onclick="switchLanguage('ko')" id="btn-ko">한국어</button>
-              </div>
-          </div>
+      <!-- 语言切换按钮 -->
+      <div class="language-switcher">
+          <button class="language-btn active" id="btn-zh" onclick="switchLanguage('zh')">中文</button>
+          <button class="language-btn" id="btn-ko" onclick="switchLanguage('ko')">한국어</button>
       </div>
       
-      <!-- 主要内容区域 -->
-      <div class="main-content">
-          <div class="login-container">
-            <div class="logo-section">
-                <div class="logo">M</div>
-                <div class="brand-name">MAKE IT HAIR Professional</div>
-            </div>
-                      <form id="loginForm">
-                  <div class="input-group">
-                      <label for="username" data-i18n="username-label">用户名</label>
-                      <input type="text" id="username" name="username" required>
-                  </div>
-                  <div class="input-group">
-                      <label for="password" data-i18n="password-label">密码</label>
-                      <input type="password" id="password" name="password" required>
-                  </div>
-                  <div class="remember-me">
-                      <input type="checkbox" id="remember" name="remember">
-                      <label for="remember" data-i18n="remember-me">记住我</label>
-                  </div>
-                  <button type="submit" class="login-button" data-i18n="login-button">登录</button>
-                  <div class="error-message" id="errorMessage" data-i18n="login-error">用户名或密码错误</div>
-                  <div class="forgot-password">
-                      <a href="#" data-i18n="forgot-password">忘记密码？</a>
-                  </div>
-              </form>
+      <div class="login-container">
+        <div class="logo-section">
+            <div class="logo">M</div>
+            <div class="brand-name">MAKE IT HAIR Professional</div>
         </div>
-      </div>
+                  <form id="loginForm">
+              <div class="input-group">
+                  <label for="username" data-i18n="username-label">用户名</label>
+                  <input type="text" id="username" name="username" required>
+              </div>
+              <div class="input-group">
+                  <label for="password" data-i18n="password-label">密码</label>
+                  <input type="password" id="password" name="password" required>
+              </div>
+              <div class="remember-me">
+                  <input type="checkbox" id="remember" name="remember">
+                  <label for="remember" data-i18n="remember-me">记住我</label>
+              </div>
+              <button type="submit" class="login-button" data-i18n="login-button">登录</button>
+              <div class="error-message" id="errorMessage" data-i18n="login-error">用户名或密码错误</div>
+              <div class="forgot-password">
+                  <a href="#" data-i18n="forgot-password">忘记密码？</a>
+              </div>
+          </form>
+    </div>
           <script>
           // 当前语言设置
           let currentLanguage = 'zh';
-          // 当前主题设置
-          let currentTheme = 'auto';
           
           // 多语言翻译字典
           const translations = {
@@ -326,8 +204,7 @@
                   'remember-me': '记住我',
                   'login-button': '登录',
                   'login-error': '用户名或密码错误',
-                  'forgot-password': '忘记密码？',
-                  'store-name': 'MAKE IT HAIR Professional - 登录系统'
+                  'forgot-password': '忘记密码？'
               },
               ko: {
                   'username-label': '사용자명',
@@ -335,8 +212,7 @@
                   'remember-me': '로그인 상태 유지',
                   'login-button': '로그인',
                   'login-error': '사용자명 또는 비밀번호가 잘못되었습니다',
-                  'forgot-password': '비밀번호를 잊으셨나요？',
-                  'store-name': 'MAKE IT HAIR Professional - 로그인 시스템'
+                  'forgot-password': '비밀번호를 잊으셨나요？'
               }
           };
           
@@ -367,10 +243,10 @@
           // 语言切换函数
           function switchLanguage(lang) {
               currentLanguage = lang;
-              localStorage.setItem('language', lang); // 同步到主系统
+              localStorage.setItem('loginLanguage', lang);
               
               // 更新按钮状态
-              document.querySelectorAll('.language-switcher .language-btn').forEach(btn => {
+              document.querySelectorAll('.language-btn').forEach(btn => {
                   btn.classList.remove('active');
               });
               document.getElementById('btn-' + lang).classList.add('active');
@@ -379,189 +255,70 @@
               updateTexts();
           }
           
-          // 主题切换函数
-          function switchTheme(theme) {
-              currentTheme = theme;
-              localStorage.setItem('theme', theme); // 同步到主系统
-              
-              // 更新按钮状态
-              document.querySelectorAll('.theme-switcher .theme-btn').forEach(btn => {
-                  btn.classList.remove('active');
-              });
-              document.getElementById('btn-' + theme).classList.add('active');
-              
-              // 应用主题
-              applyTheme();
+          // 获取员工数据
+          function getEmployees() {
+              const employees = localStorage.getItem('employees');
+              return employees ? JSON.parse(employees) : [];
           }
-          
-          // 应用主题
-          function applyTheme() {
-              const body = document.body;
-              
-              if (currentTheme === 'light') {
-                  body.setAttribute('data-theme', 'light');
-              } else if (currentTheme === 'dark') {
-                  body.removeAttribute('data-theme');
-              } else {
-                  // 自动模式：根据系统时间判断
-                  const hour = new Date().getHours();
-                  if (hour >= 6 && hour < 18) {
-                      body.setAttribute('data-theme', 'light');
-                  } else {
-                      body.removeAttribute('data-theme');
-                  }
-              }
-          }
-          
-                  // 获取员工数据
-        async function getEmployees() {
-            try {
-                if (window.dataManager && window.dataManager.db) {
-                    return await dataManager.getEmployees();
-                } else {
-                    const employees = localStorage.getItem('employees');
-                    return employees ? JSON.parse(employees) : [];
-                }
-            } catch (error) {
-                console.error('获取员工数据失败:', error);
-                const employees = localStorage.getItem('employees');
-                return employees ? JSON.parse(employees) : [];
-            }
-        }
         
         // 设置当前用户
         function setCurrentUser(user) {
             localStorage.setItem('currentUser', JSON.stringify(user));
         }
         
-        // 检查是否已经登录
-        function checkLoginStatus() {
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                // 已经登录，跳转到主页面
-                window.location.href = 'index.html';
-                return true;
-            }
-            return false;
-        }
-        
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
-            try {
-                // 初始化数据管理器
-                if (window.dataManager && !window.dataManager.db) {
-                    await dataManager.initialize();
-                }
-                
-                const employees = await getEmployees();
-                
-                // 如果没有员工数据，创建默认管理员
-                if (employees.length === 0) {
-                    const defaultAdmin = {
-                        id: Date.now(),
-                        name: '시스템 관리자',
-                        position: 'admin',
-                        username: 'admin',
-                        password: 'admin',
-                        mobile: '010-0000-0000',
-                        createTime: new Date().toLocaleString('zh-CN')
-                    };
-                    
-                    if (window.dataManager && window.dataManager.db) {
-                        await dataManager.saveEmployee(defaultAdmin);
-                    } else {
-                        employees.push(defaultAdmin);
-                        localStorage.setItem('employees', JSON.stringify(employees));
-                    }
-                }
-                
-                // 查找匹配的用户
-                const user = employees.find(emp => emp.username === username && emp.password === password);
-                
-                if (user) {
-                    // 登录成功，设置当前用户
-                    setCurrentUser(user);
-                    
-                    // 记录登录操作历史
-                    const operation = {
-                        id: Date.now(),
-                        type: 'login',
-                        category: 'system',
-                        targetId: user.id,
-                        targetName: '系统登录',
-                        description: `用户 ${user.name} (${user.position}) 登录系统`,
-                        operatorId: user.id,
-                        operatorName: user.name,
-                        timestamp: new Date().toISOString(),
-                        beforeData: null,
-                        afterData: null
-                    };
-                    
-                    if (window.dataManager && window.dataManager.db) {
-                        await dataManager.saveOperation(operation);
-                    } else {
-                        const operations = JSON.parse(localStorage.getItem('operations')) || [];
-                        operations.push(operation);
-                        localStorage.setItem('operations', JSON.stringify(operations));
-                    }
-                    
-                    // 跳转到主页面
-                    window.location.href = 'index.html';
-                } else {
-                    // 登录失败，显示错误消息
-                    document.getElementById('errorMessage').style.display = 'block';
-                    setTimeout(() => {
-                        document.getElementById('errorMessage').style.display = 'none';
-                    }, 3000); // 3秒后自动隐藏错误消息
-                }
-            } catch (error) {
-                console.error('登录处理失败:', error);
+            const employees = getEmployees();
+            
+            // 如果没有员工数据，创建默认管理员
+            if (employees.length === 0) {
+                const defaultAdmin = {
+                    id: Date.now(),
+                    name: '시스템 관리자',
+                    position: 'admin',
+                    username: 'admin',
+                    password: 'admin',
+                    mobile: '010-0000-0000',
+                    createTime: new Date().toLocaleString('zh-CN')
+                };
+                employees.push(defaultAdmin);
+                localStorage.setItem('employees', JSON.stringify(employees));
+            }
+            
+            // 查找匹配的用户
+            const user = employees.find(emp => emp.username === username && emp.password === password);
+            
+                          if (user) {
+                  // 登录成功，设置当前用户、同步语言设置并跳转
+                  setCurrentUser(user);
+                  localStorage.setItem('language', currentLanguage); // 同步语言设置到主系统
+                  window.location.href = 'index.html';
+              } else {
+                // 登录失败，显示错误消息
                 document.getElementById('errorMessage').style.display = 'block';
                 setTimeout(() => {
                     document.getElementById('errorMessage').style.display = 'none';
-                }, 3000);
+                }, 3000); // 3秒后自动隐藏错误消息
             }
         });
         
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 检查是否已经登录
-            if (checkLoginStatus()) {
-                return; // 已经登录，会跳转到主页面
-            }
-            
-            // 隐藏错误消息
-            document.getElementById('errorMessage').style.display = 'none';
-            
-            // 初始化语言设置，与主系统保持一致
-            const savedLanguage = localStorage.getItem('language') || 'zh';
-            if (savedLanguage !== 'zh') {
-                switchLanguage(savedLanguage);
-            } else {
-                updateTexts();
-            }
-            
-            // 初始化主题设置，与主系统保持一致
-            const savedTheme = localStorage.getItem('theme') || 'auto';
-            currentTheme = savedTheme;
-            
-            // 更新主题按钮状态
-            document.querySelectorAll('.theme-switcher .theme-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById('btn-' + savedTheme).classList.add('active');
-            
-            // 应用主题
-            applyTheme();
-            
-            // 如果是自动模式，每分钟检查一次时间
-            if (savedTheme === 'auto') {
-                setInterval(applyTheme, 60000); // 每分钟检查一次
-            }
-        });
+                  // 页面加载时初始化
+          document.addEventListener('DOMContentLoaded', function() {
+              // 隐藏错误消息
+              document.getElementById('errorMessage').style.display = 'none';
+              
+              // 初始化语言设置，优先使用保存的语言或与主系统保持一致
+              const savedLanguage = localStorage.getItem('loginLanguage') || localStorage.getItem('language') || 'zh';
+              if (savedLanguage !== 'zh') {
+                  switchLanguage(savedLanguage);
+              } else {
+                  // 确保中文也能正确显示
+                  updateTexts();
+              }
+          });
     </script>
 </body>
 </html> 
