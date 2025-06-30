@@ -3,168 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <title>MAKE IT HAIR Professional - 登录</title>
-    <!-- 引入优化字体 -->
+    <!-- 字体/粒子/动效CDN -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400|Poppins:400,700|Source+Han+Sans+SC:400,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
     <style>
         :root {
             --gold: #D4AF37;
             --gold-light: #FFD700;
             --black: #000000;
             --dark-gray: #1a1a1a;
-            --text-light: #ffffff;
+            --text-light: #fff;
+            --shadow: 0 10px 32px 0 rgba(212,175,55,0.13), 0 2px 4px rgba(0,0,0,0.23);
+            --glass: rgba(24,24,24,0.76);
+            --glass-blur: blur(20px) saturate(180%);
+        }
+        
+        #tsparticles {
+            position: fixed; left:0; top:0; width:100vw; height:100vh;
+            pointer-events: none; z-index: 0;
         }
         
         body {
-            font-family: 'Montserrat', 'Source Han Sans SC', 'Arial', sans-serif;
+            font-family: 'Montserrat', 'Poppins', 'Source Han Sans SC', 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            height: 100vh;
-            background: linear-gradient(120deg, #181818 0%, #232323 100%);
+            background: linear-gradient(135deg, #191919 0%, #232323 100%);
             color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         
         .login-container {
-            background: rgba(32, 32, 32, 0.82);
-            backdrop-filter: blur(16px) saturate(175%);
-            -webkit-backdrop-filter: blur(16px) saturate(175%);
-            padding: 48px 32px 36px 32px;
-            border-radius: 20px;
-            border: 1.5px solid rgba(212, 175, 55, 0.13);
-            width: 360px;
-            box-shadow: 0 12px 40px rgba(212, 175, 55, 0.18);
-            transition: all 0.3s cubic-bezier(0.23, 1.13, 0.32, 1.2);
-        }
-        
-        .logo-section {
+            background: var(--glass);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: var(--shadow);
+            border: 1.5px solid rgba(212,175,55,0.08);
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+            padding: 40px;
             text-align: center;
-            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
         }
         
-        .logo {
-            font-size: 2.3em;
+        .login-logo {
+            font-size: 3em;
             color: var(--gold);
             font-family: 'Montserrat', cursive;
-            font-weight: bold;
-            margin-bottom: 16px;
-            text-shadow: 0 0 18px rgba(212, 175, 55, 0.21);
-            letter-spacing: 2px;
+            font-weight: 900;
+            user-select: none;
+            letter-spacing: 1px;
+            text-shadow: 0 0 22px rgba(212,175,55,0.28);
+            margin-bottom: 10px;
         }
         
-        .brand-name {
+        .login-subtitle {
             color: var(--gold-light);
-            font-style: italic;
-            font-size: 1.19em;
-            font-weight: 700;
-            margin-bottom: 28px;
-            opacity: 0.88;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--gold);
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--gold);
-            background: rgba(0, 0, 0, 0.17);
-            color: var(--gold-light);
-            border-radius: 7px;
-            outline: none;
-            box-sizing: border-box;
-            font-family: inherit;
             font-size: 1em;
-            transition: border-color 0.18s, box-shadow 0.16s;
+            margin-bottom: 20px;
+            font-style: italic;
         }
         
-        .input-group input:focus {
-            border-color: var(--gold-light);
-            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-        }
-        
-        .login-button {
-            width: 100%;
-            padding: 12px 0;
-            background: linear-gradient(120deg, var(--gold-light) 60%, var(--gold) 100%);
-            color: #111;
-            border: none;
-            border-radius: 7px;
-            font-size: 1.1em;
-            font-family: inherit;
+        .login-title {
+            color: var(--gold);
+            font-size: 1.5em;
+            margin-bottom: 30px;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 2px 14px rgba(212, 175, 55, 0.13);
         }
         
-        .login-button:hover {
-            transform: translateY(-2px);
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         
-        .login-button:active {
-            transform: scale(0.97);
+        .form-group {
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            color: var(--gold);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--text-light);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--gold-light);
+            box-shadow: 0 0 5px rgba(212,175,55,0.5);
         }
         
         .remember-me {
             display: flex;
             align-items: center;
-            margin: 15px 0;
+            margin-top: 10px;
+            cursor: pointer;
         }
         
         .remember-me input {
             margin-right: 8px;
         }
         
-        .forgot-password {
-            text-align: center;
-            margin-top: 15px;
+        .login-button {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
         }
         
-        .forgot-password a {
-            color: var(--gold-light);
-            text-decoration: none;
-            font-size: 0.9em;
+        .login-button:hover {
+            background: var(--gold-light);
         }
         
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-        
-        .error-message {
-            color: #ff4444;
-            text-align: center;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        /* 语言切换按钮样式 */
         .language-switcher {
-            position: fixed;
+            position: absolute;
             top: 20px;
             right: 20px;
             display: flex;
             gap: 5px;
-            z-index: 1000;
         }
         
         .language-btn {
             background: transparent;
+            color: var(--text-light);
             border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 8px 12px;
-            border-radius: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-size: 0.9em;
+            transition: all 0.3s ease;
         }
         
         .language-btn:hover {
@@ -175,177 +164,236 @@
         .language-btn.active {
             background: var(--gold);
             color: var(--black);
+            font-weight: bold;
         }
         
-        /* 新增：页脚样式 */
-        .footer {
-            margin-top: 38px;
-            color: #b7b7b7;
-            font-size: 0.96em;
-            opacity: 0.74;
-            text-align: center;
+        .error-message {
+            color: #ff6666;
+            font-size: 0.9em;
+            margin-top: 20px;
+            display: none;
         }
     </style>
   </head>
   <body>
-      <!-- 语言切换按钮 -->
-      <div class="language-switcher">
-          <button class="language-btn active" id="btn-zh" onclick="switchLanguage('zh')">中文</button>
-          <button class="language-btn" id="btn-ko" onclick="switchLanguage('ko')">한국어</button>
-      </div>
+    <div id="tsparticles"></div>
       
       <div class="login-container">
-        <div class="logo-section">
-            <div class="logo">M</div>
-            <div class="brand-name">MAKE IT HAIR Professional<br>管理系统登录</div>
+        <div class="language-switcher">
+            <button class="language-btn active" onclick="switchLanguage('zh')" id="btn-zh">中文</button>
+            <button class="language-btn" onclick="switchLanguage('ko')" id="btn-ko">한국어</button>
         </div>
-                  <form id="loginForm">
-              <div class="input-group">
-                  <label for="username" data-i18n="username-label">用户名</label>
-                  <input type="text" id="username" name="username" required />
+        
+        <div class="login-logo">M</div>
+        <div class="login-subtitle">MAKE IT HAIR Professional</div>
+        <div class="login-title" data-i18n="login-title">管理系统登录</div>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username" data-i18n="username">用户名：</label>
+                <input type="text" id="username" name="username" required>
               </div>
-              <div class="input-group">
-                  <label for="password" data-i18n="password-label">密码</label>
-                  <input type="password" id="password" name="password" required />
+            
+            <div class="form-group">
+                <label for="password" data-i18n="password">密码：</label>
+                <input type="password" id="password" name="password" required>
               </div>
+            
               <div class="remember-me">
-                  <input type="checkbox" id="remember" name="remember" />
-                  <label for="remember" data-i18n="remember-me">记住我</label>
+                <input type="checkbox" id="rememberLogin" name="rememberLogin">
+                <label for="rememberLogin" data-i18n="remember-login">记住登录状态</label>
               </div>
+            
               <button type="submit" class="login-button" data-i18n="login-button">登录</button>
-              <div class="error-message" id="errorMessage" data-i18n="login-error">用户名或密码错误</div>
-              <div class="forgot-password">
-                  <a href="#" data-i18n="forgot-password">忘记密码？</a>
-              </div>
           </form>
-          <!-- 新增：页脚 -->
-          <div class="footer">© Mesia 2025</div>
+        
+        <div class="error-message" id="errorMessage" data-i18n="login-error">用户名或密码错误，请重试。</div>
     </div>
+    
           <script>
-          // 当前语言设置
-          let currentLanguage = 'zh';
-          
-          // 多语言翻译字典
+        // 初始化粒子效果
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof tsParticles !== 'undefined') {
+                tsParticles.load("tsparticles", {
+                    particles: {
+                        number: {
+                            value: 30,
+                            density: {
+                                enable: true,
+                                value_area: 800
+                            }
+                        },
+                        color: {
+                            value: "#D4AF37"
+                        },
+                        shape: {
+                            type: "circle",
+                        },
+                        opacity: {
+                            value: 0.3,
+                            random: true,
+                            anim: {
+                                enable: true,
+                                speed: 1,
+                                opacity_min: 0.1,
+                                sync: false
+                            }
+                        },
+                        size: {
+                            value: 3,
+                            random: true,
+                            anim: {
+                                enable: true,
+                                speed: 2,
+                                size_min: 0.1,
+                                sync: false
+                            }
+                        },
+                        line_linked: {
+                            enable: true,
+                            distance: 150,
+                            color: "#D4AF37",
+                            opacity: 0.2,
+                            width: 1
+                        },
+                        move: {
+                            enable: true,
+                            speed: 1,
+                            direction: "none",
+                            random: true,
+                            straight: false,
+                            out_mode: "out",
+                            bounce: false,
+                        }
+                    },
+                    interactivity: {
+                        detect_on: "canvas",
+                        events: {
+                            onhover: {
+                                enable: true,
+                                mode: "grab"
+                            },
+                            onclick: {
+                                enable: true,
+                                mode: "push"
+                            },
+                            resize: true
+                        },
+                        modes: {
+                            grab: {
+                                distance: 140,
+                                line_linked: {
+                                    opacity: 0.5
+                                }
+                            },
+                            push: {
+                                particles_nb: 3
+                            }
+                        }
+                    },
+                    retina_detect: true
+                });
+            }
+            
+            // 初始化语言
+            const savedLanguage = localStorage.getItem('language') || 'zh';
+            switchLanguage(savedLanguage);
+            
+            // 检查是否已登录
+            checkLoginStatus();
+        });
+        
+        // 语言切换功能
+        function switchLanguage(lang) {
+            // 更新按钮状态
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + lang).classList.add('active');
+            
+            // 保存语言设置
+            localStorage.setItem('language', lang);
+            
+            // 更新界面文本
+            updateTexts();
+        }
+        
+        // 获取翻译文本
+        function getText(key) {
+            const currentLanguage = localStorage.getItem('language') || 'zh';
           const translations = {
               zh: {
-                  'username-label': '用户名',
-                  'password-label': '密码',
-                  'remember-me': '记住我',
+                    'login-title': '管理系统登录',
+                    'username': '用户名：',
+                    'password': '密码：',
+                    'remember-login': '记住登录状态',
                   'login-button': '登录',
-                  'login-error': '用户名或密码错误',
-                  'forgot-password': '忘记密码？'
+                    'login-error': '用户名或密码错误，请重试。'
               },
               ko: {
-                  'username-label': '사용자명',
-                  'password-label': '비밀번호',
-                  'remember-me': '로그인 상태 유지',
+                    'login-title': '관리 시스템 로그인',
+                    'username': '사용자 이름:',
+                    'password': '비밀번호:',
+                    'remember-login': '로그인 상태 기억',
                   'login-button': '로그인',
-                  'login-error': '사용자명 또는 비밀번호가 잘못되었습니다',
-                  'forgot-password': '비밀번호를 잊으셨나요？'
+                    'login-error': '사용자 이름 또는 비밀번호가 잘못되었습니다. 다시 시도하세요.'
               }
           };
           
-          // 获取翻译文本
-          function getText(key) {
               return translations[currentLanguage] && translations[currentLanguage][key] 
                   ? translations[currentLanguage][key] 
                   : key;
           }
           
-          // 更新所有文本
+        // 更新界面文本
           function updateTexts() {
               document.querySelectorAll('[data-i18n]').forEach(element => {
                   const key = element.getAttribute('data-i18n');
-                  if (translations[currentLanguage] && translations[currentLanguage][key]) {
-                      element.textContent = translations[currentLanguage][key];
-                  }
-              });
-              
-              // 更新页面标题
-              if (currentLanguage === 'ko') {
-                  document.title = 'MAKE IT HAIR Professional - 로그인';
-              } else {
-                  document.title = 'MAKE IT HAIR Professional - 登录';
-              }
-          }
-          
-          // 语言切换函数
-          function switchLanguage(lang) {
-              currentLanguage = lang;
-              localStorage.setItem('loginLanguage', lang);
-              
-              // 更新按钮状态
-              document.querySelectorAll('.language-btn').forEach(btn => {
-                  btn.classList.remove('active');
-              });
-              document.getElementById('btn-' + lang).classList.add('active');
-              
-              // 更新文本
-              updateTexts();
-          }
-          
-          // 获取员工数据
-          function getEmployees() {
-              const employees = localStorage.getItem('employees');
-              return employees ? JSON.parse(employees) : [];
-          }
-        
-        // 设置当前用户
-        function setCurrentUser(user) {
-            localStorage.setItem('currentUser', JSON.stringify(user));
+                element.textContent = getText(key);
+            });
         }
         
+        // 检查登录状态
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const rememberLogin = localStorage.getItem('rememberLogin');
+            
+            // 如果已登录且选择了记住登录状态，直接跳转到首页
+            if (isLoggedIn === 'true' && rememberLogin === 'true') {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // 处理登录表单提交
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value.trim();
+            
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const rememberLogin = document.getElementById('rememberLogin').checked;
             
-            const employees = getEmployees();
-            
-            // 如果没有员工数据，创建默认管理员
-            if (employees.length === 0) {
-                const defaultAdmin = {
-                    id: Date.now(),
-                    name: '시스템 관리자',
-                    position: 'admin',
-                    username: 'admin',
-                    password: 'admin',
-                    mobile: '010-0000-0000',
-                    createTime: new Date().toLocaleString('zh-CN')
+            // 这里应该进行实际的登录验证，这里简化为固定的用户名和密码
+            if (username === 'admin' && password === 'admin') {
+                // 保存登录状态
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('rememberLogin', rememberLogin ? 'true' : 'false');
+                
+                // 添加会话标记，表示是从登录页面来的
+                sessionStorage.setItem('fromLogin', 'true');
+                
+                // 保存用户信息
+                const user = {
+                    name: '系统管理员',
+                    position: '管理员',
+                    id: 1
                 };
-                employees.push(defaultAdmin);
-                localStorage.setItem('employees', JSON.stringify(employees));
-            }
-            
-            // 查找匹配的用户
-            const user = employees.find(emp => emp.username === username && emp.password === password);
-            
-                          if (user) {
-                  // 登录成功，设置当前用户、同步语言设置并跳转
-                  setCurrentUser(user);
-                  localStorage.setItem('language', currentLanguage); // 同步语言设置到主系统
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // 跳转到首页
                   window.location.href = 'index.html';
               } else {
-                // 登录失败，显示错误消息
+                // 显示错误信息
                 document.getElementById('errorMessage').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('errorMessage').style.display = 'none';
-                }, 3000); // 3秒后自动隐藏错误消息
-            }
-        });
-        
-                  // 页面加载时初始化
-          document.addEventListener('DOMContentLoaded', function() {
-              // 隐藏错误消息
-              document.getElementById('errorMessage').style.display = 'none';
-              
-              // 初始化语言设置，优先使用保存的语言或与主系统保持一致
-              const savedLanguage = localStorage.getItem('loginLanguage') || localStorage.getItem('language') || 'zh';
-              if (savedLanguage !== 'zh') {
-                  switchLanguage(savedLanguage);
-              } else {
-                  // 确保中文也能正确显示
-                  updateTexts();
               }
           });
     </script>
