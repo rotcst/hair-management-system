@@ -873,7 +873,7 @@
                         </div>
                         
                         <!-- 右侧：职员详情 -->
-                        <div id="employee-list-right" style="flex: 1; overflow-y: auto; display: none; box-sizing: border-box; padding-bottom: 30px;">
+                        <div id="employee-list-right" style="flex: 1; display: none; box-sizing: border-box; padding-bottom: 30px;">
                             <div id="employee-detail-content" style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 20px;">
                                 <!-- 职员详情将在这里动态显示 -->
                             </div>
@@ -881,135 +881,154 @@
                     </div>
                 </div>
                 
-                <!-- 其他内容区域也将保持原样布局，只是移除返回按钮 -->
+                <!-- 新增产品页面 -->
                 <div id="add-product" class="content-area">
-                    <h1 data-i18n="add-product">新增产品</h1>
+                    <h1 style="margin-bottom: 15px;" data-i18n="add-product">新增产品</h1>
                     
                     <form id="addProductForm">
                         <!-- 产品基本信息 -->
-                        <div style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 20px;">
-                            <h3 style="color: var(--gold); margin: 0 0 15px 0;" data-i18n="product-basic-info">产品基本信息</h3>
+                        <div style="background: rgba(212, 175, 55, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 15px;">
+                            <h3 style="color: var(--gold); margin: 0 0 15px 0; font-size: 1.1em;" data-i18n="product-basic-info">产品基本信息</h3>
                             
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                                 <div>
-                                    <label for="productNameCN" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-name-cn">产品名称（中文）：</label>
-                                    <input type="text" id="productNameCN" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                    <label for="productName" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-name">产品名称：</label>
+                                    <input type="text" id="productName" required style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                                 </div>
                                 <div>
-                                    <label for="productNameKO" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-name-ko">产品名称（韩文）：</label>
-                                    <input type="text" id="productNameKO" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                    <label for="brandName" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="brand-name">品牌名称：</label>
+                                    <input type="text" id="brandName" style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                                 </div>
                             </div>
                             
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                                 <div>
-                                    <label for="productCategory" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-category-select">产品分类：</label>
-                                    <select id="productCategory" style="width: 100%; padding: 10px; background: var(--dark-gray); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                        <option value="" data-i18n="please-select-category">请选择产品分类...</option>
-                                        <!-- 分类选项将通过JavaScript动态添加 -->
+                                    <label for="productModel" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-model">型号：</label>
+                                    <input type="text" id="productModel" style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="productSku" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-sku">货号：</label>
+                                    <input type="text" id="productSku" style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label for="productCategory" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-category-select">产品分类：</label>
+                                <select id="productCategory" style="width: 100%; padding: 8px; background: var(--dark-gray); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                    <option value="" data-i18n="please-select-category">请选择产品分类...</option>
+                                    <option value="uncategorized" data-i18n="uncategorized">未分类</option>
+                                    <!-- 其他分类选项将通过JavaScript动态添加 -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- 规格信息 -->
+                        <div style="background: rgba(135, 206, 235, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); margin-bottom: 15px;">
+                            <h3 style="color: #87CEEB; margin: 0 0 15px 0; font-size: 1.1em;" data-i18n="product-specifications">规格信息</h3>
+                            
+                            <!-- 单位规格 -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <label for="unitType" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="unit-type">数量单位：</label>
+                                    <select id="unitType" onchange="updateUnitExample()" style="width: 100%; padding: 8px; background: var(--dark-gray); border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                        <option value="个" data-i18n="unit-piece">个</option>
+                                        <option value="只" data-i18n="unit-only">只</option>
+                                        <option value="支" data-i18n="unit-stick">支</option>
+                                        <option value="瓶" data-i18n="unit-bottle">瓶</option>
+                                        <option value="盒" data-i18n="unit-box">盒</option>
+                                        <option value="袋" data-i18n="unit-bag">袋</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="productCode" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-code">产品编码：</label>
-                                    <input type="text" id="productCode" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                    <label for="weightVolume" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="weight-volume">重量/体积：</label>
+                                    <input type="number" id="weightVolume" min="0" step="0.1" onchange="calculateTotalWeight()" style="width: 100%; padding: 8px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="weightUnit" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="weight-unit">重量单位：</label>
+                                    <select id="weightUnit" onchange="calculateTotalWeight()" style="width: 100%; padding: 8px; background: var(--dark-gray); border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                        <option value="g" data-i18n="unit-gram">g（克）</option>
+                                        <option value="ml" data-i18n="unit-ml">ml（毫升）</option>
+                                        <option value="kg" data-i18n="unit-kg">kg（千克）</option>
+                                        <option value="l" data-i18n="unit-liter">L（升）</option>
+                                    </select>
                                 </div>
                             </div>
                             
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <!-- 包装规格 -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                                 <div>
-                                    <label for="productPrice" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-price">产品单价（₩）：</label>
-                                    <input type="text" id="productPrice" placeholder="10,000" oninput="formatPriceInput(this)" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label for="productVolumePerUnit" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-volume">容量/单位：</label>
-                                    <input type="text" id="productVolumePerUnit" placeholder="500ml" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label for="productBrand" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-brand">品牌：</label>
-                                    <input type="text" id="productBrand" placeholder="MAKE IT HAIR" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label for="productDescription" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="product-description">产品描述：</label>
-                                <textarea id="productDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; min-height: 80px; resize: vertical;"></textarea>
-                            </div>
-                        </div>
-                        
-                        <!-- 库存信息 -->
-                        <div style="background: rgba(135, 206, 235, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); margin-bottom: 20px;">
-                            <h3 style="color: #87CEEB; margin: 0 0 15px 0;" data-i18n="inventory-info">库存信息</h3>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                <div>
-                                    <label for="initialStock" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="initial-stock">初始库存量：</label>
-                                    <input type="number" id="initialStock" min="0" value="0" style="width: 100%; padding: 10px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label for="minimumStock" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="minimum-stock">最低库存预警：</label>
-                                    <input type="number" id="minimumStock" min="0" value="5" style="width: 100%; padding: 10px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label for="stockLocation" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="stock-location">库存位置：</label>
-                                    <input type="text" id="stockLocation" placeholder="A-12" style="width: 100%; padding: 10px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: flex; align-items: center; color: #87CEEB; cursor: pointer;">
-                                    <input type="checkbox" id="enableAutoReorder" style="margin-right: 5px;">
-                                    <span data-i18n="enable-auto-reorder">启用自动补货提醒</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- 产品图片 -->
-                        <div style="background: rgba(144, 238, 144, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(144, 238, 144, 0.3); margin-bottom: 20px;">
-                            <h3 style="color: #90EE90; margin: 0 0 15px 0;" data-i18n="product-image">产品图片</h3>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; color: #90EE90; margin-bottom: 10px;" data-i18n="upload-product-image">上传产品图片：</label>
-                                
-                                <!-- 图片上传区域 -->
-                                <div id="imageUploadArea" style="border: 2px dashed #90EE90; border-radius: 5px; padding: 20px; text-align: center; cursor: pointer; position: relative; background: rgba(0,0,0,0.3);" onclick="document.getElementById('productImageInput').click()">
-                                    <input type="file" id="productImageInput" accept="image/*" style="display: none;" onchange="previewProductImage(this)">
-                                    <div id="uploadIconArea">
-                                        <span style="font-size: 2em; color: #90EE90;">📷</span>
-                                        <p style="color: #90EE90; margin: 10px 0 0 0;" data-i18n="click-to-upload">点击上传图片</p>
-                                        <p style="color: #cccccc; font-size: 0.8em; margin: 5px 0 0 0;" data-i18n="image-format-hint">支持JPG、PNG格式，建议尺寸800x800像素</p>
+                                    <label for="perBoxCount" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="per-box-count">每盒数量：</label>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <span style="color: #87CEEB; font-size: 0.9em;">每盒</span>
+                                        <input type="number" id="perBoxCount" min="1" value="1" onchange="calculateTotalWeight()" style="flex: 1; padding: 8px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                        <span id="perBoxUnit" style="color: #87CEEB; font-size: 0.9em;">瓶</span>
                                     </div>
-                                    <!-- 图片预览区域 -->
-                                    <div id="imagePreviewArea" style="display: none; position: relative;">
-                                        <img id="productImagePreview" style="max-width: 100%; max-height: 300px; border-radius: 5px;">
-                                        <button type="button" onclick="removeProductImage(event)" style="position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1.2em; line-height: 1;">×</button>
+                                </div>
+                                <div>
+                                    <label for="perCaseCount" style="display: block; color: #87CEEB; margin-bottom: 5px;" data-i18n="per-case-count">箱规：</label>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <span style="color: #87CEEB; font-size: 0.9em;">每箱</span>
+                                        <input type="number" id="perCaseCount" min="1" value="1" onchange="calculateTotalWeight()" style="flex: 1; padding: 8px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                        <span style="color: #87CEEB; font-size: 0.9em;">盒</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- 其他设置 -->
-                        <div style="background: rgba(255, 182, 193, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 182, 193, 0.3); margin-bottom: 20px;">
-                            <h3 style="color: #FFB6C1; margin: 0 0 15px 0;" data-i18n="other-settings">其他设置</h3>
                             
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: flex; align-items: center; color: #FFB6C1; cursor: pointer; margin-bottom: 10px;">
-                                    <input type="checkbox" id="isActive" checked style="margin-right: 5px;">
-                                    <span data-i18n="is-product-active">产品处于启用状态</span>
-                                </label>
-                                
-                                <label style="display: flex; align-items: center; color: #FFB6C1; cursor: pointer;">
-                                    <input type="checkbox" id="isPromotional" style="margin-right: 5px;">
-                                    <span data-i18n="is-promotional">是促销产品</span>
-                                </label>
-                            </div>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label for="productTags" style="display: block; color: #FFB6C1; margin-bottom: 5px;" data-i18n="product-tags">产品标签（多个标签用逗号分隔）：</label>
-                                <input type="text" id="productTags" placeholder="新品,热销,护发" style="width: 100%; padding: 10px; background: transparent; border: 1px solid #FFB6C1; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            <!-- 规格计算结果 -->
+                            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 5px; border: 1px solid #87CEEB;">
+                                <p style="color: #87CEEB; margin: 0; font-size: 0.95em;">
+                                    <strong data-i18n="specification-summary">规格汇总：</strong>
+                                    <span id="specificationSummary">每瓶 0g，每盒 1瓶，每箱 1盒，每箱总重量 0g</span>
+                                </p>
                             </div>
                         </div>
                         
-                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="add-product-submit">添加产品</button>
+                        <!-- 价格信息 -->
+                        <div style="background: rgba(144, 238, 144, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(144, 238, 144, 0.3); margin-bottom: 15px;">
+                            <h3 style="color: #90EE90; margin: 0 0 15px 0; font-size: 1.1em;" data-i18n="price-info">价格信息</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <label for="purchasePrice" style="display: block; color: #90EE90; margin-bottom: 5px;" data-i18n="purchase-price">进货价（₩）：</label>
+                                    <input type="text" id="purchasePrice" oninput="formatKoreanPrice(this)" style="width: 100%; padding: 8px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="wholesalePrice" style="display: block; color: #90EE90; margin-bottom: 5px;" data-i18n="wholesale-price">批发价（₩）：</label>
+                                    <input type="text" id="wholesalePrice" oninput="formatKoreanPrice(this)" style="width: 100%; padding: 8px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="retailPrice" style="display: block; color: #90EE90; margin-bottom: 5px;" data-i18n="retail-price">零售价（₩）：</label>
+                                    <input type="text" id="retailPrice" oninput="formatKoreanPrice(this)" style="width: 100%; padding: 8px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; color: #90EE90; cursor: pointer;">
+                                    <input type="checkbox" id="isOnSale" checked style="margin-right: 8px;">
+                                    <span data-i18n="is-on-sale">在售</span>
+                                </label>
+                                <label style="display: flex; align-items: center; color: #90EE90; cursor: pointer; margin-top: 8px;">
+                                    <input type="checkbox" id="isDiscontinued" style="margin-right: 8px;">
+                                    <span data-i18n="is-discontinued">停产</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- 备注信息 -->
+                        <div style="background: rgba(255, 182, 193, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 182, 193, 0.3); margin-bottom: 20px;">
+                            <h3 style="color: #FFB6C1; margin: 0 0 15px 0; font-size: 1.1em;" data-i18n="notes-info">备注信息</h3>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label for="productNotes" style="display: block; color: #FFB6C1; margin-bottom: 5px;" data-i18n="product-notes">备注：</label>
+                                <textarea id="productNotes" data-i18n-placeholder="product-notes-placeholder" placeholder="请输入产品备注信息..." style="width: 100%; padding: 10px; background: transparent; border: 1px solid #FFB6C1; color: var(--text-light); border-radius: 5px; box-sizing: border-box; min-height: 80px; resize: vertical;"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- 操作按钮 -->
+                        <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                            <button type="button" onclick="resetProductForm()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="cancel">取消</button>
+                            <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="add-product-submit">添加产品</button>
+                        </div>
                     </form>
                 </div>
 
@@ -1033,8 +1052,105 @@
                 </div>
 
                 <div id="product-list" class="content-area">
-                    <h1 data-i18n="product-list">产品列表</h1>
-                    <p data-i18n="product-list-content">显示所有产品的列表...</p>
+                    <h1 style="margin-bottom: 15px;" data-i18n="product-list">产品列表</h1>
+                    
+                    <!-- 搜索筛选和排序控制 -->
+                    <div id="product-count-display" style="margin: 10px 0; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <!-- 左侧：搜索框和筛选 -->
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <input type="text" id="productSearchInput" data-i18n-placeholder="search-product-placeholder" placeholder="搜索产品名/品牌/货号..." oninput="searchProducts()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; min-width: 200px; font-size: 0.9em;">
+                                <select id="productCategoryFilter" onchange="searchProducts()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
+                                    <option value="" data-i18n="all-categories">全部分类</option>
+                                    <option value="uncategorized" data-i18n="uncategorized">未分类</option>
+                                    <!-- 其他分类选项将通过JavaScript动态添加 -->
+                                </select>
+                                <select id="productStatusFilter" onchange="searchProducts()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
+                                    <option value="" data-i18n="all-status">全部状态</option>
+                                    <option value="on-sale" data-i18n="on-sale">在售</option>
+                                    <option value="discontinued" data-i18n="discontinued">停产</option>
+                                </select>
+                                <button onclick="clearProductFilters()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="clear-filters">清空筛选</button>
+                            </div>
+                            
+                            <!-- 右侧：排序按钮 -->
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button id="sort-product-name" onclick="toggleProductSort('name')" style="background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; opacity: 0.7;" data-i18n="sort-by-name">产品名称</button>
+                                <button id="sort-brand" onclick="toggleProductSort('brand')" style="background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; opacity: 0.7;" data-i18n="sort-by-brand">品牌</button>
+                                <button id="sort-category" onclick="toggleProductSort('category')" style="background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; opacity: 0.7;" data-i18n="sort-by-category">分类</button>
+                                <button id="sort-price" onclick="toggleProductSort('price')" style="background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; opacity: 0.7;" data-i18n="sort-by-price">进货价</button>
+                                <button id="sort-default" onclick="toggleProductSort('default')" style="background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; opacity: 1;" data-i18n="sort-default">默认排序</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 统计信息 -->
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; color: #87CEEB;">
+                            <span id="product-statistics">筛选结果：显示 0 个产品</span>
+                            <div style="display: flex; gap: 15px; font-size: 0.9em;">
+                                <span id="total-products">总产品数：0</span>
+                                <span id="filtered-products">筛选结果：0</span>
+                                <span id="on-sale-products">在售：0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 分页控制面板 -->
+                    <div id="product-pagination-controls" style="margin: 10px 0; padding: 10px; background: rgba(144, 238, 144, 0.1); border-radius: 5px; border: 1px solid rgba(144, 238, 144, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 15px; color: #90EE90;">
+                                <span style="font-weight: bold; font-size: 1em;" data-i18n="pagination-info">分页信息：</span>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 0.9em;" data-i18n="go-to-page">跳转到第</span>
+                                    <input type="number" id="product-page-jump-input" min="1" onkeypress="handleProductPageJumpKeypress(event)" style="width: 60px; padding: 6px 8px; background: var(--dark-gray); border: 1px solid #90EE90; color: #90EE90; border-radius: 3px; text-align: center; font-size: 0.9em;">
+                                    <span style="font-size: 0.9em;" data-i18n="page-unit">页</span>
+                                    <button onclick="jumpToProductPage()" style="background: #90EE90; color: var(--black); border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="jump-btn">跳转</button>
+                                </div>
+                            </div>
+                            <div id="product-pagination" style="display: flex; align-items: center; gap: 8px; color: #90EE90; font-size: 0.9em;">
+                                <button id="product-first-page" onclick="goToProductPage(1)" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="first-page">首页</button>
+                                <button id="product-prev-page" onclick="goToPrevProductPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="prev-page">上一页</button>
+                                <span id="product-page-info" style="background: var(--gold); color: var(--black); padding: 6px 16px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">第 1 页 / 共 1 页 (0 个项目)</span>
+                                <button id="product-next-page" onclick="goToNextProductPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="next-page">下一页</button>
+                                <button id="product-last-page" onclick="goToLastProductPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="last-page">末页</button>
+                                <select id="product-items-per-page" onchange="changeProductItemsPerPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; font-size: 0.9em; margin-left: 10px;">
+                                    <option value="10" data-i18n="items-per-page-10">每页显示: 10</option>
+                                    <option value="20" selected data-i18n="items-per-page-20">每页显示: 20</option>
+                                    <option value="50" data-i18n="items-per-page-50">每页显示: 50</option>
+                                </select>
+                                <span style="font-size: 0.9em;" data-i18n="items-unit">条</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 左右分栏布局 -->
+                    <div style="display: flex; gap: 20px; height: calc(100vh - 500px); min-height: 400px;">
+                        <!-- 左侧产品列表 -->
+                        <div id="product-list-left" style="width: 40%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); display: flex; flex-direction: column; height: 100%;">
+                            <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0; height: 53px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between;">
+                                <h3 style="color: var(--gold); margin: 0;" data-i18n="product-list">产品列表</h3>
+                                <span style="color: var(--gold); font-weight: bold; font-size: 0.9em;" id="product-count-text" data-i18n="total-products-count" data-i18n-params='{"count": "0"}'>总计 0 个产品</span>
+                            </div>
+                            <div id="product-list-content" style="padding: 15px; flex: 1; overflow-y: auto; box-sizing: border-box;">
+                                <!-- 产品列表将在这里动态生成 -->
+                                <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-products">暂无产品数据</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧产品详情 -->
+                        <div id="product-detail-right" style="width: 60%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); display: none; flex-direction: column; height: 100%;">
+                            <div id="product-detail-header" style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 53px; box-sizing: border-box;">
+                                <h3 style="color: var(--gold); margin: 0;" data-i18n="product-detail">产品详情</h3>
+                                <div id="product-action-buttons" style="display: flex; gap: 10px;">
+                                    <!-- 按钮将在这里动态生成 -->
+                                </div>
+                            </div>
+                            <div id="product-detail-content" style="padding: 20px; flex: 1; overflow-y: visible; line-height: 1.6; box-sizing: border-box;">
+                                <!-- 产品详情将在这里动态生成 -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- 删除职员页面 -->
@@ -1179,7 +1295,7 @@
                     <h1 style="margin-bottom: 15px;" data-i18n="salon-info">沙龙信息</h1>
                     
                     <!-- 搜索筛选和排序控制 -->
-                    <div id="salon-count-display" style="margin: 15px 0; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                    <div id="salon-count-display" style="margin: 10px 0; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <!-- 左侧：搜索框和筛选 -->
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -1212,27 +1328,39 @@
                         </div>
                     </div>
                     
+                    <!-- 统计信息 -->
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; color: #87CEEB;">
+                            <span id="salon-statistics">筛选结果：显示 0 个沙龙</span>
+                            <div style="display: flex; gap: 15px; font-size: 0.9em;">
+                                <span id="total-salons">总沙龙数：0</span>
+                                <span id="filtered-salons">筛选结果：0</span>
+                                <span id="current-page-salons">当前页：0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- 分页控制面板 -->
-                    <div id="salon-pagination-controls" style="margin: 15px 0; padding: 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                    <div id="salon-pagination-controls" style="margin: 10px 0; padding: 10px; background: rgba(144, 238, 144, 0.1); border-radius: 5px; border: 1px solid rgba(144, 238, 144, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                            <div style="display: flex; align-items: center; gap: 15px; color: #87CEEB;">
+                            <div style="display: flex; align-items: center; gap: 15px; color: #90EE90;">
                                 <span style="font-weight: bold; font-size: 1em;" data-i18n="pagination-info">分页信息：</span>
                                 <!-- 跳转到指定页面 -->
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 0.9em;" data-i18n="go-to-page">跳转到第</span>
-                                    <input type="number" id="page-jump-input" min="1" onkeypress="handlePageJumpKeypress(event)" style="width: 60px; padding: 6px 8px; background: var(--dark-gray); border: 1px solid #87CEEB; color: #87CEEB; border-radius: 3px; text-align: center; font-size: 0.9em;">
+                                    <input type="number" id="page-jump-input" min="1" onkeypress="handlePageJumpKeypress(event)" style="width: 60px; padding: 6px 8px; background: var(--dark-gray); border: 1px solid #90EE90; color: #90EE90; border-radius: 3px; text-align: center; font-size: 0.9em;">
                                     <span style="font-size: 0.9em;" data-i18n="page-unit">页</span>
-                                    <button onclick="jumpToPage()" style="background: #87CEEB; color: var(--black); border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="jump-btn">跳转</button>
+                                    <button onclick="jumpToPage()" style="background: #90EE90; color: var(--black); border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="jump-btn">跳转</button>
                                 </div>
                             </div>
                             <!-- 分页控件 -->
-                            <div id="salon-pagination" style="display: flex; align-items: center; gap: 8px; color: #87CEEB; font-size: 0.9em;">
-                                <button id="first-page" onclick="goToSalonPage(1)" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="first-page">首页</button>
-                                <button id="prev-page" onclick="goToPrevSalonPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="prev-page">上一页</button>
+                            <div id="salon-pagination" style="display: flex; align-items: center; gap: 8px; color: #90EE90; font-size: 0.9em;">
+                                <button id="first-page" onclick="goToSalonPage(1)" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="first-page">首页</button>
+                                <button id="prev-page" onclick="goToPrevSalonPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="prev-page">上一页</button>
                                 <span id="page-info" style="background: var(--gold); color: var(--black); padding: 6px 16px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">第 1 页 / 共 1 页 (1 个项目)</span>
-                                <button id="next-page" onclick="goToNextSalonPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="next-page">下一页</button>
-                                <button id="last-page" onclick="goToLastSalonPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="last-page">末页</button>
-                                <select id="items-per-page" onchange="changeItemsPerPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; font-size: 0.9em; margin-left: 10px;">
+                                <button id="next-page" onclick="goToNextSalonPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="next-page">下一页</button>
+                                <button id="last-page" onclick="goToLastSalonPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="last-page">末页</button>
+                                <select id="items-per-page" onchange="changeItemsPerPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; font-size: 0.9em; margin-left: 10px;">
                                     <option value="10" data-i18n="items-per-page-10">每页显示: 10</option>
                                     <option value="20" selected data-i18n="items-per-page-20">每页显示: 20</option>
                                     <option value="50" data-i18n="items-per-page-50">每页显示: 50</option>
@@ -1243,7 +1371,7 @@
                     </div>
                     
                     <!-- 左右分栏布局 -->
-                    <div style="display: flex; gap: 20px; height: calc(100vh - 320px); min-height: 400px;">
+                    <div style="display: flex; gap: 20px; height: calc(100vh - 500px); min-height: 400px;">
                         <!-- 左侧沙龙列表 -->
                         <div id="salon-list-left" style="width: 40%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); display: flex; flex-direction: column; height: 100%;">
                             <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0; height: 53px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between;">
@@ -1273,10 +1401,10 @@
                 
                 <!-- 删除沙龙页面 -->
                 <div id="delete-salon" class="content-area">
-                    <h1 data-i18n="delete-salon">删除沙龙</h1>
+                    <h1 style="margin-bottom: 15px;" data-i18n="delete-salon">删除沙龙</h1>
                     
                     <!-- 筛选控制区域 -->
-                    <div id="delete-salon-filters" style="margin: 15px 0; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                    <div id="delete-salon-filters" style="margin: 10px 0; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <!-- 左侧：筛选条件 -->
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -1307,7 +1435,7 @@
                     </div>
                     
                     <!-- 统计信息 -->
-                    <div style="margin: 15px 0; padding: 10px 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; color: #87CEEB;">
                             <span id="delete-salon-statistics">筛选结果：显示 0 个沙龙</span>
                             <div style="display: flex; gap: 15px; font-size: 0.9em;">
@@ -1319,7 +1447,7 @@
                     </div>
                     
                     <!-- 分页控制 -->
-                    <div id="delete-salon-pagination-controls" style="margin: 15px 0; padding: 15px; background: rgba(144, 238, 144, 0.1); border-radius: 5px; border: 1px solid rgba(144, 238, 144, 0.3);">
+                    <div id="delete-salon-pagination-controls" style="margin: 10px 0; padding: 10px; background: rgba(144, 238, 144, 0.1); border-radius: 5px; border: 1px solid rgba(144, 238, 144, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                             <div style="display: flex; align-items: center; gap: 15px; color: #90EE90;">
                                 <span style="font-weight: bold; font-size: 1em;" data-i18n="pagination-info">分页信息：</span>
@@ -1347,11 +1475,11 @@
                     </div>
                     
                     <!-- 沙龙列表区域 -->
-                    <div style="background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); height: calc(100vh - 320px); min-height: 300px; display: flex; flex-direction: column;">
-                        <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0;">
+                    <div style="background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); height: calc(100vh - 500px); min-height: 300px; display: flex; flex-direction: column;">
+                        <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0; height: 53px; box-sizing: border-box; display: flex; align-items: center;">
                             <h3 style="color: var(--gold); margin: 0;" data-i18n="salon-delete-list">沙龙删除列表</h3>
                         </div>
-                        <div id="delete-salon-list-content" style="padding: 15px; flex: 1; overflow-y: auto;">
+                        <div id="delete-salon-list-content" style="padding: 15px; flex: 1; overflow-y: auto; box-sizing: border-box;">
                             <!-- 沙龙列表将在这里动态生成 -->
                             <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-salons-to-delete">没有可删除的沙龙</p>
                         </div>
@@ -1567,12 +1695,16 @@
                     <input type="text" id="categoryNameKO" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom: 20px;">
+                    <label for="categoryCode" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-code">分类代码：</label>
+                    <input type="text" id="categoryCode" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="例如: CAT001">
+                </div>
+                <div style="margin-bottom: 20px;">
                     <label for="categoryDescription" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-description">分类描述：</label>
                     <textarea id="categoryDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; min-height: 80px; resize: vertical;"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button type="button" onclick="closeCreateCategoryModal()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="cancel">取消</button>
-                    <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="create">创建</button>
+                    <button type="button" onclick="submitCreateCategory()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="create">创建</button>
                 </div>
             </form>
         </div>
@@ -1940,6 +2072,116 @@
         window.addEventListener('DOMContentLoaded', function() {
             // 初始化系统
             initializeSystem();
+            
+            // 添加产品表单提交事件监听器
+            const addProductForm = document.getElementById('addProductForm');
+            if (addProductForm) {
+                addProductForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        id: Date.now(),
+                        name: document.getElementById('productName').value,
+                        brandName: document.getElementById('brandName').value,
+                        model: document.getElementById('productModel').value,
+                        sku: document.getElementById('productSku').value,
+                        category: document.getElementById('productCategory').value || 'uncategorized',
+                        unitType: document.getElementById('unitType').value,
+                        weightVolume: parseFloat(document.getElementById('weightVolume').value) || 0,
+                        weightUnit: document.getElementById('weightUnit').value,
+                        perBoxCount: parseInt(document.getElementById('perBoxCount').value) || 1,
+                        perCaseCount: parseInt(document.getElementById('perCaseCount').value) || 1,
+                        purchasePrice: document.getElementById('purchasePrice').value.replace(/[^\d]/g, ''),
+                        wholesalePrice: document.getElementById('wholesalePrice').value.replace(/[^\d]/g, ''),
+                        retailPrice: document.getElementById('retailPrice').value.replace(/[^\d]/g, ''),
+                        isOnSale: document.getElementById('isOnSale').checked,
+                        isDiscontinued: document.getElementById('isDiscontinued').checked,
+                        notes: document.getElementById('productNotes').value,
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser ? currentUser.id : null
+                    };
+                    
+                    // 验证必填字段
+                    if (!formData.name) {
+                        alert('请输入产品名称');
+                        return;
+                    }
+                    
+                    // 添加产品
+                    productsData.push(formData);
+                    saveProducts();
+                    
+                    alert('产品添加成功！');
+                    resetProductForm();
+                    
+                    // 记录操作日志
+                    if (typeof addOperationLog === 'function') {
+                        addOperationLog('create', 'product', formData.id, `创建产品: ${formData.name}`);
+                    }
+                });
+            }
+            
+            // 添加产品分类表单提交事件监听器
+            const createCategoryForm = document.getElementById('createCategoryForm');
+            if (createCategoryForm) {
+                createCategoryForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        id: Date.now(),
+                        nameCN: document.getElementById('categoryNameCN').value,
+                        nameKO: document.getElementById('categoryNameKO').value,
+                        code: document.getElementById('categoryCode').value || generateCategoryCode(),
+                        description: document.getElementById('categoryDescription').value,
+                        parentId: document.getElementById('parentCategory').value || null,
+                        sortOrder: parseInt(document.getElementById('categorySortOrder').value) || 0,
+                        active: document.getElementById('categoryActive').checked,
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser ? currentUser.id : null
+                    };
+                    
+                    // 验证必填字段
+                    if (!formData.nameCN) {
+                        alert('请输入分类名称（中文）');
+                        return;
+                    }
+                    
+                    // 检查代码是否重复
+                    if (productCategoriesData.some(cat => cat.code === formData.code && cat.id !== formData.id)) {
+                        alert('分类代码已存在，请使用其他代码');
+                        return;
+                    }
+                    
+                    // 添加分类
+                    productCategoriesData.push(formData);
+                    saveProductCategories();
+                    
+                    alert('产品分类创建成功！');
+                    resetCategoryForm();
+                    displayProductCategories();
+                    
+                    // 记录操作日志
+                    if (typeof addOperationLog === 'function') {
+                        addOperationLog('create', 'category', formData.id, `创建产品分类: ${formData.nameCN}`);
+                    }
+                });
+            }
+            
+            // 生成分类代码函数
+            function generateCategoryCode() {
+                const timestamp = Date.now();
+                return `CAT_${timestamp}`;
+            }
+            
+            // 重置分类表单函数
+            function resetCategoryForm() {
+                const form = document.getElementById('createCategoryForm');
+                if (form) {
+                    form.reset();
+                    document.getElementById('categorySortOrder').value = '0';
+                    document.getElementById('categoryActive').checked = true;
+                }
+            }
             
             // 检查是否是从登录页面跳转过来的
             const fromLogin = sessionStorage.getItem('fromLogin');
@@ -2346,6 +2588,75 @@
         'district-others': '其他地区',
                     'clear-filters': '清空筛选',
                     'select': '选择',
+                    // 产品管理相关翻译
+                    'product-basic-info': '产品基本信息',
+                    'product-name': '产品名称',
+                    'brand-name': '品牌名称',
+                    'product-model': '型号',
+                    'product-sku': '货号',
+                    'product-category-select': '产品分类',
+                    'please-select-category': '请选择产品分类...',
+                    'uncategorized': '未分类',
+                    'product-specifications': '规格信息',
+                    'unit-type': '数量单位',
+                    'unit-piece': '个',
+                    'unit-only': '只',
+                    'unit-stick': '支',
+                    'unit-bottle': '瓶',
+                    'unit-box': '盒',
+                    'unit-bag': '袋',
+                    'weight-volume': '重量/体积',
+                    'weight-unit': '重量单位',
+                    'unit-gram': 'g（克）',
+                    'unit-ml': 'ml（毫升）',
+                    'unit-kg': 'kg（千克）',
+                    'unit-liter': 'L（升）',
+                    'per-box-count': '每盒数量',
+                    'per-case-count': '箱规',
+                    'specification-summary': '规格汇总',
+                    'price-info': '价格信息',
+                    'purchase-price': '进货价（₩）',
+                    'wholesale-price': '批发价（₩）',
+                    'retail-price': '零售价（₩）',
+                    'is-on-sale': '在售',
+                    'is-discontinued': '停产',
+                    'notes-info': '备注信息',
+                    'product-notes': '备注',
+                    'product-name-required': '请输入产品名称',
+                    'reset-form': '重置表单',
+                    'create-product-category': '创建产品分类',
+                    'product-category-content': '管理产品分类信息',
+                    'category-name-cn': '分类名称（中文）',
+                    'category-name-ko': '분류명（한국어）',
+                    'category-code': '分类代码',
+                    'category-description': '分类描述',
+                    'edit-product-category': '编辑产品分类',
+                    'product-list-content': '查看和管理所有产品信息',
+                    'search-placeholder': '搜索产品名称、品牌或货号...',
+                    'product-detail': '产品详情',
+                    'product-brand': '品牌',
+                    'product-model-label': '型号',
+                    'product-sku-label': '货号',
+                    'purchase-price-label': '进货价',
+                    'wholesale-price-label': '批发价',
+                    'retail-price-label': '零售价',
+                    'status': '状态',
+                    'on-sale': '在售',
+                    'discontinued': '停产',
+                    'created-time': '创建时间',
+                    'product-notes-placeholder': '请输入产品备注信息...',
+                    'search-product-placeholder': '搜索产品名/品牌/货号...',
+                    'all-categories': '全部分类',
+                    'all-status': '全部状态',
+                    'sort-by-name': '产品名称',
+                    'sort-by-brand': '品牌',
+                    'sort-by-category': '分类',
+                    'sort-by-price': '进货价',
+                    'no-categories': '暂无产品分类，请点击"创建产品分类"添加',
+                    'category-list': '产品分类列表',
+                    'total-products-count': '总计 {count} 个产品',
+                    'no-products': '暂无产品数据',
+                    'add-product-submit': '添加产品',
                     'salon-region': '区域',
                     'responsible-person': '负责人',
                     'all-employees': '所有职员',
@@ -2570,6 +2881,75 @@
         'district-others': '기타 지역',
                     'clear-filters': '필터 지우기',
                     'select': '선택',
+                    // 제품 관리 관련 번역
+                    'product-basic-info': '제품 기본 정보',
+                    'product-name': '제품명',
+                    'brand-name': '브랜드명',
+                    'product-model': '모델',
+                    'product-sku': '상품번호',
+                    'product-category-select': '제품 카테고리',
+                    'please-select-category': '제품 카테고리를 선택하세요...',
+                    'uncategorized': '미분류',
+                    'product-specifications': '사양 정보',
+                    'unit-type': '수량 단위',
+                    'unit-piece': '개',
+                    'unit-only': '개',
+                    'unit-stick': '개',
+                    'unit-bottle': '병',
+                    'unit-box': '박스',
+                    'unit-bag': '봉지',
+                    'weight-volume': '무게/부피',
+                    'weight-unit': '무게 단위',
+                    'unit-gram': 'g（그램）',
+                    'unit-ml': 'ml（밀리리터）',
+                    'unit-kg': 'kg（킬로그램）',
+                    'unit-liter': 'L（리터）',
+                    'per-box-count': '박스당 수량',
+                    'per-case-count': '케이스 규격',
+                    'specification-summary': '사양 요약',
+                    'price-info': '가격 정보',
+                    'purchase-price': '매입가（₩）',
+                    'wholesale-price': '도매가（₩）',
+                    'retail-price': '소매가（₩）',
+                    'is-on-sale': '판매중',
+                    'is-discontinued': '단종',
+                    'notes-info': '비고 정보',
+                    'product-notes': '비고',
+                    'product-name-required': '제품명을 입력하세요',
+                    'reset-form': '폼 초기화',
+                    'create-product-category': '제품 카테고리 생성',
+                    'product-category-content': '제품 카테고리 정보 관리',
+                    'category-name-cn': '카테고리명（중국어）',
+                    'category-name-ko': '카테고리명（한국어）',
+                    'category-code': '카테고리 코드',
+                    'category-description': '카테고리 설명',
+                    'edit-product-category': '제품 카테고리 편집',
+                    'product-list-content': '모든 제품 정보 보기 및 관리',
+                    'search-placeholder': '제품명, 브랜드 또는 상품번호 검색...',
+                    'product-detail': '제품 상세정보',
+                    'product-brand': '브랜드',
+                    'product-model-label': '모델',
+                    'product-sku-label': '상품번호',
+                    'purchase-price-label': '매입가',
+                    'wholesale-price-label': '도매가',
+                    'retail-price-label': '소매가',
+                    'status': '상태',
+                    'on-sale': '판매중',
+                    'discontinued': '단종',
+                    'created-time': '생성 시간',
+                    'product-notes-placeholder': '제품 비고 정보를 입력하세요...',
+                    'search-product-placeholder': '제품명/브랜드/상품번호 검색...',
+                    'all-categories': '전체 카테고리',
+                    'all-status': '전체 상태',
+                    'sort-by-name': '제품명',
+                    'sort-by-brand': '브랜드',
+                    'sort-by-category': '카테고리',
+                    'sort-by-price': '매입가',
+                    'no-categories': '제품 카테고리가 없습니다. "제품 카테고리 생성"을 클릭하여 추가하세요',
+                    'category-list': '제품 카테고리 목록',
+                    'total-products-count': '총 {count}개 제품',
+                    'no-products': '제품 데이터가 없습니다',
+                    'add-product-submit': '제품 추가',
                     'salon-region': '지역',
                     'responsible-person': '담당자',
                     'all-employees': '모든 직원',
@@ -2688,6 +3068,9 @@
             
             // 初始化测试数据
             initializeTestData();
+            
+            // 初始化产品管理数据
+            initializeProductData();
             
             // 获取当前用户信息
             const currentUserStr = localStorage.getItem('currentUser');
@@ -2957,16 +3340,26 @@
             return '₩ ' + formatNumber(amount);
         }
         
-        // 处理创建产品分类表单提交
-        document.getElementById('createCategoryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            createProductCategory();
+        // 处理创建产品分类表单提交 - 使用DOM加载事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const createCategoryForm = document.getElementById('createCategoryForm');
+            if (createCategoryForm) {
+                createCategoryForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitCreateCategory();
+                });
+            }
         });
         
-        // 处理编辑产品分类表单提交
-        document.getElementById('editCategoryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            updateProductCategory();
+        // 处理编辑产品分类表单提交 - 使用DOM加载事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const editCategoryForm = document.getElementById('editCategoryForm');
+            if (editCategoryForm) {
+                editCategoryForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    updateProductCategory();
+                });
+            }
         });
         
         // ==================== 产品管理功能 ====================
@@ -4691,8 +5084,10 @@
             
             if (!employee) return;
             
-            // 显示右侧详情面板
-            document.getElementById('employee-list-right').style.display = 'block';
+            // 显示右侧详情面板并移除滚动条（查看模式不需要滚动条）
+            const rightPanel = document.getElementById('employee-list-right');
+            rightPanel.style.display = 'block';
+            rightPanel.style.overflowY = 'visible';
             
             // 获取职位文本
             let positionText = '';
@@ -4793,6 +5188,10 @@
             const employee = employees.find(e => e.id === employeeId);
             
             if (!employee) return;
+            
+            // 为编辑模式添加滚动条（编辑表单内容较多，需要滚动）
+            const rightPanel = document.getElementById('employee-list-right');
+            rightPanel.style.overflowY = 'auto';
             
             // 获取当前语言的按钮文本
             const cancelText = getText('cancel');
@@ -6183,6 +6582,263 @@
         
         // 添加调试日志以便排查问题
         console.log('删除沙龙页面功能已重新设计完成');
+        
+        // ========================================
+        // 产品管理相关功能
+        // ========================================
+        
+        // 产品数据存储和管理
+        let productsData = [];
+        let productCategoriesData = [];
+        
+        // 初始化产品数据
+        function initializeProductData() {
+            // 加载产品分类数据
+            const savedCategories = localStorage.getItem('productCategories');
+            if (savedCategories) {
+                productCategoriesData = JSON.parse(savedCategories);
+            } else {
+                // 创建默认分类
+                productCategoriesData = [
+                    {
+                        id: 1,
+                        nameCN: '未分类',
+                        nameKO: '미분류',
+                        code: 'uncategorized',
+                        description: '未分类的产品',
+                        parentId: null,
+                        sortOrder: 0,
+                        active: true,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                saveProductCategories();
+            }
+            
+            // 加载产品数据
+            const savedProducts = localStorage.getItem('products');
+            if (savedProducts) {
+                productsData = JSON.parse(savedProducts);
+            } else {
+                productsData = [];
+            }
+            
+            console.log('产品管理系统初始化完成：', productsData.length, '个产品，', productCategoriesData.length, '个分类');
+        }
+        
+        // 保存产品数据
+        function saveProducts() {
+            localStorage.setItem('products', JSON.stringify(productsData));
+        }
+        
+        // 保存产品分类数据
+        function saveProductCategories() {
+            localStorage.setItem('productCategories', JSON.stringify(productCategoriesData));
+        }
+        
+        // 加载产品分类到下拉选择框
+        function loadProductCategories() {
+            const categorySelect = document.getElementById('productCategory');
+            if (!categorySelect) return;
+            
+            categorySelect.innerHTML = '<option value="" data-i18n="please-select-category">请选择产品分类...</option>';
+            
+            const categories = productCategoriesData.filter(cat => cat.active);
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.code;
+                option.textContent = category.nameCN;
+                categorySelect.appendChild(option);
+            });
+            
+            updateTexts();
+        }
+        
+        // 更新单位示例
+        function updateUnitExample() {
+            const unitType = document.getElementById('unitType').value;
+            const perBoxUnit = document.getElementById('perBoxUnit');
+            if (perBoxUnit) {
+                perBoxUnit.textContent = unitType;
+            }
+            calculateTotalWeight();
+        }
+        
+        // 计算总重量
+        function calculateTotalWeight() {
+            const weightVolume = parseFloat(document.getElementById('weightVolume').value) || 0;
+            const weightUnit = document.getElementById('weightUnit').value;
+            const perBoxCount = parseInt(document.getElementById('perBoxCount').value) || 1;
+            const perCaseCount = parseInt(document.getElementById('perCaseCount').value) || 1;
+            const unitType = document.getElementById('unitType').value;
+            
+            const totalUnitsPerCase = perBoxCount * perCaseCount;
+            const totalWeightPerCase = weightVolume * totalUnitsPerCase;
+            
+            let displayUnit = weightUnit;
+            let displayWeight = totalWeightPerCase;
+            
+            // 单位转换
+            if (weightUnit === 'g' && totalWeightPerCase >= 1000) {
+                displayWeight = totalWeightPerCase / 1000;
+                displayUnit = 'kg';
+            } else if (weightUnit === 'ml' && totalWeightPerCase >= 1000) {
+                displayWeight = totalWeightPerCase / 1000;
+                displayUnit = 'L';
+            }
+            
+            const summaryElement = document.getElementById('specificationSummary');
+            if (summaryElement) {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                if (currentLanguage === 'ko') {
+                    summaryElement.textContent = `${unitType}당 ${weightVolume}${weightUnit}, 박스당 ${perBoxCount}${unitType}, 케이스당 ${perCaseCount}박스, 케이스 총 중량 ${displayWeight.toFixed(1)}${displayUnit}`;
+                } else {
+                    summaryElement.textContent = `每${unitType} ${weightVolume}${weightUnit}，每盒 ${perBoxCount}${unitType}，每箱 ${perCaseCount}盒，每箱总重量 ${displayWeight.toFixed(1)}${displayUnit}`;
+                }
+            }
+        }
+        
+        // 格式化韩元价格
+        function formatKoreanPrice(input) {
+            let value = input.value.replace(/[^\d]/g, '');
+            if (value) {
+                value = parseInt(value).toLocaleString('ko-KR');
+            }
+            input.value = value;
+        }
+        
+        // 重置产品表单
+        function resetProductForm() {
+            const form = document.getElementById('addProductForm');
+            if (form) {
+                form.reset();
+                setTimeout(calculateTotalWeight, 100);
+            }
+        }
+        
+        // 显示产品列表（占位函数）
+        function displayProductList() {
+            console.log('产品列表功能开发中...');
+        }
+        
+        // 显示产品分类
+        function displayProductCategories() {
+            console.log('正在加载产品分类列表...');
+            loadProductCategoriesList();
+        }
+        
+        console.log('产品管理基础功能模块加载完成');
+        
+        // ========================================
+        // 产品分类页面弹窗控制函数
+        // ========================================
+        
+        // 打开新建分类弹窗
+        function openCreateCategoryModal() {
+            const modal = document.getElementById('createCategoryModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // 清空表单
+                const form = document.getElementById('createCategoryForm');
+                if (form) {
+                    form.reset();
+                }
+            }
+        }
+        
+        // 关闭新建分类弹窗
+        function closeCreateCategoryModal() {
+            const modal = document.getElementById('createCategoryModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // 提交新建分类
+        function submitCreateCategory() {
+            const categoryNameCN = document.getElementById('categoryNameCN').value.trim();
+            const categoryNameKO = document.getElementById('categoryNameKO').value.trim();
+            const categoryCode = document.getElementById('categoryCode').value.trim();
+            const categoryDescription = document.getElementById('categoryDescription').value.trim();
+            
+            if (!categoryNameCN || !categoryNameKO || !categoryCode) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            // 检查分类代码是否已存在
+            const existingCategory = productCategoriesData.find(cat => cat.code === categoryCode);
+            if (existingCategory) {
+                alert('分类代码已存在，请使用其他代码');
+                return;
+            }
+            
+            // 创建新分类
+            const newCategory = {
+                id: Date.now(),
+                nameCN: categoryNameCN,
+                nameKO: categoryNameKO,
+                code: categoryCode,
+                description: categoryDescription,
+                parentId: null,
+                sortOrder: productCategoriesData.length,
+                active: true,
+                createdAt: new Date().toISOString()
+            };
+            
+            productCategoriesData.push(newCategory);
+            saveProductCategories();
+            
+            // 刷新分类列表显示
+            loadProductCategoriesList();
+            
+            // 关闭弹窗
+            closeCreateCategoryModal();
+            
+            alert('分类创建成功！');
+        }
+        
+        // 加载产品分类列表
+        function loadProductCategoriesList() {
+            const container = document.getElementById('productCategoriesContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            productCategoriesData.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-item';
+                categoryDiv.style.cssText = `
+                    padding: 12px;
+                    margin: 8px 0;
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                `;
+                
+                categoryDiv.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${category.nameCN} / ${category.nameKO}</div>
+                    <div style="color: #666; font-size: 0.9em;">代码: ${category.code}</div>
+                    <div style="color: #888; font-size: 0.8em; margin-top: 5px;">${category.description || '无描述'}</div>
+                `;
+                
+                categoryDiv.addEventListener('mouseenter', () => {
+                    categoryDiv.style.background = '#f5f5f5';
+                    categoryDiv.style.borderColor = '#ccc';
+                });
+                
+                categoryDiv.addEventListener('mouseleave', () => {
+                    categoryDiv.style.background = 'white';
+                    categoryDiv.style.borderColor = '#ddd';
+                });
+                
+                container.appendChild(categoryDiv);
+            });
+        }
+        
+        console.log('产品分类弹窗控制函数加载完成');
     </script>
 </body>
 </html> 
