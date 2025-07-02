@@ -75,11 +75,11 @@
             color: var(--gold);
             font-family: 'Montserrat', cursive;
             font-weight: 900;
+            -webkit-user-select: none;
             user-select: none;
             letter-spacing: 1px;
             text-shadow: 0 0 22px rgba(212,175,55,0.28);
         }
-        
         .sidebar-subtitle {
             color: var(--gold-light);
             font-size: 0.9em;
@@ -709,7 +709,7 @@
                         </div>
                         <div style="padding: 0;">
                             <div style="text-align: right; padding: 10px 20px; color: #aaa; font-size: 0.9em;">
-                                <span data-i18n="unit-label">[단위:천원]</span>
+                                <span data-i18n="unit-label">[单位:千元]</span>
                             </div>
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead>
@@ -1694,10 +1694,7 @@
                     <label for="categoryNameKO" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-name-ko">分类名称（韩文）：</label>
                     <input type="text" id="categoryNameKO" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label for="categoryCode" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-code">分类代码：</label>
-                    <input type="text" id="categoryCode" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;" placeholder="例如: CAT001">
-                </div>
+
                 <div style="margin-bottom: 20px;">
                     <label for="categoryDescription" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="category-description">分类描述：</label>
                     <textarea id="categoryDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; min-height: 80px; resize: vertical;"></textarea>
@@ -2567,6 +2564,13 @@
                     'salon-name-required': '请输入沙龙名称',
                     'no-matching-salons': '没有找到匹配的沙龙',
                     'please-select-salon': '请选择沙龙',
+                    'add-product-tip': '点击',
+                    'add-first-product': '来添加第一个产品',
+                    'no-products': '暂无产品数据',
+                    'add-category-tip': '点击',
+                    'add-first-category': '按钮来添加第一个分类',
+                    'no-categories': '暂无产品分类',
+                    'view': '查看',
                             'salon-deleted-success': '沙龙删除成功',
         'salon-delete-failed': '沙龙删除失败',
         'single-delete': '单个删除',
@@ -2974,6 +2978,13 @@
                     'danger-warning': '주의: 삭제 작업은 되돌릴 수 없습니다!',
                     'select-all-filtered': '필터 결과 전체 선택',
                     'select-all-global': '모든 살롱 전체 선택',
+                    'add-product-tip': '클릭',
+                    'add-first-product': '하여 첫 번째 제품을 추가하세요',
+                    'no-products': '제품 데이터가 없습니다',
+                    'add-category-tip': '클릭',
+                    'add-first-category': '버튼을 클릭하여 첫 번째 카테고리를 추가하세요',
+                    'no-categories': '제품 카테고리가 없습니다',
+                    'view': '보기',
                     // 其他翻译...
                 }
             };
@@ -3961,10 +3972,6 @@
                 responsibleId: responsibleId
             }, 1);
         }
-        
-        // 移除旧的删除沙龙选项函数，已被新的删除页面功能替代
-        
-        // 移除旧的选项卡切换函数，已被新的删除页面功能替代
         
         // 移除旧的删除选定沙龙函数，已被新的删除页面功能替代
         
@@ -6716,9 +6723,239 @@
             }
         }
         
-        // 显示产品列表（占位函数）
+        // 显示产品列表（左右分栏布局）
         function displayProductList() {
-            console.log('产品列表功能开发中...');
+            console.log('正在显示产品列表...');
+            
+            // 确保产品数据已初始化
+            if (!productCategoriesData || productCategoriesData.length === 0) {
+                initializeProductData();
+            }
+            
+            const container = document.getElementById('product-list-content');
+            
+            if (!container) {
+                console.error('产品列表容器未找到');
+                return;
+            }
+            
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            console.log('加载的产品数量:', products.length);
+            
+            // 更新产品计数
+            const countElement = document.getElementById('product-count-text');
+            if (countElement) {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                if (currentLanguage === 'ko') {
+                    countElement.textContent = `총 ${products.length}개 제품`;
+                } else {
+                    countElement.textContent = `总计 ${products.length} 个产品`;
+                }
+            }
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #cccccc; padding: 40px;">
+                        <p data-i18n="no-products">暂无产品数据</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">
+                            <span data-i18n="add-product-tip">点击</span>
+                            <a href="#" onclick="showContent('add-product')" style="color: var(--gold); text-decoration: underline;">新增产品</a>
+                            <span data-i18n="add-first-product">来添加第一个产品</span>
+                        </p>
+                    </div>
+                `;
+                updateTexts();
+                return;
+            }
+            
+            // 生成左侧产品列表
+            let leftHtml = '';
+            products.forEach(product => {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                const statusText = product.isOnSale ? 
+                    (currentLanguage === 'ko' ? '판매중' : '在售') : 
+                    (currentLanguage === 'ko' ? '단종' : '停产');
+                
+                leftHtml += `
+                    <div onclick="showProductDetail(${product.id})" style="
+                        display: flex; 
+                        justify-content: space-between; 
+                        align-items: center; 
+                        padding: 12px 15px; 
+                        background: rgba(212, 175, 55, 0.1); 
+                        border-radius: 5px; 
+                        border: 1px solid rgba(212, 175, 55, 0.3);
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        margin-bottom: 6px;
+                    " 
+                    onmouseover="this.style.backgroundColor='rgba(212, 175, 55, 0.2)'" 
+                    onmouseout="this.style.backgroundColor='rgba(212, 175, 55, 0.1)'">
+                        <!-- 左侧：产品名 -->
+                        <div style="flex: 1; color: var(--gold); font-weight: bold; font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px;">
+                            ${product.name || '未命名产品'}
+                        </div>
+                        <!-- 右侧：状态 -->
+                        <div style="color: ${product.isOnSale ? '#4CAF50' : '#f44336'}; font-size: 0.8em; font-weight: bold;">
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // 构建完整的HTML结构
+            container.innerHTML = leftHtml;
+            updateTexts();
+        }
+        
+        // 显示产品详情
+        function showProductDetail(productId) {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) {
+                console.error('Product not found:', productId);
+                return;
+            }
+            
+            const productDetailRight = document.getElementById('product-detail-right');
+            const productDetailContent = document.getElementById('product-detail-content');
+            
+            if (!productDetailRight || !productDetailContent) {
+                console.error('Product detail elements not found');
+                return;
+            }
+            
+            // 显示右侧详情面板
+            productDetailRight.style.display = 'flex';
+            
+            // 获取当前语言
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            
+            // 获取产品分类名称
+            let categoryName = '';
+            if (product.category) {
+                const categories = JSON.parse(localStorage.getItem('productCategories') || '[]');
+                const category = categories.find(c => c.code === product.category);
+                if (category) {
+                    categoryName = currentLanguage === 'ko' ? category.nameKO : category.nameCN;
+                }
+            }
+            
+            // 格式化价格
+            const formatPrice = (price) => {
+                if (!price) return '0 ₩';
+                const numPrice = parseInt(price.toString().replace(/[^\d]/g, ''));
+                return numPrice.toLocaleString('ko-KR') + ' ₩';
+            };
+            
+            // 状态文本
+            const statusText = product.isOnSale ? 
+                (currentLanguage === 'ko' ? '판매중' : '在售') : 
+                (currentLanguage === 'ko' ? '단종' : '停产');
+            const statusColor = product.isOnSale ? '#4CAF50' : '#f44336';
+            
+            // 生成详情内容
+            const detailHtml = `
+                <div style="width: 100%; line-height: 1.6;">
+                    <!-- 基本信息 -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px; font-size: 1.1em;" data-i18n="basic-info">基本信息</h4>
+                        <div style="display: grid; gap: 10px;">
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="product-name">产品名称：</span>
+                                <span style="color: var(--text-light); font-weight: bold; font-size: 1em; line-height: 1.4;">${product.name || '未命名产品'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="brand-name">品牌名称：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.brandName || '-'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="product-model">型号：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.model || '-'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="product-sku">货号：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.sku || '-'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="product-category">产品分类：</span>
+                                <span style="color: var(--gold); line-height: 1.4;">${categoryName || (currentLanguage === 'ko' ? '미분류' : '未分类')}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="status">状态：</span>
+                                <span style="color: ${statusColor}; font-weight: bold; line-height: 1.4;">${statusText}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 规格信息 -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px; font-size: 1.1em;" data-i18n="product-specifications">规格信息</h4>
+                        <div style="display: grid; gap: 10px;">
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="unit-type">数量单位：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.unitType || '-'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="weight-volume">重量/体积：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.weightVolume || 0}${product.weightUnit || 'g'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="per-box-count">每盒数量：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.perBoxCount || 1}${product.unitType || '个'}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="per-case-count">箱规：</span>
+                                <span style="color: var(--text-light); line-height: 1.4;">${product.perCaseCount || 1}盒</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 价格信息 -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px; font-size: 1.1em;" data-i18n="price-info">价格信息</h4>
+                        <div style="display: grid; gap: 10px;">
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="purchase-price">进货价：</span>
+                                <span style="color: var(--gold); font-weight: bold; line-height: 1.4;">${formatPrice(product.purchasePrice)}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="wholesale-price">批发价：</span>
+                                <span style="color: var(--gold); font-weight: bold; line-height: 1.4;">${formatPrice(product.wholesalePrice)}</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; padding: 4px 0;">
+                                <span style="color: #cccccc; width: 100px; font-size: 0.9em; line-height: 1.4; flex-shrink: 0;" data-i18n="retail-price">零售价：</span>
+                                <span style="color: var(--gold); font-weight: bold; line-height: 1.4;">${formatPrice(product.retailPrice)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 备注信息 -->
+                    ${product.notes ? `
+                        <div style="margin-bottom: 25px;">
+                            <h4 style="color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px; font-size: 1.1em;" data-i18n="notes">备注</h4>
+                            <div style="background: rgba(24,24,24,0.3); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 5px; padding: 12px; color: var(--text-light); font-size: 0.9em; line-height: 1.4;">
+                                ${product.notes}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            productDetailContent.innerHTML = detailHtml;
+            
+            // 在标题行添加编辑和删除按钮
+            const actionButtons = document.getElementById('product-action-buttons');
+            if (actionButtons) {
+                actionButtons.innerHTML = `
+                    <button onclick="editProduct(${product.id})" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-right: 10px;" data-i18n="edit-btn">编辑</button>
+                    <button onclick="deleteProduct(${product.id})" style="background: #f44336; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="delete">删除</button>
+                `;
+            }
+            
+            // 更新翻译文本
+            updateTexts();
         }
         
         // 显示产品分类
@@ -6758,20 +6995,23 @@
         function submitCreateCategory() {
             const categoryNameCN = document.getElementById('categoryNameCN').value.trim();
             const categoryNameKO = document.getElementById('categoryNameKO').value.trim();
-            const categoryCode = document.getElementById('categoryCode').value.trim();
             const categoryDescription = document.getElementById('categoryDescription').value.trim();
             
-            if (!categoryNameCN || !categoryNameKO || !categoryCode) {
-                alert('请填写所有必填字段');
+            if (!categoryNameCN || !categoryNameKO) {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                const message = currentLanguage === 'ko' ? '모든 필수 필드를 입력하세요' : '请填写所有必填字段';
+                alert(message);
                 return;
             }
             
-            // 检查分类代码是否已存在
-            const existingCategory = productCategoriesData.find(cat => cat.code === categoryCode);
-            if (existingCategory) {
-                alert('分类代码已存在，请使用其他代码');
-                return;
+            // 自动生成分类代码
+            function generateCategoryCode() {
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substr(2, 5);
+                return `cat_${timestamp}_${random}`;
             }
+            
+            const categoryCode = generateCategoryCode();
             
             // 创建新分类
             const newCategory = {
@@ -6795,50 +7035,192 @@
             // 关闭弹窗
             closeCreateCategoryModal();
             
-            alert('分类创建成功！');
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            const successMessage = currentLanguage === 'ko' ? '분류가 성공적으로 생성되었습니다!' : '分类创建成功！';
+            alert(successMessage);
         }
         
         // 加载产品分类列表
         function loadProductCategoriesList() {
-            const container = document.getElementById('productCategoriesContainer');
-            if (!container) return;
+            const container = document.getElementById('categoryList');
+            if (!container) {
+                console.error('产品分类容器未找到 (categoryList)');
+                return;
+            }
             
-            container.innerHTML = '';
+            // 直接从localStorage读取分类数据，确保数据是最新的
+            const categories = JSON.parse(localStorage.getItem('productCategories') || '[]');
+            console.log('正在加载产品分类列表，分类数量:', categories.length);
             
-            productCategoriesData.forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'category-item';
-                categoryDiv.style.cssText = `
-                    padding: 12px;
-                    margin: 8px 0;
-                    background: white;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: all 0.2s;
+            if (categories.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #cccccc; padding: 40px;">
+                        <p data-i18n="no-categories">暂无产品分类</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">
+                            <span data-i18n="add-category-tip">点击</span>
+                            <span style="color: var(--gold);">"创建产品分类"</span>
+                            <span data-i18n="add-first-category">按钮来添加第一个分类</span>
+                        </p>
+                    </div>
                 `;
+                updateTexts();
+                return;
+            }
+            
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            let html = '';
+            categories.forEach(category => {
+                // 根据语言显示分类名称
+                const categoryName = currentLanguage === 'ko' ? 
+                    (category.nameKO || '이름 없는 분류') :
+                    (category.nameCN || '未命名分类');
                 
-                categoryDiv.innerHTML = `
-                    <div style="font-weight: bold; margin-bottom: 5px;">${category.nameCN} / ${category.nameKO}</div>
-                    <div style="color: #666; font-size: 0.9em;">代码: ${category.code}</div>
-                    <div style="color: #888; font-size: 0.8em; margin-top: 5px;">${category.description || '无描述'}</div>
+                // 根据语言显示创建时间标签
+                const createdTimeLabel = currentLanguage === 'ko' ? '생성 시간' : '创建时间';
+                
+                // 根据语言显示描述标签
+                const descriptionLabel = currentLanguage === 'ko' ? '설명' : '描述';
+                
+                html += `
+                    <div style="
+                        padding: 15px;
+                        margin-bottom: 15px;
+                        background: rgba(212, 175, 55, 0.1);
+                        border: 1px solid rgba(212, 175, 55, 0.3);
+                        border-radius: 8px;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='rgba(212, 175, 55, 0.15)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.1)'">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${category.description ? '15px' : '0'};">
+                            <div style="flex: 1;">
+                                <h3 style="color: var(--gold); margin: 0; font-size: 1.1em;">${categoryName}</h3>
+                                <p style="color: #cccccc; margin: 5px 0 0 0; font-size: 0.9em;"><strong>${createdTimeLabel}：</strong>${category.createdAt ? new Date(category.createdAt).toLocaleDateString() : '-'}</p>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="editProductCategory(${category.id})" style="background: var(--gold); color: var(--black); border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8em;" data-i18n="edit-btn">编辑</button>
+                                <button onclick="deleteProductCategory(${category.id}, '${categoryName}')" style="background: #f44336; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8em;" data-i18n="delete">删除</button>
+                            </div>
+                        </div>
+                        ${category.description ? `
+                            <div style="padding-top: 10px; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                                <strong style="color: #FFB6C1;">${descriptionLabel}：</strong>
+                                <span style="color: #cccccc; font-size: 0.9em;">${category.description}</span>
+                            </div>
+                        ` : ''}
+                    </div>
                 `;
-                
-                categoryDiv.addEventListener('mouseenter', () => {
-                    categoryDiv.style.background = '#f5f5f5';
-                    categoryDiv.style.borderColor = '#ccc';
-                });
-                
-                categoryDiv.addEventListener('mouseleave', () => {
-                    categoryDiv.style.background = 'white';
-                    categoryDiv.style.borderColor = '#ddd';
-                });
-                
-                container.appendChild(categoryDiv);
             });
+            
+            container.innerHTML = html;
+            updateTexts();
         }
         
         console.log('产品分类弹窗控制函数加载完成');
+        
+        // ========================================
+        // 缺失的产品管理函数
+        // ========================================
+        
+        // 编辑产品函数
+        function editProduct(productId) {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) {
+                alert('产品不存在');
+                return;
+            }
+            
+            // 这里可以实现产品编辑的逻辑
+            alert(`编辑产品功能正在开发中\n产品ID: ${productId}\n产品名称: ${product.name}`);
+        }
+        
+        // 删除产品函数
+        function deleteProduct(productId) {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) {
+                alert('产品不存在');
+                return;
+            }
+            
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            const confirmMessage = currentLanguage === 'ko' ? 
+                `제품 "${product.name}"을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다!` :
+                `确定要删除产品 "${product.name}" 吗？此操作不可撤销！`;
+            
+            if (confirm(confirmMessage)) {
+                const updatedProducts = products.filter(p => p.id !== productId);
+                localStorage.setItem('products', JSON.stringify(updatedProducts));
+                
+                // 隐藏右侧详情面板
+                const productDetailRight = document.getElementById('product-detail-right');
+                if (productDetailRight) {
+                    productDetailRight.style.display = 'none';
+                }
+                
+                // 重新加载产品列表
+                displayProductList();
+                
+                const successMessage = currentLanguage === 'ko' ? '제품이 성공적으로 삭제되었습니다.' : '产品删除成功！';
+                alert(successMessage);
+            }
+        }
+        
+        // 编辑产品分类函数
+        function editProductCategory(categoryId) {
+            const categories = JSON.parse(localStorage.getItem('productCategories') || '[]');
+            const category = categories.find(c => c.id === categoryId);
+            
+            if (!category) {
+                alert('分类不存在');
+                return;
+            }
+            
+            // 这里可以实现分类编辑的逻辑
+            alert(`编辑分类功能正在开发中\n分类ID: ${categoryId}\n分类名称: ${category.nameCN}`);
+        }
+        
+        // 删除产品分类函数
+        function deleteProductCategory(categoryId, categoryName) {
+            const categories = JSON.parse(localStorage.getItem('productCategories') || '[]');
+            const category = categories.find(c => c.id === categoryId);
+            
+            if (!category) {
+                alert('分类不存在');
+                return;
+            }
+            
+            // 检查是否有产品使用了这个分类
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const productsUsingCategory = products.filter(p => p.category === category.code);
+            
+            if (productsUsingCategory.length > 0) {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                const message = currentLanguage === 'ko' ? 
+                    `이 분류를 사용하는 ${productsUsingCategory.length}개의 제품이 있습니다. 분류를 삭제할 수 없습니다.` :
+                    `还有 ${productsUsingCategory.length} 个产品正在使用此分类，无法删除！`;
+                alert(message);
+                return;
+            }
+            
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            const confirmMessage = currentLanguage === 'ko' ? 
+                `분류 "${categoryName}"을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다!` :
+                `确定要删除分类 "${categoryName}" 吗？此操作不可撤销！`;
+            
+            if (confirm(confirmMessage)) {
+                const updatedCategories = categories.filter(c => c.id !== categoryId);
+                localStorage.setItem('productCategories', JSON.stringify(updatedCategories));
+                
+                // 重新加载分类列表
+                loadProductCategoriesList();
+                
+                const successMessage = currentLanguage === 'ko' ? '분류가 성공적으로 삭제되었습니다.' : '分类删除成功！';
+                alert(successMessage);
+            }
+        }
+        
     </script>
 </body>
 </html> 
