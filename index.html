@@ -2,7 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>MAKE IT HAIR Professional - 管理系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Mesia首尔西部地区管理系统</title>
+    
     <!-- 字体/粒子/动效CDN -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400|Poppins:400,700|Source+Han+Sans+SC:400,700&display=swap" rel="stylesheet">
     <!-- SheetJS库用于处理Excel文件 -->
@@ -29,7 +32,7 @@
             font-family: 'Montserrat', 'Poppins', 'Source Han Sans SC', 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #191919 0%, #232323 100%);
+            background: #000000; /* 改为纯黑色背景，移除深灰色渐变 */
             color: var(--text-light);
             min-height: 100vh;
             overflow-x: hidden;
@@ -47,8 +50,8 @@
         .sidebar {
             width: 280px;
             background: rgba(24,24,24,0.95);
-            backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
             border-right: 1.5px solid rgba(212,175,55,0.15);
             box-shadow: var(--shadow);
             display: flex;
@@ -177,10 +180,10 @@
         
         .content-container {
             flex: 1;
-            padding: 20px;
+            padding: 20px 20px 30px 20px; /* 调整底部padding，配合0px间距设置 */
             margin-top: 20px;
             overflow-y: auto; /* 内容区域滚动 */
-            height: calc(100vh - 94px); /* 减去顶部导航的高度 */
+            height: calc(100vh - 54px); /* 减去顶部导航的高度54px */
         }
         
         /* 移除返回按钮，因为导航现在通过侧边栏完成 */
@@ -196,8 +199,8 @@
             left: 15px;
             z-index: 100;
             background: var(--glass);
-            backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
             border-radius: 5px;
             border: 1px solid var(--gold);
             padding: 5px;
@@ -232,13 +235,33 @@
             .hamburger-menu {
                 display: block;
             }
+            
+            .content-container {
+                height: calc(100vh - 54px); /* 移动端保持与桌面端一致的高度计算 */
+                padding-bottom: 74px; /* 移动端也为footer预留空间 */
+            }
+            
+            .content-area {
+                height: calc(100vh - 170px); /* 移动端保持相同的内容区域高度 */
+                max-height: calc(100vh - 170px);
+                margin-bottom: 0px; /* 移动端黄色边框与版权文字也紧贴，0px间距 */
+            }
+            
+            .footer {
+                left: 0; /* 移动端时覆盖整个宽度 */
+                bottom: 5px; /* 移动端距离底部5px */
+            }
+            
+            .top-nav {
+                left: 0; /* 移动端时覆盖整个宽度 */
+            }
         }
         
         /* 保留原有样式 */
         .container, .content-area, .top-nav, .footer {
             background: var(--glass);
-            backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
             box-shadow: var(--shadow);
             border: 1.5px solid rgba(212,175,55,0.08);
         }
@@ -249,7 +272,9 @@
             border-radius: 10px;
             border: 1px solid var(--gold);
             margin-top: 20px;
-            max-height: calc(100vh - 150px); /* 减去顶部导航和边距的高度 */
+            margin-bottom: 0px; /* 黄色边框与版权文字紧贴，0px间距 */
+            height: calc(100vh - 170px); /* 调整高度，配合0px间距 */
+            max-height: calc(100vh - 170px); /* 确保高度一致性 */
             overflow: hidden; /* 默认隐藏滚动条 */
         }
         
@@ -334,8 +359,18 @@
         .footer {
             text-align: center;
             margin-top: auto;
-            padding: 15px;
-            border-top: 1px solid rgba(212,175,55,0.15);
+            padding: 5px 15px; /* 上下间距设为5px */
+            height: auto; /* 让高度自适应内容 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            position: fixed; /* 固定在底部 */
+            bottom: 5px; /* 距离底部5px */
+            left: 280px; /* 与侧边栏对齐 */
+            right: 0;
+            background: transparent; /* 移除背景，让文字直接显示在页面背景上 */
+            z-index: 999; /* 降低层级，不覆盖内容边框 */
         }
         
         /* 顶部导航栏样式 */
@@ -517,11 +552,11 @@
                     </div>
                 </div>
                 
-                <!-- 客户信息管理 -->
+                <!-- 沙龙管理 -->
                 <div class="sidebar-menu-item">
                     <div class="sidebar-menu-header" onclick="toggleSidebarSubmenu('customer')">
                         <span class="sidebar-menu-icon">🏢</span>
-                        <span class="sidebar-menu-title" data-i18n="customer-management">客户信息管理</span>
+                        <span class="sidebar-menu-title" data-i18n="customer-management">沙龙管理</span>
                         <span class="sidebar-menu-arrow">▼</span>
                     </div>
                     <div class="sidebar-submenu" id="sidebar-customer-submenu">
@@ -537,11 +572,11 @@
                     </div>
                 </div>
                 
-                <!-- 产品信息管理 -->
+                <!-- 产品管理 -->
                 <div class="sidebar-menu-item">
                     <div class="sidebar-menu-header" onclick="toggleSidebarSubmenu('product')">
                         <span class="sidebar-menu-icon">📦</span>
-                        <span class="sidebar-menu-title" data-i18n="product-management">产品信息管理</span>
+                        <span class="sidebar-menu-title" data-i18n="product-management">产品管理</span>
                         <span class="sidebar-menu-arrow">▼</span>
                     </div>
                     <div class="sidebar-submenu" id="sidebar-product-submenu">
@@ -557,11 +592,11 @@
                     </div>
                 </div>
                 
-                <!-- 库存信息管理 -->
+                <!-- 库存管理 -->
                 <div class="sidebar-menu-item">
                     <div class="sidebar-menu-header" onclick="toggleSidebarSubmenu('inventory')">
                         <span class="sidebar-menu-icon">🔄</span>
-                        <span class="sidebar-menu-title" data-i18n="inventory-management">库存信息管理</span>
+                        <span class="sidebar-menu-title" data-i18n="inventory-management">库存管理</span>
                         <span class="sidebar-menu-arrow">▼</span>
                     </div>
                     <div class="sidebar-submenu" id="sidebar-inventory-submenu">
@@ -577,11 +612,11 @@
                     </div>
                 </div>
                 
-                <!-- 财务信息管理 -->
+                <!-- 财务管理 -->
                 <div class="sidebar-menu-item">
                     <div class="sidebar-menu-header" onclick="toggleSidebarSubmenu('finance')">
                         <span class="sidebar-menu-icon">💰</span>
-                        <span class="sidebar-menu-title" data-i18n="finance-management">财务信息管理</span>
+                        <span class="sidebar-menu-title" data-i18n="finance-management">财务管理</span>
                         <span class="sidebar-menu-arrow">▼</span>
                     </div>
                     <div class="sidebar-submenu" id="sidebar-finance-submenu">
@@ -600,11 +635,11 @@
                     </div>
                 </div>
                 
-                <!-- 操作历史管理 -->
+                <!-- 操作管理 -->
                 <div class="sidebar-menu-item">
                     <div class="sidebar-menu-header" onclick="toggleSidebarSubmenu('audit')">
                         <span class="sidebar-menu-icon">📋</span>
-                        <span class="sidebar-menu-title" data-i18n="audit-management">操作历史管理</span>
+                        <span class="sidebar-menu-title" data-i18n="audit-management">操作管理</span>
                         <span class="sidebar-menu-arrow">▼</span>
                     </div>
                     <div class="sidebar-submenu" id="sidebar-audit-submenu">
@@ -652,8 +687,8 @@
                     
                     <!-- 语言切换器 -->
                     <div class="language-switcher">
-                        <button class="language-btn active" onclick="switchLanguage('zh')" id="btn-zh">中文</button>
-                        <button class="language-btn" onclick="switchLanguage('ko')" id="btn-ko">한국어</button>
+                        <button class="language-btn active" onclick="setUserLanguage('zh')" id="btn-zh">中文</button>
+                        <button class="language-btn" onclick="setUserLanguage('ko')" id="btn-ko">한국어</button>
                     </div>
                 </div>
             </div>
@@ -739,7 +774,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 15px; text-align: center; color: var(--text-light); border: 1px solid rgba(212, 175, 55, 0.1);" data-i18n="delivery-pending">派送未完成</td>
+                                        <td style="padding: 15px; text-align: center; color: var(--text-light); border: 1px solid rgba(212, 175, 55, 0.1);" data-i18n="delivery-pending">配送未完成</td>
                                         <td style="padding: 15px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.1);">
                                             <a href="#" style="color: var(--gold); text-decoration: none; font-weight: bold; font-size: 1.1em;">0</a>
                                         </td>
@@ -820,7 +855,7 @@
                             </div>
                         </div>
                         
-                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-size: 1em;" data-i18n="add">添加</button>
+                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="add">添加</button>
                     </form>
                 </div>
                 
@@ -829,17 +864,17 @@
                     <p data-i18n="employee-list-desc">这里显示所有职员的详细信息列表。</p>
                     
                     <!-- 主容器：分为左右两部分 -->
-                    <div id="employee-list-container" style="display: flex; gap: 20px; margin-top: 20px; height: calc(100vh - 300px);">
+                    <div id="employee-list-container" style="display: flex; gap: 20px; margin-top: 20px; height: calc(100vh - 320px); min-height: 400px;">
                         <!-- 左侧：职员列表 -->
-                        <div id="employee-list-left" style="flex: 0 0 40%; overflow-y: overlay; padding-right: 10px;">
+                        <div id="employee-list-left" style="flex: 0 0 40%; overflow-y: auto; padding-right: 10px; box-sizing: border-box;">
                             <div id="employee-list-content">
                                 <!-- 职员列表将在这里动态生成 -->
                             </div>
                         </div>
                         
                         <!-- 右侧：职员详情 -->
-                        <div id="employee-list-right" style="flex: 1; overflow-y: overlay; display: none;">
-                            <div id="employee-detail-content" style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div id="employee-list-right" style="flex: 1; overflow-y: auto; display: none; box-sizing: border-box; padding-bottom: 30px;">
+                            <div id="employee-detail-content" style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 20px;">
                                 <!-- 职员详情将在这里动态显示 -->
                             </div>
                         </div>
@@ -974,7 +1009,7 @@
                             </div>
                         </div>
                         
-                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 1.1em;" data-i18n="add-product-submit">添加产品</button>
+                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="add-product-submit">添加产品</button>
                     </form>
                 </div>
 
@@ -984,13 +1019,13 @@
                     <!-- 添加产品分类按钮 -->
                     <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
                         <p data-i18n="product-category-content">管理产品分类信息</p>
-                        <button onclick="openCreateCategoryModal()" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;" data-i18n="create-product-category">创建产品分类</button>
+                        <button onclick="openCreateCategoryModal()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="create-product-category">创建产品分类</button>
                     </div>
                     
                     <!-- 产品分类列表 -->
                     <div style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-top: 20px;">
                         <h3 style="color: var(--gold); margin: 0 0 15px 0;" data-i18n="category-list">产品分类列表</h3>
-                        <div id="categoryList" style="margin-top: 15px;">
+                        <div id="categoryList" style="margin-top: 15px; max-height: calc(100vh - 320px); overflow-y: auto;">
                             <!-- 产品分类列表将在这里动态生成 -->
                             <div style="text-align: center; color: #cccccc; padding: 20px;" data-i18n="no-categories">暂无产品分类，请点击"创建产品分类"添加</div>
                         </div>
@@ -1018,67 +1053,16 @@
                 <div id="new-salon" class="content-area">
                     <h1 data-i18n="new-salon">新增沙龙</h1>
                     
-                    <!-- 批量上传沙龙 -->
-                    <div style="background: rgba(135, 206, 235, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); margin-bottom: 12px;">
-                        <h3 style="color: #87CEEB; margin: 0 0 8px 0; font-size: 1em;" data-i18n="batch-upload-salon">批量上传沙龙</h3>
-                        
-                        <div style="margin-bottom: 8px;">
-                            <label style="display: block; color: #87CEEB; margin-bottom: 6px; font-size: 0.9em;" data-i18n="select-file">选择文件：</label>
-                            
-                            <!-- 文件上传区域 -->
-                            <div id="fileUploadArea" style="border: 2px dashed #87CEEB; border-radius: 5px; padding: 8px 12px; text-align: center; cursor: pointer; position: relative; background: rgba(0,0,0,0.3); max-width: 400px; min-height: 50px;" onclick="document.getElementById('salonFileInput').click()">
-                                <input type="file" id="salonFileInput" accept=".xlsx,.xls" style="display: none;" onchange="previewSalonFile(this)">
-                                <div id="fileUploadIconArea" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px;">
-                                    <span style="font-size: 1.2em; color: #87CEEB;">📁</span>
-                                    <span style="color: #87CEEB; font-size: 0.9em;" data-i18n="click-to-upload-file">点击上传文件</span>
-                                </div>
-                                <!-- 文件预览区域 -->
-                                <div id="filePreviewArea" style="display: none;">
-                                    <p id="fileName" style="color: var(--text-light); font-size: 0.9em; margin: 4px 0;"></p>
-                                    <button type="button" onclick="removeSalonFile(event)" style="background: rgba(255,0,0,0.7); color: white; border: none; padding: 3px 10px; border-radius: 3px; cursor: pointer; margin-top: 4px; font-size: 0.8em;" data-i18n="remove-file">移除文件</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 数据预览区域 -->
-                        <div id="dataPreviewArea" style="display: none; margin-bottom: 15px;">
-                            <label style="display: block; color: #87CEEB; margin-bottom: 10px;" data-i18n="data-preview">数据预览：</label>
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" style="margin-right: 10px;">
-                                <label for="selectAll" style="color: var(--text-light); margin-right: 20px;" data-i18n="select-all">全选</label>
-                                <span style="color: var(--text-light); margin-right: 20px;" data-i18n="selected-count">已选择 0 个沙龙</span>
-                                <label for="responsibleEmployeeSelect" style="color: #87CEEB; margin-right: 10px;" data-i18n="assign-responsible">指定负责人：</label>
-                                <select id="responsibleEmployeeSelect" style="padding: 5px; background: var(--dark-gray); border: 1px solid #87CEEB; color: var(--text-light); border-radius: 3px; margin-right: 10px;">
-                                    <option value="" data-i18n="please-select-employee">请选择职员...</option>
-                                </select>
-                                <button type="button" onclick="assignResponsible()" style="background: #4CAF50; color: white; border: none; padding: 5px 15px; border-radius: 3px; cursor: pointer;" data-i18n="assign-responsible-btn">分配负责人</button>
-                            </div>
-                            
-                            <div id="dataPreviewTable" style="max-height: 180px; overflow-y: auto; border: 1px solid #87CEEB; border-radius: 5px;">
-                                <!-- 数据预览表格将在这里动态生成 -->
-                            </div>
-                            
-                            <style>
-
-                                
-
-                            </style>
-                        </div>
-                        
-                        <div style="display: flex; gap: 8px; margin-top: 8px;">
-                            <button type="button" onclick="processSalonFile()" style="background: #87CEEB; color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="process-file">处理文件</button>
-                            <button type="button" onclick="downloadTemplate()" style="background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="download-template">下载样例模板</button>
-                            <button type="button" id="confirmBatchCreateBtn" onclick="confirmBatchCreate()" style="display: none; background: var(--gold); color: var(--black); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="confirm-batch-create">确认批量创建</button>
-                            <button type="button" id="cancelBatchBtn" onclick="cancelBatch()" style="display: none; background: #666; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="cancel">取消</button>
-                        </div>
-                    </div>
+                    <!-- 左右分栏布局 -->
+                    <div style="display: flex; gap: 20px; height: calc(100vh - 320px); min-height: 500px;">
+                        <!-- 左侧：单个新增页面 -->
+                        <div style="flex: 0 0 40%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); padding: 20px; height: 100%; overflow-y: auto; box-sizing: border-box;">
+                            <h2 style="color: var(--gold); margin: 0 0 15px 0; text-align: center; font-size: 1.1em;" data-i18n="single-add-salon">单个新增沙龙</h2>
                     
                     <form id="newSalonForm">
-                        <!-- 第一排：沙龙基本信息和院长信息 -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px;">
                             <!-- 沙龙基本信息 -->
-                            <div style="background: rgba(212, 175, 55, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3);">
-                                <h3 style="color: var(--gold); margin: 0 0 8px 0; font-size: 1em;" data-i18n="salon-basic-info">沙龙基本信息</h3>
+                                <div style="background: rgba(212, 175, 55, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 12px;">
+                                    <h3 style="color: var(--gold); margin: 0 0 10px 0; font-size: 0.95em;" data-i18n="salon-basic-info">沙龙基本信息</h3>
                                 
                                 <div style="display: grid; gap: 8px;">
                                     <div>
@@ -1103,8 +1087,8 @@
                             </div>
                             
                             <!-- 院长信息和联系信息 -->
-                            <div style="background: rgba(144, 238, 144, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(144, 238, 144, 0.3);">
-                                <h3 style="color: #90EE90; margin: 0 0 8px 0; font-size: 1em;" data-i18n="director-info">院长信息</h3>
+                                <div style="background: rgba(144, 238, 144, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(144, 238, 144, 0.3); margin-bottom: 15px;">
+                                    <h3 style="color: #90EE90; margin: 0 0 10px 0; font-size: 0.95em;" data-i18n="director-info">院长信息</h3>
                                 
                                 <div style="display: grid; gap: 8px;">
                                     <div>
@@ -1117,90 +1101,170 @@
                                     </div>
                                     <div>
                                         <label for="salonPhone" style="display: block; color: #90EE90; margin-bottom: 3px; font-size: 0.85em;" data-i18n="salon-phone">店铺电话：</label>
-                                        <input type="tel" id="salonPhone" oninput="formatPhoneNumber(this)" placeholder="000-0000-0000" style="width: 100%; padding: 6px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.85em;">
+                                        <input type="tel" id="salonPhone" style="width: 100%; padding: 6px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.85em;">
                                     </div>
                                     <div>
                                         <label for="salonEmail" style="display: block; color: #90EE90; margin-bottom: 3px; font-size: 0.85em;" data-i18n="salon-email">电子邮箱：</label>
                                         <input type="email" id="salonEmail" style="width: 100%; padding: 6px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.85em;">
                                     </div>
+                                    <div>
+                                        <label for="salonNotes" style="display: block; color: #90EE90; margin-bottom: 3px; font-size: 0.85em;" data-i18n="notes">备注：</label>
+                                        <textarea id="salonNotes" data-i18n-placeholder="notes-placeholder" placeholder="在这里添加备注信息..." style="width: 100%; padding: 6px; background: transparent; border: 1px solid #90EE90; color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.85em; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
                                 </div>
                             </div>
                         </div>
                         
-                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="add">添加</button>
+                                <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-size: 0.85em;" data-i18n="add">添加</button>
                     </form>
+                        </div>
+                        
+                        <!-- 右侧：批量新增页面 -->
+                        <div style="flex: 1; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); padding: 20px; height: 100%; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box;">
+                            <h2 style="color: #87CEEB; margin: 0 0 15px 0; text-align: center; font-size: 1.1em;" data-i18n="batch-add-salon">批量新增沙龙</h2>
+                            
+                            <!-- 批量上传沙龙 -->
+                            <div style="background: rgba(135, 206, 235, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); margin-bottom: 12px; flex-shrink: 0;">
+                                <h3 style="color: #87CEEB; margin: 0 0 10px 0; font-size: 0.95em;" data-i18n="batch-upload-salon">批量上传沙龙</h3>
+                                
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: block; color: #87CEEB; margin-bottom: 6px; font-size: 0.85em;" data-i18n="select-file">选择文件：</label>
+                                    
+                                    <!-- 文件上传区域 -->
+                                    <div id="fileUploadArea" style="border: 2px dashed #87CEEB; border-radius: 5px; padding: 8px; text-align: center; cursor: pointer; position: relative; background: rgba(0,0,0,0.3); min-height: 45px;" onclick="document.getElementById('salonFileInput').click()">
+                                        <input type="file" id="salonFileInput" accept=".xlsx,.xls" style="display: none;" onchange="previewSalonFile(this)">
+                                        <div id="fileUploadIconArea" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 45px;">
+                                            <span style="font-size: 1.2em; color: #87CEEB;">📁</span>
+                                            <span style="color: #87CEEB; font-size: 0.85em;" data-i18n="click-to-upload-file">点击上传文件</span>
+                                        </div>
+                                        <!-- 文件预览区域 -->
+                                        <div id="filePreviewArea" style="display: none;">
+                                            <p id="fileName" style="color: var(--text-light); font-size: 0.85em; margin: 4px 0;"></p>
+                                            <button type="button" onclick="removeSalonFile(event)" style="background: var(--gold); color: var(--black); border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-size: 0.85em;" data-i18n="remove-file">移除文件</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                                    <button type="button" onclick="processSalonFile()" style="background: var(--gold); color: var(--black); border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-size: 0.85em;" data-i18n="process-file">处理文件</button>
+                                    <button type="button" onclick="downloadTemplate()" style="background: var(--gold); color: var(--black); border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-size: 0.85em;" data-i18n="download-template">下载样例模板</button>
+                                    <button type="button" id="confirmBatchCreateBtn" onclick="confirmBatchCreate()" style="display: none; background: var(--gold); color: var(--black); border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-size: 0.85em;" data-i18n="confirm-batch-create">确认批量创建</button>
+                                    <button type="button" id="cancelBatchBtn" onclick="cancelBatch()" style="display: none; background: var(--gold); color: var(--black); border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-size: 0.85em;" data-i18n="cancel">取消</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 数据预览区域 -->
+                            <div id="dataPreviewArea" style="display: none; flex: 1; flex-direction: column; min-height: 0;">
+                                <label style="display: block; color: #87CEEB; margin-bottom: 8px; font-size: 0.9em; flex-shrink: 0;" data-i18n="data-preview">数据预览：</label>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" style="margin-right: 3px;">
+                                    <label for="selectAll" style="color: var(--text-light); margin-right: 10px; font-size: 0.85em;" data-i18n="select-all">全选</label>
+                                    <span style="color: var(--text-light); margin-right: 10px; font-size: 0.85em;" data-i18n="selected-count">已选择 0 个沙龙</span>
+                                    <label for="responsibleEmployeeSelect" style="color: #87CEEB; margin-right: 5px; font-size: 0.85em;" data-i18n="assign-responsible">指定负责人：</label>
+                                    <select id="responsibleEmployeeSelect" style="padding: 4px 6px; background: var(--dark-gray); border: 1px solid #87CEEB; color: var(--text-light); border-radius: 3px; margin-right: 8px; font-size: 0.8em;">
+                                        <option value="" data-i18n="please-select-employee">请选择职员...</option>
+                                    </select>
+                                    <button type="button" onclick="assignResponsible()" style="background: var(--gold); color: var(--black); border: none; padding: 4px 12px; border-radius: 3px; cursor: pointer; font-size: 0.8em;" data-i18n="assign-responsible-btn">分配负责人</button>
+                                </div>
+                                
+                                <div id="dataPreviewTable" style="flex: 1; overflow: hidden; border: 1px solid #87CEEB; border-radius: 5px; min-height: 0;">
+                                    <!-- 数据预览表格将在这里动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- 沙龙信息页面 -->
                 <div id="salon-info" class="content-area">
-                    <h1 data-i18n="salon-info">沙龙信息</h1>
+                    <h1 style="margin-bottom: 15px;" data-i18n="salon-info">沙龙信息</h1>
                     
-                    <!-- 沙龙统计信息和搜索筛选 -->
+                    <!-- 搜索筛选和排序控制 -->
                     <div id="salon-count-display" style="margin: 15px 0; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <!-- 左侧：搜索框和筛选 -->
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                                <input type="text" id="salonSearchInput" data-i18n-placeholder="search-salon-placeholder" placeholder="搜索沙龙名/院长名/手机号..." oninput="searchSalons()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; min-width: 200px;">
-                                <select id="responsibleFilter" onchange="searchSalons()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
+                                <input type="text" id="salonSearchInput" data-i18n-placeholder="search-salon-placeholder" placeholder="搜索沙龙名/院长名/手机号..." oninput="searchSalons()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; min-width: 200px; font-size: 0.9em;">
+                                <select id="responsibleFilter" onchange="searchSalons()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
                                     <option value="" data-i18n="all-employees">所有职员</option>
                                 </select>
-                                <select id="districtFilter" onchange="searchSalons()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
-                                    <option value="" data-i18n="all-districts">全部区域</option>
-                                    <option value="guro" data-i18n="district-guro">九老区</option>
-                                    <option value="yeongdeungpo" data-i18n="district-yeongdeungpo">永登浦区</option>
-                                    <option value="geumcheon" data-i18n="district-geumcheon">衿川区</option>
-                                    <option value="overseas" data-i18n="district-overseas">海外区域</option>
-                                </select>
-                                <button onclick="clearAllFilters()" style="background: #666; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="clear-filters">清空筛选</button>
+                                                        <select id="districtFilter" onchange="searchSalons()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
+                            <option value="" data-i18n="all-districts">全部区域</option>
+                            <option value="yeongdeungpo" data-i18n="district-yeongdeungpo">永登浦区</option>
+                            <option value="guro" data-i18n="district-guro">九老区</option>
+                            <option value="geumcheon" data-i18n="district-geumcheon">衿川区</option>
+                            <option value="yangcheon" data-i18n="district-yangcheon">阳川区</option>
+                            <option value="others" data-i18n="district-others">其他地区</option>
+                            <option value="overseas" data-i18n="district-overseas">海外区域</option>
+                        </select>
+                                <button onclick="clearAllFilters()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="clear-filters">清空筛选</button>
                             </div>
                             
-                            <!-- 右侧：统计信息 -->
-                            <div>
-                                <span style="color: var(--gold); font-weight: bold; font-size: 1.1em;" id="salon-count-text" data-i18n="total-salons-count" data-i18n-params='{"count": "851"}'>总计 851 家沙龙</span>
+                            <!-- 右侧：排序按钮 -->
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <button id="sort-name" onclick="toggleSalonSort('name')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-name">沙龙名称</button>
+                                <button id="sort-address" onclick="toggleSalonSort('address')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-address">地址名称</button>
+                                <button id="sort-addTime" onclick="toggleSalonSort('addTime')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-add-time">新增时间</button>
+                                <button id="sort-lastTransaction" onclick="toggleSalonSort('lastTransaction')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-last-transaction">最后交易</button>
+                                <button id="sort-overdueDays" onclick="toggleSalonSort('overdueDays')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-overdue-days">欠款天数</button>
+                                <button id="sort-overdueAmount" onclick="toggleSalonSort('overdueAmount')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-overdue-amount">欠款金额</button>
+                                <button id="sort-default" onclick="toggleSalonSort('default')" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" data-i18n="sort-default">默认排序</button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- 排序控制面板 -->
-                    <div id="salon-sort-controls" style="margin: 15px 0; padding: 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                    <!-- 分页控制面板 -->
+                    <div id="salon-pagination-controls" style="margin: 15px 0; padding: 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                            <div style="display: flex; align-items: center; gap: 10px; color: #87CEEB;">
-                                <span style="font-weight: bold; font-size: 1em;" data-i18n="sort-by">排序方式：</span>
+                            <div style="display: flex; align-items: center; gap: 15px; color: #87CEEB;">
+                                <span style="font-weight: bold; font-size: 1em;" data-i18n="pagination-info">分页信息：</span>
+                                <!-- 跳转到指定页面 -->
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 0.9em;" data-i18n="go-to-page">跳转到第</span>
+                                    <input type="number" id="page-jump-input" min="1" onkeypress="handlePageJumpKeypress(event)" style="width: 60px; padding: 6px 8px; background: var(--dark-gray); border: 1px solid #87CEEB; color: #87CEEB; border-radius: 3px; text-align: center; font-size: 0.9em;">
+                                    <span style="font-size: 0.9em;" data-i18n="page-unit">页</span>
+                                    <button onclick="jumpToPage()" style="background: #87CEEB; color: var(--black); border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="jump-btn">跳转</button>
+                                </div>
                             </div>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button id="sort-name" onclick="toggleSalonSort('name')" style="background: rgba(135, 206, 235, 0.2); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-name">沙龙名称 ↑</button>
-                                <button id="sort-address" onclick="toggleSalonSort('address')" style="background: rgba(135, 206, 235, 0.2); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-address">地址名称 ↑</button>
-                                <button id="sort-addTime" onclick="toggleSalonSort('addTime')" style="background: rgba(135, 206, 235, 0.2); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-add-time">新增时间 ↑</button>
-                                <button id="sort-lastTransaction" onclick="toggleSalonSort('lastTransaction')" style="background: rgba(135, 206, 235, 0.2); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-last-transaction">最后交易 ↑</button>
-                                <button id="sort-overdueDays" onclick="toggleSalonSort('overdueDays')" style="background: rgba(135, 206, 235, 0.2); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-overdue-days">欠款天数 ↑</button>
-                                <button id="sort-overdueAmount" onclick="toggleSalonSort('overdueAmount')" style="background: rgba(135, 206, 235, 0.2); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-overdue-amount">欠款金额 ↑</button>
-                                <button id="sort-default" onclick="toggleSalonSort('default')" style="background: rgba(135, 206, 235, 0.4); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.background='rgba(135, 206, 235, 0.4)'" onmouseout="updateSortButtonStyle(this)" data-i18n="sort-default">默认排序</button>
+                            <!-- 分页控件 -->
+                            <div id="salon-pagination" style="display: flex; align-items: center; gap: 8px; color: #87CEEB; font-size: 0.9em;">
+                                <button id="first-page" onclick="goToSalonPage(1)" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="first-page">首页</button>
+                                <button id="prev-page" onclick="goToPrevSalonPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="prev-page">上一页</button>
+                                <span id="page-info" style="background: var(--gold); color: var(--black); padding: 6px 16px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">第 1 页 / 共 1 页 (1 个项目)</span>
+                                <button id="next-page" onclick="goToNextSalonPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="next-page">下一页</button>
+                                <button id="last-page" onclick="goToLastSalonPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="last-page">末页</button>
+                                <select id="items-per-page" onchange="changeItemsPerPage()" style="background: var(--dark-gray); color: #87CEEB; border: 1px solid #87CEEB; padding: 6px 12px; border-radius: 3px; font-size: 0.9em; margin-left: 10px;">
+                                    <option value="10" data-i18n="items-per-page-10">每页显示: 10</option>
+                                    <option value="20" selected data-i18n="items-per-page-20">每页显示: 20</option>
+                                    <option value="50" data-i18n="items-per-page-50">每页显示: 50</option>
+                                </select>
+                                <span style="font-size: 0.9em;" data-i18n="items-unit">条</span>
                             </div>
                         </div>
                     </div>
                     
                     <!-- 左右分栏布局 -->
-                    <div style="display: flex; gap: 20px; height: calc(100vh - 280px); min-height: 500px;">
+                    <div style="display: flex; gap: 20px; height: calc(100vh - 320px); min-height: 400px;">
                         <!-- 左侧沙龙列表 -->
-                        <div id="salon-list-left" style="width: 40%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); overflow-y: auto;">
-                            <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div id="salon-list-left" style="width: 40%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); display: flex; flex-direction: column; height: 100%;">
+                            <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0; height: 53px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between;">
                                 <h3 style="color: var(--gold); margin: 0;" data-i18n="salon-list">沙龙列表</h3>
+                                <span style="color: var(--gold); font-weight: bold; font-size: 0.9em;" id="salon-count-text" data-i18n="total-salons-count" data-i18n-params='{"count": "851"}'>总计 851 家沙龙</span>
                             </div>
-                            <div id="salon-list-content" style="padding: 10px;">
+                            <div id="salon-list-content" style="padding: 15px; flex: 1; overflow-y: auto; box-sizing: border-box;">
                                 <!-- 沙龙列表将在这里动态生成 -->
                                 <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-salons">暂无沙龙数据</p>
                             </div>
                         </div>
                         
                         <!-- 右侧沙龙详情 -->
-                        <div id="salon-detail-right" style="width: 60%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); display: none; flex-direction: column;">
-                            <div id="salon-detail-header" style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <div id="salon-detail-right" style="width: 60%; background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); display: none; flex-direction: column; height: 100%;">
+                            <div id="salon-detail-header" style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 53px; box-sizing: border-box;">
                                 <h3 style="color: var(--gold); margin: 0;" data-i18n="salon-detail">沙龙详情</h3>
                                 <div id="salon-action-buttons" style="display: flex; gap: 10px;">
                                     <!-- 按钮将在这里动态生成 -->
                                 </div>
                             </div>
-                            <div id="salon-detail-content" style="padding: 20px; flex: 1; overflow-y: auto; line-height: 1.6;">
+                            <div id="salon-detail-content" style="padding: 20px; flex: 1; overflow-y: auto; line-height: 1.6; box-sizing: border-box;">
                                 <!-- 沙龙详情将在这里动态生成 -->
                             </div>
                         </div>
@@ -1210,13 +1274,89 @@
                 <!-- 删除沙龙页面 -->
                 <div id="delete-salon" class="content-area">
                     <h1 data-i18n="delete-salon">删除沙龙</h1>
-                    <div style="margin-top: 20px;">
-                        <label for="deleteSalonSelect" style="display: block; color: var(--gold); margin-bottom: 10px;" data-i18n="select-salon-to-delete">选择要删除的沙龙：</label>
-                        <select id="deleteSalonSelect" style="width: 100%; padding: 10px; background: var(--dark-gray); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px;">
-                            <option value="" data-i18n="please-select-salon">请选择沙龙...</option>
-                        </select>
-                        <button onclick="deleteSelectedSalon()" style="background: #ff6666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px;" data-i18n="confirm-delete">确认删除</button>
+                    
+                    <!-- 筛选控制区域 -->
+                    <div id="delete-salon-filters" style="margin: 15px 0; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <!-- 左侧：筛选条件 -->
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <input type="text" id="deleteSalonSearchInput" data-i18n-placeholder="search-salon-placeholder" placeholder="搜索沙龙名/院长名/手机号..." oninput="filterSalonsForDelete()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; min-width: 200px; font-size: 0.9em;">
+                                <select id="deleteResponsibleFilter" onchange="filterSalonsForDelete()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
+                                    <option value="" data-i18n="all-employees">所有职员</option>
+                                </select>
+                                <select id="deleteDistrictFilter" onchange="filterSalonsForDelete()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
+                                    <option value="" data-i18n="all-districts">全部区域</option>
+                                    <option value="yeongdeungpo" data-i18n="district-yeongdeungpo">永登浦区</option>
+                                    <option value="guro" data-i18n="district-guro">九老区</option>
+                                    <option value="geumcheon" data-i18n="district-geumcheon">衿川区</option>
+                                    <option value="yangcheon" data-i18n="district-yangcheon">阳川区</option>
+                                    <option value="others" data-i18n="district-others">其他地区</option>
+                                    <option value="overseas" data-i18n="district-overseas">海外区域</option>
+                                </select>
+                                <button onclick="clearDeleteFilters()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="clear-filters">清空筛选</button>
+                            </div>
+                            
+                            <!-- 右侧：选择和删除操作 -->
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button onclick="selectAllFilteredSalons()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="select-all">全选</button>
+                                <button onclick="deselectAllSalonsForDelete()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="deselect-all">取消全选</button>
+                                <span id="delete-selected-count" style="color: var(--gold); font-weight: bold; font-size: 0.9em; margin: 0 10px;">已选择：0 个沙龙</span>
+                                <button onclick="deleteSelectedSalonsAdvanced()" style="background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="delete-selected">删除选中项</button>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- 统计信息 -->
+                    <div style="margin: 15px 0; padding: 10px 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; color: #87CEEB;">
+                            <span id="delete-salon-statistics">筛选结果：显示 0 个沙龙</span>
+                            <div style="display: flex; gap: 15px; font-size: 0.9em;">
+                                <span id="delete-total-salons">总沙龙数：0</span>
+                                <span id="delete-filtered-salons">筛选结果：0</span>
+                                <span id="delete-selected-salons">已选择：0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 分页控制 -->
+                    <div id="delete-salon-pagination-controls" style="margin: 15px 0; padding: 15px; background: rgba(144, 238, 144, 0.1); border-radius: 5px; border: 1px solid rgba(144, 238, 144, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 15px; color: #90EE90;">
+                                <span style="font-weight: bold; font-size: 1em;" data-i18n="pagination-info">分页信息：</span>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 0.9em;" data-i18n="go-to-page">跳转到第</span>
+                                    <input type="number" id="delete-page-jump-input" min="1" onkeypress="handleDeletePageJumpKeypress(event)" style="width: 60px; padding: 6px 8px; background: var(--dark-gray); border: 1px solid #90EE90; color: #90EE90; border-radius: 3px; text-align: center; font-size: 0.9em;">
+                                    <span style="font-size: 0.9em;" data-i18n="page-unit">页</span>
+                                    <button onclick="jumpToDeletePage()" style="background: #90EE90; color: var(--black); border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="jump-btn">跳转</button>
+                                </div>
+                            </div>
+                            <div id="delete-salon-pagination" style="display: flex; align-items: center; gap: 8px; color: #90EE90; font-size: 0.9em;">
+                                <button id="delete-first-page" onclick="goToDeletePage(1)" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="first-page">首页</button>
+                                <button id="delete-prev-page" onclick="goToPrevDeletePage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="prev-page">上一页</button>
+                                <span id="delete-page-info" style="background: var(--gold); color: var(--black); padding: 6px 16px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">第 1 页 / 共 1 页 (0 个项目)</span>
+                                <button id="delete-next-page" onclick="goToNextDeletePage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="next-page">下一页</button>
+                                <button id="delete-last-page" onclick="goToLastDeletePage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 0.9em;" data-i18n="last-page">末页</button>
+                                <select id="delete-items-per-page" onchange="changeDeleteItemsPerPage()" style="background: var(--dark-gray); color: #90EE90; border: 1px solid #90EE90; padding: 6px 12px; border-radius: 3px; font-size: 0.9em; margin-left: 10px;">
+                                    <option value="10" data-i18n="items-per-page-10">每页显示: 10</option>
+                                    <option value="20" selected data-i18n="items-per-page-20">每页显示: 20</option>
+                                    <option value="50" data-i18n="items-per-page-50">每页显示: 50</option>
+                                </select>
+                                <span style="font-size: 0.9em;" data-i18n="items-unit">条</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 沙龙列表区域 -->
+                    <div style="background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); height: calc(100vh - 320px); min-height: 300px; display: flex; flex-direction: column;">
+                        <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0;">
+                            <h3 style="color: var(--gold); margin: 0;" data-i18n="salon-delete-list">沙龙删除列表</h3>
+                        </div>
+                        <div id="delete-salon-list-content" style="padding: 15px; flex: 1; overflow-y: auto;">
+                            <!-- 沙龙列表将在这里动态生成 -->
+                            <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-salons-to-delete">没有可删除的沙龙</p>
+                        </div>
+                    </div>
+
                 </div>
                 
                 <!-- 业绩目标页面 -->
@@ -1243,8 +1383,8 @@
                             </select>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button onclick="recalculatePerformanceTargets()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;" data-i18n="recalculate-targets">重新计算目标</button>
-                            <button onclick="resetPerformanceTargets()" style="background: #ff6666; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;" data-i18n="reset-targets">重置目标</button>
+                            <button onclick="recalculatePerformanceTargets()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="recalculate-targets">重新计算目标</button>
+                            <button onclick="resetPerformanceTargets()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="reset-targets">重置目标</button>
                         </div>
                     </div>
                     
@@ -1279,7 +1419,7 @@
                     </div>
                     
                     <!-- 个人业绩目标列表 -->
-                    <div id="performance-list" style="margin-top: 20px;">
+                    <div id="performance-list" style="margin-top: 20px; max-height: calc(100vh - 320px); overflow-y: auto; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 5px; padding: 15px; background: rgba(24,24,24,0.3);">
                         <!-- 个人业绩目标将在这里动态生成 -->
                         <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-performance-data">暂无业绩数据</p>
                     </div>
@@ -1331,12 +1471,12 @@
                                 </div>
                             </div>
                             <div style="flex-shrink: 0;">
-                                <button onclick="clearHistoryFilters()" style="min-width: 120px; background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; white-space: nowrap;" data-i18n="clear-all-filters">清空筛选</button>
+                                <button onclick="clearHistoryFilters()" style="min-width: 120px; background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; white-space: nowrap; font-size: 0.9em;" data-i18n="clear-all-filters">清空筛选</button>
                             </div>
                         </div>
                     </div>
                     
-                    <div id="operation-history-list" style="margin-top: 20px;">
+                    <div id="operation-history-list" style="margin-top: 20px; max-height: calc(100vh - 320px); overflow-y: auto; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 5px; padding: 15px; background: rgba(24,24,24,0.3);">
                         <!-- 操作历史记录将在这里动态生成 -->
                         <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-operation-history">暂无操作历史记录</p>
                     </div>
@@ -1345,7 +1485,7 @@
                 <!-- 数据对比查看页面 -->
                 <div id="data-comparison" class="content-area">
                     <h1 data-i18n="data-comparison">数据对比查看</h1>
-                    <div id="comparison-content" style="margin-top: 20px;">
+                    <div id="comparison-content" style="margin-top: 20px; max-height: calc(100vh - 320px); overflow-y: auto; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 5px; padding: 15px; background: rgba(24,24,24,0.3);">
                         <p style="color: #cccccc; text-align: center; padding: 40px;" data-i18n="select-history-record">请从操作历史记录中选择要对比的记录</p>
                     </div>
                 </div>
@@ -1374,7 +1514,7 @@
                         </div>
                     </div>
                     
-                    <div id="audit-report-content" style="margin-top: 20px;">
+                    <div id="audit-report-content" style="margin-top: 20px; max-height: calc(100vh - 320px); overflow-y: auto; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 5px; padding: 15px; background: rgba(24,24,24,0.3);">
                         <!-- 审计报告内容将在这里动态生成 -->
                         <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-audit-data">暂无审计数据</p>
                     </div>
@@ -1398,7 +1538,7 @@
                         </div>
                     </div>
                     
-                    <div class="approval-list" id="approvalList">
+                    <div class="approval-list" id="approvalList" style="max-height: calc(100vh - 320px); overflow-y: auto; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 5px; padding: 15px; background: rgba(24,24,24,0.3);">
                         <!-- 审批列表将在这里动态生成 -->
                         <p style="text-align: center; color: #cccccc; padding: 40px;" data-i18n="no-pending-approvals">暂无待审批项目</p>
                     </div>
@@ -1431,8 +1571,8 @@
                     <textarea id="categoryDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; min-height: 80px; resize: vertical;"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button type="button" onclick="closeCreateCategoryModal()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="cancel">取消</button>
-                    <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="create">创建</button>
+                    <button type="button" onclick="closeCreateCategoryModal()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="cancel">取消</button>
+                    <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="create">创建</button>
                 </div>
             </form>
         </div>
@@ -1457,8 +1597,8 @@
                     <textarea id="editCategoryDescription" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; min-height: 80px; resize: vertical;"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button type="button" onclick="closeEditCategoryModal()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="cancel">取消</button>
-                    <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="save">保存</button>
+                    <button type="button" onclick="closeEditCategoryModal()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="cancel">取消</button>
+                    <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="save">保存</button>
                 </div>
             </form>
         </div>
@@ -1487,8 +1627,14 @@
             // 更新按钮样式
             updateSortButtons();
             
-            // 重新显示列表
-            displaySalonList(currentFilter, 1);
+            // 根据当前状态重新显示列表
+            if (currentFilter === 'filtered') {
+                // 如果当前是筛选状态，重新执行搜索以应用排序
+                searchSalons();
+            } else {
+                // 否则显示正常列表
+                displaySalonList(currentFilter, 1);
+            }
         }
         
         // 更新排序按钮样式
@@ -1499,22 +1645,16 @@
                 const i18nKey = button.getAttribute('data-i18n');
                 let buttonText = getText(i18nKey);
                 
-                // 重置背景色
+                // 使用统一的按钮样式，不添加箭头
                 if (field === currentSortField) {
-                    button.style.background = 'rgba(135, 206, 235, 0.4)';
-                    // 根据排序方向添加箭头
-                    if (currentSortOrder === 'asc') {
-                        buttonText += ' ↑';
+                    button.style.background = 'var(--gold)';
+                    button.style.opacity = '1';
                     } else {
-                        buttonText += ' ↓';
-                    }
-                } else {
-                    button.style.background = 'rgba(135, 206, 235, 0.2)';
-                    // 不是当前字段时显示默认上箭头
-                    buttonText += ' ↑';
+                    button.style.background = 'var(--gold)';
+                    button.style.opacity = '0.7';
                 }
                 
-                // 直接设置文本内容
+                // 直接设置文本内容，不添加任何箭头
                 button.textContent = buttonText;
             });
         }
@@ -1524,6 +1664,100 @@
             const field = button.id.replace('sort-', '');
             if (field !== currentSortField) {
                 button.style.background = 'rgba(135, 206, 235, 0.2)';
+            }
+        }
+        
+        // 分页相关函数
+        function updatePaginationInfo(currentPage, totalPages, totalItems) {
+            const pageInfo = document.getElementById('page-info');
+            const firstPageBtn = document.getElementById('first-page');
+            const prevPageBtn = document.getElementById('prev-page');
+            const nextPageBtn = document.getElementById('next-page');
+            const lastPageBtn = document.getElementById('last-page');
+            const jumpInput = document.getElementById('page-jump-input');
+            
+            if (pageInfo) {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                if (currentLanguage === 'ko') {
+                    pageInfo.textContent = `${currentPage} 페이지 / 총 ${totalPages} 페이지 (${totalItems} 개 항목)`;
+                } else {
+                    pageInfo.textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页 (${totalItems} 个项目)`;
+                }
+            }
+            
+            // 更新跳转输入框的最大值
+            if (jumpInput) {
+                jumpInput.max = totalPages;
+                jumpInput.placeholder = totalPages > 0 ? `1-${totalPages}` : '1';
+            }
+            
+            // 更新按钮状态
+            if (firstPageBtn) firstPageBtn.disabled = currentPage === 1;
+            if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+            if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
+            if (lastPageBtn) lastPageBtn.disabled = currentPage === totalPages;
+            
+            // 更新按钮样式
+            const disabledStyle = 'opacity: 0.5; cursor: not-allowed;';
+            const normalStyle = 'opacity: 1; cursor: pointer;';
+            
+            if (firstPageBtn) firstPageBtn.style.cssText += currentPage === 1 ? disabledStyle : normalStyle;
+            if (prevPageBtn) prevPageBtn.style.cssText += currentPage === 1 ? disabledStyle : normalStyle;
+            if (nextPageBtn) nextPageBtn.style.cssText += currentPage === totalPages ? disabledStyle : normalStyle;
+            if (lastPageBtn) lastPageBtn.style.cssText += currentPage === totalPages ? disabledStyle : normalStyle;
+        }
+        
+        function goToSalonPage(page) {
+            displaySalonList(currentFilter, page);
+        }
+        
+        function goToPrevSalonPage() {
+            if (currentPage > 1) {
+                displaySalonList(currentFilter, currentPage - 1);
+            }
+        }
+        
+        function goToNextSalonPage() {
+            const totalPages = Math.ceil(currentSalonsData.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                displaySalonList(currentFilter, currentPage + 1);
+            }
+        }
+        
+        function goToLastSalonPage() {
+            const totalPages = Math.ceil(currentSalonsData.length / itemsPerPage);
+            displaySalonList(currentFilter, totalPages);
+        }
+        
+        function changeItemsPerPage() {
+            const select = document.getElementById('items-per-page');
+            itemsPerPage = parseInt(select.value);
+            displaySalonList(currentFilter, 1); // 重置到第一页
+        }
+        
+        function jumpToPage() {
+            const input = document.getElementById('page-jump-input');
+            const pageNumber = parseInt(input.value);
+            
+            if (!pageNumber || pageNumber < 1) {
+                alert('请输入有效的页码');
+                return;
+            }
+            
+            const totalPages = Math.ceil(currentSalonsData.length / itemsPerPage);
+            
+            if (pageNumber > totalPages) {
+                alert(`页码不能超过总页数 ${totalPages}`);
+                return;
+            }
+            
+            displaySalonList(currentFilter, pageNumber);
+            input.value = ''; // 清空输入框
+        }
+        
+        function handlePageJumpKeypress(event) {
+            if (event.key === 'Enter') {
+                jumpToPage();
             }
         }
         
@@ -1628,9 +1862,9 @@
                     checkBatchUploadPermission();
                 }
                 
-                // 如果是删除沙龙页面，更新选项
+                // 如果是删除沙龙页面，初始化页面
                 if (contentId === 'delete-salon') {
-                    updateDeleteSalonOptions();
+                    initDeleteSalonPage();
                 }
                 
                 // 如果是职员列表页面，刷新列表
@@ -1694,6 +1928,11 @@
                 if (contentId === 'performance-target') {
                     displayPerformanceTargets();
                 }
+                
+                // 如果是总览页面，更新统计数据
+                if (contentId === 'dashboard') {
+                    updateDashboardStats();
+                }
             }
         }
         
@@ -1710,6 +1949,9 @@
                 
                 // 自动点击概况总览菜单
                 showContent('dashboard');
+                
+                // 延迟更新统计数据，确保页面元素已加载
+                setTimeout(updateDashboardStats, 100);
                 
                 // 标记概况总览菜单为激活状态
                 document.querySelectorAll('.sidebar-menu-item').forEach(item => {
@@ -1815,9 +2057,56 @@
         function backToMenu() {
             // 不执行任何操作
         }
+        
+        // 更新总览页面统计数据
+        function updateDashboardStats() {
+            const salons = getSalons();
+            const totalSalons = salons.length;
+            
+            // 更新沙龙交易数的目标值（设置为当前沙龙总数）
+            const transactionSalonRows = document.querySelectorAll('tr');
+            transactionSalonRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 4) {
+                    const firstCell = cells[0];
+                    if (firstCell && firstCell.getAttribute('data-i18n') === 'transaction-salon-count') {
+                        // 更新目标值（第二列）
+                        cells[1].textContent = totalSalons;
+                        // 可以在这里添加更多逻辑来计算实际值和进度率
+                    }
+                }
+            });
+        }
 
-        // 语言切换功能
+        // 智能语言系统初始化（整合用户建议的方案）
+        function initializeLanguageSystem() {
+            // 优先级：用户设置 > 系统语言 > 默认语言
+            const userLanguage = localStorage.getItem('language');
+            
+            if (userLanguage) {
+                // 用户已手动选择过语言，优先使用用户设置
+                console.log('使用用户设置的语言:', userLanguage);
+                switchLanguage(userLanguage);
+            } else {
+                // 用户未设置，自动检测系统语言
+                const systemLanguage = navigator.language || navigator.userLanguage;
+                console.log('检测到系统语言:', systemLanguage);
+                
+                // 判断系统语言并设置对应语言
+                const languageToUse = systemLanguage.startsWith('ko') ? 'ko' : 'zh';
+                console.log('自动选择语言:', languageToUse);
+                
+                switchLanguage(languageToUse);
+            }
+        }
+        
+        // 用户主动切换语言（保持现有功能，增加日志）
         function switchLanguage(lang) {
+            console.log('切换语言到:', lang);
+            
+            // 设置HTML文档语言属性（SEO友好）
+            document.documentElement.lang = lang === 'ko' ? 'ko-KR' : 'zh-CN';
+            
             // 更新按钮状态
             document.querySelectorAll('.language-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -1841,6 +2130,20 @@
             }
         }
         
+        // 用户主动设置语言偏好（类似您提供的方案）
+        function setUserLanguage(lang) {
+            console.log('用户主动设置语言偏好:', lang);
+            
+            // 保存用户偏好（这会覆盖系统自动检测）
+            localStorage.setItem('language', lang);
+            
+            // 立即切换语言
+            switchLanguage(lang);
+            
+            // 可选：显示设置成功提示
+            // alert(getText('language-changed-success'));
+        }
+        
         // 获取翻译文本
         function getText(key) {
             const currentLanguage = localStorage.getItem('language') || 'zh';
@@ -1850,24 +2153,26 @@
                     'new-employee': '新增职员',
                     'employee-list': '职员列表',
                     'delete-employee': '删除职员',
-                    'customer-management': '客户信息管理',
+                    'customer-management': '沙龙管理',
                     'new-salon': '新增沙龙',
+                    'single-add-salon': '单个新增沙龙',
+                    'batch-add-salon': '批量新增沙龙',
                     'salon-info': '沙龙信息',
                     'delete-salon': '删除沙龙',
-                    'product-management': '产品信息管理',
+                    'product-management': '产品管理',
                     'add-product': '新增产品',
                     'product-list': '产品列表',
                     'product-category': '产品分类',
-                    'inventory-management': '库存信息管理',
+                    'inventory-management': '库存管理',
                     'stock-check': '库存盘点',
                     'restock-alert': '补货提醒',
                     'usage-record': '使用记录',
-                    'finance-management': '财务信息管理',
+                    'finance-management': '财务管理',
                     'income-record': '收入记录',
                     'expense-record': '支出记录',
                     'financial-report': '财务报表',
                     'performance-target': '业绩目标',
-                    'audit-management': '操作历史管理',
+                    'audit-management': '操作管理',
                     'operation-history': '操作历史记录',
                     'data-comparison': '数据对比查看',
                     'audit-report': '审计报告',
@@ -1899,7 +2204,7 @@
                     'count': '件数',
                     'outbound-pending': '出库未批准',
                     'payment-pending': '收款未批准',
-                    'delivery-pending': '派送未完成',
+                    'delivery-pending': '配送未完成',
                     'unit-label': '[单位:千元]',
                     'basic-info': '基本信息',
                     'login-account': '登录账号',
@@ -1930,6 +2235,21 @@
                     'district-geumcheon': '衿川区',
                     'district-overseas': '海外区域',
                     'sort-by': '排序方式',
+            'first-page': '首页',
+            'prev-page': '上一页',
+            'next-page': '下一页',
+            'last-page': '末页',
+            'items-per-page-10': '每页显示: 10',
+            'items-per-page-20': '每页显示: 20',
+            'items-per-page-50': '每页显示: 50',
+            'items-unit': '条',
+            'pagination-info': '分页信息',
+            'go-to-page': '跳转到第',
+            'page-unit': '页',
+            'jump-btn': '跳转',
+            'notes': '备注',
+            'notes-placeholder': '在这里添加备注信息...',
+            'no-notes': '暂无备注信息',
                     'sort-name': '沙龙名称',
                     'sort-address': '地址名称',
                     'sort-add-time': '新增时间',
@@ -2005,8 +2325,25 @@
                     'salon-name-required': '请输入沙龙名称',
                     'no-matching-salons': '没有找到匹配的沙龙',
                     'please-select-salon': '请选择沙龙',
-                    'salon-deleted-success': '沙龙删除成功',
-                    'salon-delete-failed': '沙龙删除失败',
+                            'salon-deleted-success': '沙龙删除成功',
+        'salon-delete-failed': '沙龙删除失败',
+        'single-delete': '单个删除',
+        'batch-delete': '批量删除',
+        'district-delete': '分区域删除',
+        'select-all': '全选',
+        'deselect-all': '取消全选',
+        'selected-count': '已选择：0 个沙龙',
+        'delete-selected': '删除选中项',
+        'delete-all': '删除全部',
+        'please-select-district': '请选择区域...',
+        'district-salon-count-info': '该区域沙龙数量：0',
+        'delete-district-salons': '删除该区域所有沙龙',
+        'responsible-delete': '根据负责人删除',
+        'please-select-responsible': '请选择负责人...',
+        'responsible-salon-count-info': '该负责人管理的沙龙数量：0',
+        'delete-responsible-salons': '删除该负责人的所有沙龙',
+        'district-yangcheon': '阳川区',
+        'district-others': '其他地区',
                     'clear-filters': '清空筛选',
                     'select': '选择',
                     'salon-region': '区域',
@@ -2025,6 +2362,15 @@
                     'district-salons-count': '共 {count} 家沙龙',
                     'search-salon-placeholder': '搜索沙龙名/院长名/手机号...',
                     'salon-phone': '店铺电话',
+                    'salon-delete-list': '沙龙删除列表',
+                    'no-salons-to-delete': '没有可删除的沙龙',
+                    'danger-operations': '危险操作',
+                    'delete-all-filtered': '删除所有筛选结果',
+                    'delete-all-salons': '删除全部沙龙',
+                    'danger-warning': '注意：删除操作不可撤销！',
+                    'select-all-filtered': '全选筛选结果',
+                    'select-all-global': '全选所有沙龙',
+                    'select-all': '全选',
                     // 其他翻译...
                 },
                 ko: {
@@ -2032,24 +2378,26 @@
                     'new-employee': '직원 추가',
                     'employee-list': '직원 목록',
                     'delete-employee': '직원 삭제',
-                    'customer-management': '고객 정보 관리',
+                    'customer-management': '살롱 관리',
                     'new-salon': '살롱 추가',
+                    'single-add-salon': '단일 살롱 추가',
+                    'batch-add-salon': '일괄 살롱 추가',
                     'salon-info': '살롱 정보',
                     'delete-salon': '살롱 삭제',
-                    'product-management': '제품 정보 관리',
+                    'product-management': '제품 관리',
                     'add-product': '제품 추가',
                     'product-list': '제품 목록',
                     'product-category': '제품 카테고리',
-                    'inventory-management': '재고 정보 관리',
+                    'inventory-management': '재고 관리',
                     'stock-check': '재고 확인',
                     'restock-alert': '재고 보충 알림',
                     'usage-record': '사용 기록',
-                    'finance-management': '재무 정보 관리',
+                    'finance-management': '재무 관리',
                     'income-record': '수입 기록',
                     'expense-record': '지출 기록',
                     'financial-report': '재무 보고서',
                     'performance-target': '실적 목표',
-                    'audit-management': '작업 기록 관리',
+                    'audit-management': '작업 관리',
                     'operation-history': '작업 기록',
                     'data-comparison': '데이터 비교',
                     'audit-report': '감사 보고서',
@@ -2112,6 +2460,21 @@
                     'district-geumcheon': '금천구',
                     'district-overseas': '해외 지역',
                     'sort-by': '정렬 방식',
+            'first-page': '첫 페이지',
+            'prev-page': '이전 페이지',
+            'next-page': '다음 페이지',
+            'last-page': '마지막 페이지',
+            'items-per-page-10': '페이지당 표시: 10',
+            'items-per-page-20': '페이지당 표시: 20',
+            'items-per-page-50': '페이지당 표시: 50',
+            'items-unit': '개',
+            'pagination-info': '페이지 정보',
+            'go-to-page': '다음으로 이동',
+            'page-unit': '페이지',
+            'jump-btn': '이동',
+            'notes': '비고',
+            'notes-placeholder': '여기에 비고 정보를 추가하세요...',
+            'no-notes': '비고 정보가 없습니다',
                     'sort-name': '살롱 이름',
                     'sort-address': '주소 이름',
                     'sort-add-time': '추가 시간',
@@ -2186,8 +2549,25 @@
                     'salon-name-required': '살롱 이름을 입력하세요',
                     'no-matching-salons': '일치하는 살롱을 찾을 수 없습니다',
                     'please-select-salon': '살롱을 선택하세요',
-                    'salon-deleted-success': '살롱 삭제 성공',
-                    'salon-delete-failed': '살롱 삭제 실패',
+                            'salon-deleted-success': '살롱 삭제 성공',
+        'salon-delete-failed': '살롱 삭제 실패',
+        'single-delete': '개별 삭제',
+        'batch-delete': '일괄 삭제',
+        'district-delete': '지역별 삭제',
+        'select-all': '전체 선택',
+        'deselect-all': '전체 해제',
+        'selected-count': '선택됨: 0개 살롱',
+        'delete-selected': '선택 항목 삭제',
+        'delete-all': '전체 삭제',
+        'please-select-district': '지역을 선택하세요...',
+        'district-salon-count-info': '해당 지역 살롱 수: 0',
+        'delete-district-salons': '해당 지역 모든 살롱 삭제',
+        'responsible-delete': '담당자별 삭제',
+        'please-select-responsible': '담당자를 선택하세요...',
+        'responsible-salon-count-info': '해당 담당자 관리 살롱 수: 0',
+        'delete-responsible-salons': '해당 담당자의 모든 살롱 삭제',
+        'district-yangcheon': '양천구',
+        'district-others': '기타 지역',
                     'clear-filters': '필터 지우기',
                     'select': '선택',
                     'salon-region': '지역',
@@ -2206,6 +2586,14 @@
                     'district-salons-count': '{count}개 살롱',
                     'search-salon-placeholder': '살롱명/원장명/휴대폰 검색...',
                     'salon-phone': '살롱 전화',
+                    'salon-delete-list': '살롱 삭제 목록',
+                    'no-salons-to-delete': '삭제할 살롱이 없습니다',
+                    'danger-operations': '위험한 작업',
+                    'delete-all-filtered': '모든 필터 결과 삭제',
+                    'delete-all-salons': '모든 살롱 삭제',
+                    'danger-warning': '주의: 삭제 작업은 되돌릴 수 없습니다!',
+                    'select-all-filtered': '필터 결과 전체 선택',
+                    'select-all-global': '모든 살롱 전체 선택',
                     // 其他翻译...
                 }
             };
@@ -2322,9 +2710,8 @@
                 }
             }
             
-            // 初始化语言
-            const savedLanguage = localStorage.getItem('language') || 'zh';
-            switchLanguage(savedLanguage);
+            // 智能初始化语言（整合用户建议的方案）
+            initializeLanguageSystem();
             
             // 显示默认内容 - 改为显示概况总览
             showContent('dashboard');
@@ -3175,55 +3562,24 @@
             const searchTerm = searchInput.value.trim();
             const responsibleId = responsibleFilter.value ? parseInt(responsibleFilter.value) : null;
             
+            // 搜索时重置到第一页
             displaySalonList({
                 search: searchTerm,
                 responsibleId: responsibleId
-            });
+            }, 1);
         }
         
-        // 更新删除沙龙选项
-        function updateDeleteSalonOptions() {
-            const selectElement = document.getElementById('deleteSalonSelect');
-            if (!selectElement) return;
-            
-            const salons = getSalons();
-            
-            let optionsHtml = `<option value="" data-i18n="please-select-salon">${getText('please-select-salon')}</option>`;
-            
-            salons.forEach(salon => {
-                optionsHtml += `<option value="${salon.id}">${salon.name}</option>`;
-            });
-            
-            selectElement.innerHTML = optionsHtml;
-        }
+        // 移除旧的删除沙龙选项函数，已被新的删除页面功能替代
         
-        // 删除选定的沙龙
-        function deleteSelectedSalon() {
-            const selectElement = document.getElementById('deleteSalonSelect');
-            const salonId = parseInt(selectElement.value);
-            
-            if (!salonId) {
-                alert(getText('please-select-salon'));
-                return;
-            }
-            
-            const salons = getSalons();
-            const salon = salons.find(s => s.id === salonId);
-            
-            if (!salon) {
-                alert(getText('salon-not-found'));
-                return;
-            }
-            
-            if (confirm(`确定要删除沙龙"${salon.name}"吗？此操作无法撤销！`)) {
-                if (deleteSalon(salonId)) {
-                    alert(getText('salon-deleted-success'));
-                    updateDeleteSalonOptions();
-                } else {
-                    alert(getText('salon-delete-failed'));
-                }
-            }
-        }
+        // 移除旧的选项卡切换函数，已被新的删除页面功能替代
+        
+        // 移除旧的删除选定沙龙函数，已被新的删除页面功能替代
+        
+        // 移除旧的批量删除沙龙列表函数，已被新的删除页面功能替代
+        
+        // 移除多个旧的删除相关函数，已被新的删除页面功能替代
+        
+        // 移除更多旧的删除相关函数，已被新的删除页面功能替代
         
         // 更新负责职员选项
         function updateResponsibleEmployeeOptions() {
@@ -3332,6 +3688,53 @@
             reader.readAsBinaryString(file);
         }
         
+        // 自动识别地址中的区域
+        function autoDetectDistrict(address) {
+            if (!address) return 'others'; // 没有地址的默认为其他地区
+            
+            const addressStr = address.toString().toLowerCase();
+            
+            // 匹配区域模式：韩文和中文都支持
+            if (addressStr.includes('영등포구') || addressStr.includes('永登浦区')) {
+                return 'yeongdeungpo';
+            } else if (addressStr.includes('구로구') || addressStr.includes('九老区')) {
+                return 'guro';
+            } else if (addressStr.includes('금천구') || addressStr.includes('衿川区')) {
+                return 'geumcheon';
+            } else if (addressStr.includes('양천구') || addressStr.includes('阳川区')) {
+                return 'yangcheon';
+            } else if (!addressStr.includes('서울') && !addressStr.includes('seoul') && !addressStr.includes('首尔') && 
+                      !addressStr.includes('대한민국') && !addressStr.includes('한국') && !addressStr.includes('中国') && 
+                      !addressStr.includes('부산') && !addressStr.includes('대구') && !addressStr.includes('인천')) {
+                // 如果地址中不包含韩国主要城市相关字样，可能是海外区域
+                return 'overseas';
+            }
+            
+            return 'others'; // 无法识别的区域自动归类为其他地区
+        }
+        
+        // 获取区域显示文本
+        function getDistrictDisplayText(district) {
+            if (!district) return getText('district-others');
+            
+            switch (district) {
+                case 'yeongdeungpo':
+                    return getText('district-yeongdeungpo'); // '永登浦区'
+                case 'guro':
+                    return getText('district-guro'); // '九老区'
+                case 'geumcheon':
+                    return getText('district-geumcheon'); // '衿川区'
+                case 'yangcheon':
+                    return getText('district-yangcheon'); // '阳川区'
+                case 'others':
+                    return getText('district-others'); // '其他地区'
+                case 'overseas':
+                    return getText('district-overseas'); // '海外区域'
+                default:
+                    return getText('district-others');
+            }
+        }
+        
         // 解析Excel文件
         function parseExcelFile(workbook) {
             // 检查是否有工作表
@@ -3412,9 +3815,13 @@
                 const address = row[addressIndex] ? row[addressIndex].toString().trim() : '';
                 
                 if (name && address) {
+                    // 自动识别区域
+                    const detectedDistrict = autoDetectDistrict(address);
+                    
                     salons.push({
                         name: name,
                         address: address,
+                        district: detectedDistrict, // 添加自动识别的区域
                         businessLicense: '', // 可以后续添加列解析
                         directorName: '未指定', // 默认值
                         directorMobile: '', // 可以后续添加列解析
@@ -3440,47 +3847,47 @@
             
             // 构建表格HTML
             let tableHtml = `
-                <table style="width: 100%; border-collapse: collapse; background: var(--dark-gray); table-layout: fixed;">
+                <table style="width: 100%; border-collapse: collapse; background: var(--dark-gray); table-layout: fixed; font-size: 0.75em;">
                     <colgroup>
-                        <col style="width: 8%;">  <!-- 选择列 -->
-                        <col style="width: 18%;">  <!-- 沙龙名称 -->
-                        <col style="width: 35%;">  <!-- 地址 -->
+                        <col style="width: 6%;">  <!-- 选择列 -->
+                        <col style="width: 16%;">  <!-- 沙龙名称 -->
+                        <col style="width: 38%;">  <!-- 地址 -->
                         <col style="width: 12%;">  <!-- 营业执照 -->
-                        <col style="width: 10%;">  <!-- 区域 -->
-                        <col style="width: 10%;">  <!-- 院长姓名 -->
-                        <col style="width: 7%;">   <!-- 负责人 -->
+                        <col style="width: 8%;">  <!-- 区域 -->
+                        <col style="width: 12%;">  <!-- 院长姓名 -->
+                        <col style="width: 8%;">   <!-- 负责人 -->
                     </colgroup>
                     <thead>
                         <tr style="background: rgba(135, 206, 235, 0.2);">
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; text-align: center; font-size: 0.9em;" data-i18n="select">选择</th>
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.9em;" data-i18n="salon-name">沙龙名称</th>
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.9em;" data-i18n="salon-address">地址</th>
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.9em;" data-i18n="business-license">营业执照</th>
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.9em;" data-i18n="salon-region">区域</th>
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.9em;" data-i18n="director-name">院长姓名</th>
-                            <th style="padding: 8px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.9em;" data-i18n="responsible-person">负责人</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; text-align: center; font-size: 0.85em;" data-i18n="select">选择</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="salon-name">沙龙名称</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="salon-address">地址</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="business-license">营业执照</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="salon-region">区域</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="director-name">院长姓名</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="responsible-person">负责人</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             
             batchSalonData.forEach((salon, index) => {
-                const region = salon.address.includes('영등포구') ? '永登浦区' : getText('unspecified');
+                const region = getDistrictDisplayText(salon.district);
                 const responsibleText = salon.responsibleEmployeeId ? 
                     getEmployees().find(e => e.id === salon.responsibleEmployeeId)?.name || getText('unassigned') : 
                     getText('unassigned');
                 
                 tableHtml += `
                     <tr style="border-bottom: 1px solid #444;">
-                        <td style="padding: 6px; border: 1px solid #444; text-align: center;">
-                            <input type="checkbox" data-index="${index}" onchange="updateSelectedCount()" style="transform: scale(1.1);">
+                        <td style="padding: 3px; border: 1px solid #444; text-align: center;">
+                            <input type="checkbox" data-index="${index}" onchange="updateSelectedCount()" style="transform: scale(0.9);">
                         </td>
-                        <td style="padding: 6px; border: 1px solid #444; color: var(--text-light); font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.name}">${salon.name}</td>
-                        <td style="padding: 6px; border: 1px solid #444; color: var(--text-light); font-size: 0.85em; line-height: 1.3; word-wrap: break-word;" title="${salon.address}">${salon.address}</td>
-                        <td style="padding: 6px; border: 1px solid #444; color: var(--gold); font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${salon.businessLicense || '-'}</td>
-                        <td style="padding: 6px; border: 1px solid #444; color: var(--gold); font-size: 0.85em;">${region}</td>
-                        <td style="padding: 6px; border: 1px solid #444; color: var(--gold); font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${salon.directorName}</td>
-                        <td class="responsible-cell" style="padding: 6px; border: 1px solid #444; color: #aaa; font-size: 0.8em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${responsibleText}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.8em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.name}">${salon.name}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.75em; line-height: 1.2; word-wrap: break-word; max-height: 32px; overflow: hidden;" title="${salon.address}">${salon.address}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.businessLicense || '-'}">${salon.businessLicense || '-'}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${region}">${region}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.directorName}">${salon.directorName}</td>
+                        <td class="responsible-cell" style="padding: 3px 4px; border: 1px solid #444; color: #aaa; font-size: 0.7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${responsibleText}">${responsibleText}</td>
                     </tr>
                 `;
             });
@@ -3491,7 +3898,7 @@
             `;
             
             dataPreviewTable.innerHTML = tableHtml;
-            dataPreviewArea.style.display = 'block';
+            dataPreviewArea.style.display = 'flex';
             confirmBtn.style.display = 'inline-block';
             cancelBtn.style.display = 'inline-block';
             
@@ -3622,7 +4029,19 @@
             // 保存当前数据和筛选条件
             currentSalonsData = salons;
             currentFilter = filteredByDistrict;
-            currentPage = page;
+            
+            // 计算分页
+            const totalItems = salons.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            currentPage = Math.min(Math.max(1, page), totalPages || 1);
+            
+            // 获取当前页的数据
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentPageSalons = salons.slice(startIndex, endIndex);
+            
+            // 更新分页信息
+            updatePaginationInfo(currentPage, totalPages, totalItems);
             
             // 更新沙龙总数显示
             if (salonCountText) {
@@ -3668,9 +4087,9 @@
                 return;
             }
             
-            let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
+            let html = `<div style="display: flex; flex-direction: column; gap: 6px; padding-bottom: 10px;">`;
             
-            salons.forEach((salon, index) => {
+            currentPageSalons.forEach((salon, index) => {
                 const responsibleEmployeeName = getEmployeeName(salon.responsibleEmployeeId);
                 
                 html += `
@@ -3678,9 +4097,9 @@
                         display: flex; 
                         justify-content: space-between; 
                         align-items: center; 
-                        padding: 12px 15px; 
+                        padding: 10px 12px; 
                         background: rgba(212, 175, 55, 0.1); 
-                        border-radius: 6px; 
+                        border-radius: 5px; 
                         border: 1px solid rgba(212, 175, 55, 0.3);
                         cursor: pointer;
                         transition: all 0.3s ease;
@@ -3689,11 +4108,11 @@
                     onmouseover="this.style.backgroundColor='rgba(212, 175, 55, 0.2)'" 
                     onmouseout="this.style.backgroundColor='rgba(212, 175, 55, 0.1)'">
                         <!-- 左侧：店名 -->
-                        <div style="flex: 1; color: var(--gold); font-weight: bold; font-size: 1.1em;">
+                        <div style="flex: 1; color: var(--gold); font-weight: bold; font-size: 0.9em;">
                             ${salon.name}
                         </div>
                         <!-- 右侧：负责职员 -->
-                        <div style="color: #cccccc; font-size: 0.9em;">
+                        <div style="color: #cccccc; font-size: 0.8em;">
                             ${responsibleEmployeeName}
                         </div>
                     </div>
@@ -4052,6 +4471,7 @@
             const directorMobile = document.getElementById('directorMobile').value.trim();
             const salonPhone = document.getElementById('salonPhone').value.trim();
             const salonEmail = document.getElementById('salonEmail').value.trim();
+            const salonNotes = document.getElementById('salonNotes') ? document.getElementById('salonNotes').value.trim() : '';
             
             if (!salonName) {
                 alert(getText('salon-name-required'));
@@ -4063,15 +4483,20 @@
                 return;
             }
             
+            // 自动识别区域
+            const detectedDistrict = autoDetectDistrict(salonAddress);
+            
             const salon = {
                 name: salonName,
                 address: salonAddress,
+                district: detectedDistrict, // 添加自动识别的区域
                 businessLicense: businessLicense,
                 responsibleEmployeeId: responsibleEmployeeId || null,
                 directorName: directorName,
                 directorMobile: directorMobile,
                 phone: salonPhone,
-                email: salonEmail
+                email: salonEmail,
+                notes: salonNotes
             };
             
             if (addSalon(salon)) {
@@ -4446,8 +4871,8 @@
                     </div>
                     
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <button type="button" onclick="showEmployeeDetail(${employeeId})" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">${cancelText}</button>
-                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">${saveText}</button>
+                        <button type="button" onclick="showEmployeeDetail(${employeeId})" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-right: 10px;">${cancelText}</button>
+                        <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;">${saveText}</button>
                     </div>
                 </form>
             `;
@@ -4594,8 +5019,12 @@
                             </div>
                         </div>
                         
-                        <!-- 空白区域 -->
+                        <!-- 备注信息 -->
                         <div>
+                            <h4 style="color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px; font-size: 1.1em;" data-i18n="notes">备注</h4>
+                            <div style="background: rgba(24,24,24,0.3); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 5px; padding: 12px; min-height: 80px; color: var(--text-light); font-size: 0.9em; line-height: 1.4;">
+                                ${salon.notes || getText('no-notes')}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4607,22 +5036,7 @@
             const actionButtons = document.getElementById('salon-action-buttons');
             if (actionButtons) {
                 actionButtons.innerHTML = `
-                    <button onclick="editSalonDetail(${salon.id})" style="
-                        background: linear-gradient(135deg, var(--gold), #e6c56c);
-                        color: var(--dark-bg);
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        font-size: 0.9em;
-                        min-width: 60px;
-                        height: 36px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n="edit-btn">编辑</button>
+                    <button onclick="editSalonDetail(${salon.id})" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="edit-btn">编辑</button>
                 `;
             }
             
@@ -4781,6 +5195,29 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- 第二排：备注信息 -->
+                        <div style="margin-bottom: 25px;">
+                            <div>
+                                <h4 style="color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px;" data-i18n="notes">备注</h4>
+                                <div>
+                                    <label style="color: #cccccc; display: block; margin-bottom: 6px; font-size: 0.9em;" data-i18n="notes">备注：</label>
+                                    <textarea id="editSalonNotes" data-i18n-placeholder="notes-placeholder" placeholder="在这里添加备注信息..." style="
+                                        width: 100%; 
+                                        padding: 8px 10px; 
+                                        background: rgba(24,24,24,0.8); 
+                                        border: 1px solid rgba(212, 175, 55, 0.5); 
+                                        color: var(--text-light); 
+                                        border-radius: 5px;
+                                        font-size: 0.9em;
+                                        box-sizing: border-box;
+                                        min-height: 80px;
+                                        resize: vertical;
+                                        font-family: inherit;
+                                    ">${salon.notes || ''}</textarea>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             `;
@@ -4791,39 +5228,8 @@
             const actionButtons = document.getElementById('salon-action-buttons');
             if (actionButtons) {
                 actionButtons.innerHTML = `
-                    <button onclick="cancelSalonEdit(${salon.id})" style="
-                        background: transparent;
-                        color: #cccccc;
-                        border: 1px solid #cccccc;
-                        padding: 8px 16px;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        font-size: 0.9em;
-                        margin-right: 10px;
-                        min-width: 60px;
-                        height: 36px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    " onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'" data-i18n="cancel">取消</button>
-                    <button onclick="saveSalonEdit(${salon.id})" style="
-                        background: linear-gradient(135deg, var(--gold), #e6c56c);
-                        color: var(--dark-bg);
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        font-size: 0.9em;
-                        min-width: 60px;
-                        height: 36px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n="save">保存</button>
+                    <button onclick="cancelSalonEdit(${salon.id})" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-right: 10px;" data-i18n="cancel">取消</button>
+                    <button onclick="saveSalonEdit(${salon.id})" style="background: var(--gold); color: var(--black); border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="save">保存</button>
                 `;
             }
             
@@ -4864,6 +5270,7 @@
             const salonEmail = document.getElementById('editSalonEmail').value.trim();
             const directorName = document.getElementById('editDirectorName').value.trim();
             const directorMobile = document.getElementById('editDirectorMobile').value.trim();
+            const salonNotes = document.getElementById('editSalonNotes').value.trim();
             
             if (!salonName) {
                 alert(getText('salon-name-required'));
@@ -4888,7 +5295,8 @@
                 phone: salonPhone,
                 email: salonEmail,
                 directorName: directorName,
-                directorMobile: directorMobile
+                directorMobile: directorMobile,
+                notes: salonNotes
             };
             
             // 保存到localStorage
@@ -4908,8 +5316,8 @@
             document.getElementById('responsibleFilter').value = '';
             document.getElementById('districtFilter').value = '';
             
-            // 重新显示所有沙龙
-            displaySalonList();
+            // 重新显示所有沙龙，重置到第一页
+            displaySalonList(null, 1);
         }
         
         // 增强的搜索沙龙函数
@@ -4941,21 +5349,40 @@
             // 区域筛选
             if (districtFilter) {
                 filteredSalons = filteredSalons.filter(salon => {
-                    if (!salon.address) return false;
-                    
-                    switch (districtFilter) {
-                        case 'guro':
-                            return salon.address.includes('구로구') || salon.address.includes('九老区');
-                        case 'yeongdeungpo':
-                            return salon.address.includes('영등포구') || salon.address.includes('永登浦区');
-                        case 'geumcheon':
-                            return salon.address.includes('금천구') || salon.address.includes('衿川区');
-                        case 'overseas':
-                            return !salon.address.includes('구로구') && !salon.address.includes('영등포구') && 
-                                   !salon.address.includes('금천구') && !salon.address.includes('九老区') && 
-                                   !salon.address.includes('永登浦区') && !salon.address.includes('衿川区');
-                        default:
-                            return true;
+                    // 使用沙龙的district字段进行筛选，更准确
+                    if (salon.district) {
+                        return salon.district === districtFilter;
+                    } else {
+                        // 如果没有district字段，回退到地址匹配
+                        if (!salon.address) return districtFilter === 'others';
+                        
+                        switch (districtFilter) {
+                            case 'yeongdeungpo':
+                                return salon.address.includes('영등포구') || salon.address.includes('永登浦区');
+                            case 'guro':
+                                return salon.address.includes('구로구') || salon.address.includes('九老区');
+                            case 'geumcheon':
+                                return salon.address.includes('금천구') || salon.address.includes('衿川구') || 
+                                       salon.address.includes('衿川区') || salon.address.includes('금천') || 
+                                       salon.address.includes('衿川') || salon.address.includes('Geumcheon') ||
+                                       salon.address.toLowerCase().includes('geumcheon');
+                            case 'yangcheon':
+                                return salon.address.includes('양천구') || salon.address.includes('阳川区');
+                            case 'others':
+                                return !salon.address.includes('구로구') && !salon.address.includes('영등포구') && 
+                                       !salon.address.includes('금천구') && !salon.address.includes('양천구') &&
+                                       !salon.address.includes('九老区') && !salon.address.includes('永登浦区') && 
+                                       !salon.address.includes('衿川区') && !salon.address.includes('阳川区') &&
+                                       (salon.address.includes('서울') || salon.address.includes('seoul') || salon.address.includes('首尔') ||
+                                        salon.address.includes('대한민국') || salon.address.includes('한국') || 
+                                        salon.address.includes('부산') || salon.address.includes('대구') || salon.address.includes('인천'));
+                            case 'overseas':
+                                return !salon.address.includes('서울') && !salon.address.includes('seoul') && !salon.address.includes('首尔') && 
+                                       !salon.address.includes('대한민국') && !salon.address.includes('한국') && 
+                                       !salon.address.includes('부산') && !salon.address.includes('대구') && !salon.address.includes('인천');
+                            default:
+                                return true;
+                        }
                     }
                 });
             }
@@ -4965,11 +5392,33 @@
         }
         
         // 显示筛选后的沙龙列表
-        function displayFilteredSalonList(salons) {
+        function displayFilteredSalonList(salons, page = 1) {
             const salonListContainer = document.getElementById('salon-list-content');
             const salonCountText = document.getElementById('salon-count-text');
             
             if (!salonListContainer) return;
+            
+            // 应用排序
+            if (currentSortField !== 'default') {
+                salons = applySalonSort(salons, currentSortField, currentSortOrder);
+            }
+            
+            // 保存当前数据和筛选状态
+            currentSalonsData = salons;
+            currentFilter = 'filtered'; // 标记为筛选状态
+            
+            // 计算分页
+            const totalItems = salons.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            currentPage = Math.min(Math.max(1, page), totalPages || 1);
+            
+            // 获取当前页的数据
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentPageSalons = salons.slice(startIndex, endIndex);
+            
+            // 更新分页信息
+            updatePaginationInfo(currentPage, totalPages, totalItems);
             
             // 更新统计数字
             if (salonCountText) {
@@ -4985,34 +5434,41 @@
                 return;
             }
             
-            // 应用排序
-            const sortedSalons = applySalonSort(salons);
+            // 生成列表HTML - 使用与正常列表相同的格式
+            let html = `<div style="display: flex; flex-direction: column; gap: 6px; padding-bottom: 10px;">`;
             
-            // 生成列表HTML
-            let listHtml = '';
-            sortedSalons.forEach(salon => {
+            currentPageSalons.forEach(salon => {
                 const responsibleEmployeeName = getEmployeeName(salon.responsibleEmployeeId);
                 
-                listHtml += `
+                html += `
                     <div onclick="showSalonDetail(${salon.id})" style="
+                        display: flex; 
+                        justify-content: space-between; 
+                        align-items: center; 
+                        padding: 10px 12px; 
                         background: rgba(212, 175, 55, 0.1); 
-                        margin-bottom: 10px; 
-                        padding: 15px; 
-                        border-radius: 8px; 
-                        border: 1px solid rgba(212, 175, 55, 0.3); 
-                        cursor: pointer; 
-                        transition: all 0.3s;
-                    " onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.1)'">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                            <h4 style="color: var(--gold); margin: 0; font-size: 1.1em;">${salon.name}</h4>
+                        border-radius: 5px; 
+                        border: 1px solid rgba(212, 175, 55, 0.3);
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        hover: background-color: rgba(212, 175, 55, 0.2);
+                    " 
+                    onmouseover="this.style.backgroundColor='rgba(212, 175, 55, 0.2)'" 
+                    onmouseout="this.style.backgroundColor='rgba(212, 175, 55, 0.1)'">
+                        <!-- 左侧：店名 -->
+                        <div style="flex: 1; color: var(--gold); font-weight: bold; font-size: 0.9em;">
+                            ${salon.name}
                         </div>
-                        <p style="margin: 2px 0; color: #cccccc; font-size: 0.9em;">${salon.address || getText('not-specified')}</p>
-                        <p style="margin: 2px 0 0 0; color: #aaa; font-size: 0.8em;">${getText('responsible-employee')}：${responsibleEmployeeName}</p>
+                        <!-- 右侧：负责职员 -->
+                        <div style="color: #cccccc; font-size: 0.8em;">
+                            ${responsibleEmployeeName}
+                        </div>
                     </div>
                 `;
             });
             
-            salonListContainer.innerHTML = listHtml;
+            html += `</div>`;
+            salonListContainer.innerHTML = html;
         }
         
         // 应用沙龙排序
@@ -5077,6 +5533,656 @@
                 return total + (transaction.outstandingAmount || 0);
             }, 0);
         }
+        
+        // ===== 删除沙龙页面功能 =====
+        
+        // 删除页面的全局变量
+        let deleteFilteredSalons = []; // 当前筛选的沙龙列表
+        let deleteSelectedSalonIds = new Set(); // 当前选择的沙龙ID集合
+        let deleteCurrentPage = 1;
+        let deleteItemsPerPage = 20;
+        
+        // 初始化删除页面
+        function initDeleteSalonPage() {
+            console.log('=== 开始初始化删除沙龙页面 ===');
+            
+            // 重置所有状态
+            deleteSelectedSalonIds.clear();
+            deleteCurrentPage = 1;
+            
+            // 获取所有沙龙
+            const allSalons = getSalons();
+            deleteFilteredSalons = [...allSalons];
+            
+            console.log('获取到沙龙数量:', allSalons.length);
+            
+            // 先加载筛选选项
+            loadDeleteFilters();
+            
+            // 清空并重置所有输入框
+            resetDeleteFilters();
+            
+            // 显示列表
+            displayDeleteSalonList(1);
+            
+            console.log('=== 删除沙龙页面初始化完成，显示', deleteFilteredSalons.length, '个沙龙 ===');
+        }
+        
+        // 加载所有筛选选项
+        function loadDeleteFilters() {
+            loadDeleteResponsibleFilter();
+            loadDeleteDistrictFilter();
+        }
+        
+        // 重置所有筛选条件
+        function resetDeleteFilters() {
+            const searchInput = document.getElementById('deleteSalonSearchInput');
+            const responsibleFilter = document.getElementById('deleteResponsibleFilter');
+            const districtFilter = document.getElementById('deleteDistrictFilter');
+            
+            if (searchInput) {
+                searchInput.value = '';
+                console.log('重置搜索框');
+            }
+            if (responsibleFilter) {
+                responsibleFilter.selectedIndex = 0;
+                console.log('重置负责人筛选');
+            }
+            if (districtFilter) {
+                districtFilter.selectedIndex = 0;
+                console.log('重置区域筛选');
+            }
+        }
+        
+        // 加载负责人筛选选项
+        function loadDeleteResponsibleFilter() {
+            const employees = getEmployees();
+            const responsibleFilter = document.getElementById('deleteResponsibleFilter');
+            
+            if (!responsibleFilter) {
+                console.error('找不到负责人筛选下拉框 (deleteResponsibleFilter)');
+                return;
+            }
+            
+            console.log('开始加载负责人选项，职员数量:', employees.length);
+            
+            // 完全重建选项，确保第一个选项是默认选项
+            responsibleFilter.innerHTML = '';
+            
+            // 添加默认选项
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = getText('all-employees');
+            defaultOption.setAttribute('data-i18n', 'all-employees');
+            responsibleFilter.appendChild(defaultOption);
+            
+            // 添加职员选项
+            employees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee.id;
+                option.textContent = `${employee.name} - ${getPositionText(employee.position)}`;
+                responsibleFilter.appendChild(option);
+                console.log('添加职员选项:', employee.name, employee.position);
+            });
+            
+            // 确保选中第一个选项
+            responsibleFilter.selectedIndex = 0;
+            
+            console.log('负责人筛选选项加载完成，共', responsibleFilter.options.length, '个选项');
+        }
+        
+        // 加载区域筛选选项
+        function loadDeleteDistrictFilter() {
+            const districtFilter = document.getElementById('deleteDistrictFilter');
+            
+            if (!districtFilter) {
+                console.error('找不到区域筛选下拉框 (deleteDistrictFilter)');
+                return;
+            }
+            
+            // 确保区域选项完整
+            const expectedOptions = [
+                { value: '', textKey: 'all-districts' },
+                { value: 'yeongdeungpo', textKey: 'district-yeongdeungpo' },
+                { value: 'guro', textKey: 'district-guro' },
+                { value: 'geumcheon', textKey: 'district-geumcheon' },
+                { value: 'yangcheon', textKey: 'district-yangcheon' },
+                { value: 'others', textKey: 'district-others' },
+                { value: 'overseas', textKey: 'district-overseas' }
+            ];
+            
+            // 重建选项
+            districtFilter.innerHTML = '';
+            
+            expectedOptions.forEach(optionData => {
+                const option = document.createElement('option');
+                option.value = optionData.value;
+                option.textContent = getText(optionData.textKey);
+                option.setAttribute('data-i18n', optionData.textKey);
+                districtFilter.appendChild(option);
+            });
+            
+            // 确保选中第一个选项
+            districtFilter.selectedIndex = 0;
+            
+            console.log('区域筛选选项加载完成，共', districtFilter.options.length, '个选项');
+        }
+        
+        // 删除页面筛选函数 - 重新设计
+        function filterSalonsForDelete() {
+            console.log('=== 执行删除页面筛选 ===');
+            
+            // 安全获取筛选条件
+            const searchElement = document.getElementById('deleteSalonSearchInput');
+            const responsibleElement = document.getElementById('deleteResponsibleFilter');
+            const districtElement = document.getElementById('deleteDistrictFilter');
+            
+            if (!searchElement || !responsibleElement || !districtElement) {
+                console.error('筛选元素未找到');
+                return;
+            }
+            
+            const searchText = searchElement.value.trim().toLowerCase();
+            const responsibleId = responsibleElement.value.trim();
+            const district = districtElement.value.trim();
+            
+            console.log('筛选条件:', { searchText, responsibleId, district });
+            
+            const allSalons = getSalons();
+            let filteredSalons = [...allSalons];
+            let filterCount = 0;
+            
+            // 1. 文本搜索筛选
+            if (searchText.length > 0) {
+                console.log('应用文本搜索:', searchText);
+                filteredSalons = filteredSalons.filter(salon => {
+                    const matchName = salon.name && salon.name.toLowerCase().includes(searchText);
+                    const matchDirector = salon.directorName && salon.directorName.toLowerCase().includes(searchText);
+                    const matchMobile = salon.directorMobile && salon.directorMobile.replace(/\D/g, '').includes(searchText.replace(/\D/g, ''));
+                    const matchPhone = salon.phone && salon.phone.replace(/\D/g, '').includes(searchText.replace(/\D/g, ''));
+                    const matchAddress = salon.address && salon.address.toLowerCase().includes(searchText);
+                    
+                    return matchName || matchDirector || matchMobile || matchPhone || matchAddress;
+                });
+                filterCount++;
+                console.log('文本搜索后剩余:', filteredSalons.length, '个沙龙');
+            }
+            
+            // 2. 负责人筛选
+            if (responsibleId.length > 0) {
+                console.log('应用负责人筛选:', responsibleId);
+                filteredSalons = filteredSalons.filter(salon => {
+                    return salon.responsibleEmployeeId && salon.responsibleEmployeeId.toString() === responsibleId;
+                });
+                filterCount++;
+                console.log('负责人筛选后剩余:', filteredSalons.length, '个沙龙');
+            }
+            
+            // 3. 区域筛选
+            if (district.length > 0) {
+                console.log('应用区域筛选:', district);
+                filteredSalons = filteredSalons.filter(salon => {
+                    return matchSalonDistrict(salon, district);
+                });
+                filterCount++;
+                console.log('区域筛选后剩余:', filteredSalons.length, '个沙龙');
+            }
+            
+            console.log('筛选完成 - 应用了', filterCount, '个筛选条件，最终结果:', filteredSalons.length, '个沙龙');
+            
+            deleteFilteredSalons = filteredSalons;
+            deleteCurrentPage = 1;
+            displayDeleteSalonList(1);
+        }
+        
+        // 区域匹配辅助函数
+        function matchSalonDistrict(salon, district) {
+            if (salon.district) {
+                return salon.district === district;
+            }
+            
+            if (!salon.address) {
+                return district === 'others';
+            }
+            
+            const address = salon.address.toLowerCase();
+            
+            switch (district) {
+                case 'yeongdeungpo':
+                    return address.includes('영등포구') || address.includes('永登浦区');
+                case 'guro':
+                    return address.includes('구로구') || address.includes('九老区');
+                case 'geumcheon':
+                    return address.includes('금천구') || address.includes('衿川구') || 
+                           address.includes('衿川区') || address.includes('금천') || 
+                           address.includes('衿川') || address.includes('geumcheon');
+                case 'yangcheon':
+                    return address.includes('양천구') || address.includes('阳川区');
+                case 'others':
+                    const isSeoul = address.includes('서울') || address.includes('seoul') || address.includes('首尔');
+                    const isKorea = isSeoul || address.includes('대한민국') || address.includes('한국');
+                    const isSpecialDistrict = address.includes('구로구') || address.includes('영등포구') || 
+                                             address.includes('금천구') || address.includes('양천구') ||
+                                             address.includes('九老区') || address.includes('永登浦区') || 
+                                             address.includes('衿川区') || address.includes('阳川区');
+                    return isKorea && !isSpecialDistrict;
+                case 'overseas':
+                    return !address.includes('서울') && !address.includes('seoul') && !address.includes('首尔') && 
+                           !address.includes('대한민국') && !address.includes('한국');
+                default:
+                    return true;
+            }
+        }
+        
+        // 显示删除页面的沙龙列表
+        function displayDeleteSalonList(page = 1) {
+            const listContainer = document.getElementById('delete-salon-list-content');
+            
+            if (!listContainer) {
+                console.error('找不到沙龙列表容器 (delete-salon-list-content)');
+                return;
+            }
+            
+            console.log('=== 开始显示删除沙龙列表 ===');
+            console.log('当前筛选的沙龙数量:', deleteFilteredSalons.length);
+            console.log('请求显示第', page, '页');
+            
+            const allSalons = getSalons();
+            
+            // 计算分页
+            const totalItems = deleteFilteredSalons.length;
+            const totalPages = Math.ceil(totalItems / deleteItemsPerPage) || 1;
+            deleteCurrentPage = Math.min(Math.max(1, page), totalPages);
+            
+            console.log('分页信息 - 总项目数:', totalItems, '总页数:', totalPages, '当前页:', deleteCurrentPage);
+            
+            // 获取当前页的数据
+            const startIndex = (deleteCurrentPage - 1) * deleteItemsPerPage;
+            const endIndex = startIndex + deleteItemsPerPage;
+            const currentPageSalons = deleteFilteredSalons.slice(startIndex, endIndex);
+            
+            console.log('当前页显示沙龙数量:', currentPageSalons.length);
+            
+            // 更新统计信息
+            updateDeleteStatistics(allSalons.length, deleteFilteredSalons.length);
+            
+            // 更新分页信息
+            updateDeletePaginationInfo(deleteCurrentPage, totalPages, totalItems);
+            
+            if (deleteFilteredSalons.length === 0) {
+                console.log('没有沙龙数据，显示空状态');
+                listContainer.innerHTML = `
+                    <div style="text-align: center; color: #cccccc; padding: 40px;">
+                        <p data-i18n="no-salons-to-delete">没有可删除的沙龙</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">请检查筛选条件或添加新的沙龙</p>
+                    </div>
+                `;
+                updateTexts();
+                return;
+            }
+            
+            // 生成列表HTML
+            let html = `<div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px;">`;
+            
+            currentPageSalons.forEach((salon, index) => {
+                const isSelected = deleteSelectedSalonIds.has(salon.id);
+                const responsibleEmployeeName = getEmployeeName(salon.responsibleEmployeeId);
+                const districtName = getDistrictDisplayText(salon.district);
+                
+                html += `
+                    <div style="
+                        display: flex; 
+                        align-items: center; 
+                        padding: 12px 15px; 
+                        background: ${isSelected ? 'rgba(212, 175, 55, 0.3)' : 'rgba(212, 175, 55, 0.1)'}; 
+                        border-radius: 6px; 
+                        border: 1px solid ${isSelected ? 'var(--gold)' : 'rgba(212, 175, 55, 0.3)'};
+                        transition: all 0.3s ease;
+                        margin-bottom: 2px;
+                    " onmouseover="this.style.background='rgba(212, 175, 55, 0.25)'" 
+                       onmouseout="this.style.background='${isSelected ? 'rgba(212, 175, 55, 0.3)' : 'rgba(212, 175, 55, 0.1)'}'">
+                        
+                        <!-- 选择框 -->
+                        <input type="checkbox" 
+                               ${isSelected ? 'checked' : ''} 
+                               onchange="toggleSalonSelection(${salon.id})"
+                               style="margin-right: 15px; width: 18px; height: 18px; cursor: pointer; accent-color: var(--gold);">
+                        
+                        <!-- 沙龙信息 - 水平并排显示 -->
+                        <div style="flex: 1; display: flex; align-items: center; gap: 15px; font-size: 0.85em;">
+                            <div style="color: var(--gold); font-weight: bold; min-width: 120px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${salon.name}
+                                </div>
+                            <div style="color: #cccccc; min-width: 80px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${salon.directorName || '未设置'}
+                                </div>
+                            <div style="color: #cccccc; min-width: 100px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${salon.directorMobile || '无手机号'}
+                            </div>
+                            <div style="color: #aaa; flex: 1; min-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${salon.address || '无地址信息'}
+                            </div>
+                            <div style="color: #87CEEB; min-width: 60px; max-width: 60px; text-align: center;">
+                                ${districtName}
+                            </div>
+                            <div style="color: #90EE90; font-weight: bold; min-width: 70px; max-width: 70px; text-align: center;">
+                                ${responsibleEmployeeName}
+                            </div>
+                            <div style="color: #aaa; font-size: 0.8em; min-width: 80px; max-width: 80px; text-align: center;">
+                                ${salon.addTime ? new Date(salon.addTime).toLocaleDateString() : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            listContainer.innerHTML = html;
+            
+            console.log('=== 沙龙列表显示完成 ===');
+            
+            // 更新翻译
+            updateTexts();
+        }
+        
+        // 切换单个沙龙的选择状态
+        function toggleSalonSelection(salonId) {
+            if (deleteSelectedSalonIds.has(salonId)) {
+                deleteSelectedSalonIds.delete(salonId);
+            } else {
+                deleteSelectedSalonIds.add(salonId);
+            }
+            updateDeleteStatistics();
+            displayDeleteSalonList(deleteCurrentPage); // 刷新显示
+        }
+        
+        // 全选筛选结果（智能全选）
+        function selectAllFilteredSalons() {
+            console.log('正在选择筛选结果中的所有沙龙...');
+            console.log('筛选结果总数:', deleteFilteredSalons.length);
+            
+            // 选择当前筛选结果中的所有沙龙
+            deleteFilteredSalons.forEach(salon => {
+                deleteSelectedSalonIds.add(salon.id);
+            });
+            
+            console.log('已选择沙龙数量:', deleteSelectedSalonIds.size);
+            updateDeleteStatistics();
+            displayDeleteSalonList(deleteCurrentPage);
+        }
+        
+        // 全选所有沙龙（不受筛选限制）
+        function selectAllSalonsGlobal() {
+            console.log('正在选择系统中的所有沙龙...');
+            const allSalons = getSalons();
+            console.log('系统总沙龙数:', allSalons.length);
+            
+            // 选择系统中的所有沙龙
+            allSalons.forEach(salon => {
+                deleteSelectedSalonIds.add(salon.id);
+            });
+            
+            console.log('已选择沙龙数量:', deleteSelectedSalonIds.size);
+            updateDeleteStatistics();
+            displayDeleteSalonList(deleteCurrentPage);
+        }
+        
+        // 取消全选
+        function deselectAllSalonsForDelete() {
+            console.log('正在取消所有选择...');
+            deleteSelectedSalonIds.clear();
+            updateDeleteStatistics();
+            displayDeleteSalonList(deleteCurrentPage);
+        }
+        
+        // 清空筛选条件
+        function clearDeleteFilters() {
+            console.log('=== 清空筛选条件 ===');
+            
+            // 重置输入框
+            const searchInput = document.getElementById('deleteSalonSearchInput');
+            const responsibleFilter = document.getElementById('deleteResponsibleFilter');
+            const districtFilter = document.getElementById('deleteDistrictFilter');
+            
+            if (searchInput) {
+                searchInput.value = '';
+                console.log('已清空搜索框');
+            }
+            if (responsibleFilter) {
+                responsibleFilter.selectedIndex = 0;
+                console.log('已重置负责人筛选');
+            }
+            if (districtFilter) {
+                districtFilter.selectedIndex = 0;
+                console.log('已重置区域筛选');
+            }
+            
+            // 重新获取所有沙龙并显示
+            const allSalons = getSalons();
+            deleteFilteredSalons = [...allSalons];
+            deleteCurrentPage = 1;
+            
+            console.log('重新加载所有沙龙，共', deleteFilteredSalons.length, '个');
+            
+            // 清空选择状态
+            deleteSelectedSalonIds.clear();
+            
+            // 显示列表
+            displayDeleteSalonList(1);
+            
+            console.log('筛选条件已清空，显示', deleteFilteredSalons.length, '个沙龙');
+        }
+        
+        // 更新删除页面统计信息
+        function updateDeleteStatistics(totalSalons = null, filteredCount = null) {
+            const allSalons = getSalons();
+            const total = totalSalons !== null ? totalSalons : allSalons.length;
+            const filtered = filteredCount !== null ? filteredCount : deleteFilteredSalons.length;
+            const selected = deleteSelectedSalonIds.size;
+            
+            // 更新各个统计元素
+            const totalElement = document.getElementById('delete-total-salons');
+            const filteredElement = document.getElementById('delete-filtered-salons');
+            const selectedElement = document.getElementById('delete-selected-salons');
+            const selectedCountElement = document.getElementById('delete-selected-count');
+            const statisticsElement = document.getElementById('delete-salon-statistics');
+            
+            if (totalElement) {
+                totalElement.textContent = `总沙龙数：${total}`;
+            }
+            
+            if (filteredElement) {
+                filteredElement.textContent = `筛选结果：${filtered}`;
+            }
+            
+            if (selectedElement) {
+                selectedElement.textContent = `已选择：${selected}`;
+            }
+            
+            if (selectedCountElement) {
+                selectedCountElement.textContent = `已选择：${selected} 个沙龙`;
+            }
+            
+            if (statisticsElement) {
+                statisticsElement.textContent = `筛选结果：显示 ${filtered} 个沙龙`;
+            }
+        }
+        
+        // 更新删除页面分页信息
+        function updateDeletePaginationInfo(currentPage, totalPages, totalItems) {
+            const pageInfo = document.getElementById('delete-page-info');
+            const firstPageBtn = document.getElementById('delete-first-page');
+            const prevPageBtn = document.getElementById('delete-prev-page');
+            const nextPageBtn = document.getElementById('delete-next-page');
+            const lastPageBtn = document.getElementById('delete-last-page');
+            const jumpInput = document.getElementById('delete-page-jump-input');
+            
+            if (pageInfo) {
+                const currentLanguage = localStorage.getItem('language') || 'zh';
+                if (currentLanguage === 'ko') {
+                    pageInfo.textContent = `${currentPage} 페이지 / 총 ${totalPages} 페이지 (${totalItems} 개 항목)`;
+                } else {
+                    pageInfo.textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页 (${totalItems} 个项目)`;
+                }
+            }
+            
+            if (jumpInput) {
+                jumpInput.max = totalPages;
+                jumpInput.placeholder = totalPages > 0 ? `1-${totalPages}` : '1';
+            }
+            
+            // 更新按钮状态
+            const updateButtonState = (btn, disabled) => {
+                if (btn) {
+                    btn.disabled = disabled;
+                    btn.style.opacity = disabled ? '0.5' : '1';
+                    btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+                }
+            };
+            
+            updateButtonState(firstPageBtn, currentPage === 1);
+            updateButtonState(prevPageBtn, currentPage === 1);
+            updateButtonState(nextPageBtn, currentPage === totalPages);
+            updateButtonState(lastPageBtn, currentPage === totalPages);
+        }
+        
+        // 删除页面分页函数
+        function goToDeletePage(page) {
+            displayDeleteSalonList(page);
+        }
+        
+        function goToPrevDeletePage() {
+            if (deleteCurrentPage > 1) {
+                displayDeleteSalonList(deleteCurrentPage - 1);
+            }
+        }
+        
+        function goToNextDeletePage() {
+            const totalPages = Math.ceil(deleteFilteredSalons.length / deleteItemsPerPage);
+            if (deleteCurrentPage < totalPages) {
+                displayDeleteSalonList(deleteCurrentPage + 1);
+            }
+        }
+        
+        function goToLastDeletePage() {
+            const totalPages = Math.ceil(deleteFilteredSalons.length / deleteItemsPerPage);
+            displayDeleteSalonList(totalPages);
+        }
+        
+        function changeDeleteItemsPerPage() {
+            const select = document.getElementById('delete-items-per-page');
+            deleteItemsPerPage = parseInt(select.value);
+            displayDeleteSalonList(1); // 重置到第一页
+        }
+        
+        function jumpToDeletePage() {
+            const input = document.getElementById('delete-page-jump-input');
+            const pageNumber = parseInt(input.value);
+            
+            if (!pageNumber || pageNumber < 1) {
+                alert('请输入有效的页码');
+                return;
+            }
+            
+            const totalPages = Math.ceil(deleteFilteredSalons.length / deleteItemsPerPage);
+            
+            if (pageNumber > totalPages) {
+                alert(`页码不能超过总页数 ${totalPages}`);
+                return;
+            }
+            
+            displayDeleteSalonList(pageNumber);
+            input.value = ''; // 清空输入框
+        }
+        
+        function handleDeletePageJumpKeypress(event) {
+            if (event.key === 'Enter') {
+                jumpToDeletePage();
+            }
+        }
+        
+        // 删除选中的沙龙（高级版本）
+        function deleteSelectedSalonsAdvanced() {
+            if (deleteSelectedSalonIds.size === 0) {
+                alert('请先选择要删除的沙龙');
+                return;
+            }
+            
+            const selectedCount = deleteSelectedSalonIds.size;
+            const confirmMessage = `确定要删除 ${selectedCount} 个选中的沙龙吗？此操作不可撤销！`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            const salons = getSalons();
+            const updatedSalons = salons.filter(salon => !deleteSelectedSalonIds.has(salon.id));
+            
+            saveSalons(updatedSalons);
+            
+            // 清空选择
+            deleteSelectedSalonIds.clear();
+            
+            // 刷新筛选和显示
+            filterSalonsForDelete();
+            
+            alert(`成功删除 ${selectedCount} 个沙龙`);
+        }
+        
+        // 删除所有筛选结果
+        function deleteAllFilteredSalons() {
+            if (deleteFilteredSalons.length === 0) {
+                alert('没有可删除的筛选结果');
+                return;
+            }
+            
+            const filteredCount = deleteFilteredSalons.length;
+            const confirmMessage = `确定要删除当前筛选出的所有 ${filteredCount} 个沙龙吗？此操作不可撤销！`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            const salons = getSalons();
+            const filteredIds = new Set(deleteFilteredSalons.map(salon => salon.id));
+            const updatedSalons = salons.filter(salon => !filteredIds.has(salon.id));
+            
+            saveSalons(updatedSalons);
+            
+            // 清空选择和筛选
+            deleteSelectedSalonIds.clear();
+            clearDeleteFilters();
+            
+            alert(`成功删除 ${filteredCount} 个沙龙`);
+        }
+        
+        // 删除全部沙龙（危险操作）
+        function deleteAllSalonsConfirm() {
+            const allSalons = getSalons();
+            const totalCount = allSalons.length;
+            
+            if (totalCount === 0) {
+                alert('没有可删除的沙龙');
+                return;
+            }
+            
+            const firstConfirm = confirm(`警告：此操作将删除系统中的全部 ${totalCount} 个沙龙！\n\n确定要继续吗？`);
+            if (!firstConfirm) return;
+            
+            const secondConfirm = confirm(`再次确认：真的要删除全部 ${totalCount} 个沙龙吗？\n\n此操作不可撤销！`);
+            if (!secondConfirm) return;
+            
+            saveSalons([]);
+            
+            // 清空选择和筛选
+            deleteSelectedSalonIds.clear();
+            clearDeleteFilters();
+            
+            alert(`已删除全部 ${totalCount} 个沙龙`);
+        }
+        
+        // 添加调试日志以便排查问题
+        console.log('删除沙龙页面功能已重新设计完成');
     </script>
 </body>
 </html> 
