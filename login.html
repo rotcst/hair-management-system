@@ -8,6 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <style>
     body { 
       background: #000; 
@@ -201,22 +202,36 @@
 </div>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDAfHsHn6jyaCDURsi-R2a0vleka36ML6Q",
-    authDomain: "mesia-ems.firebaseapp.com",
-    databaseURL: "https://mesia-ems-default-rtdb.firebaseio.com",
-    projectId: "mesia-ems",
-    storageBucket: "mesia-ems.firebasestorage.app",
-    messagingSenderId: "718797479793",
-    appId: "1:718797479793:web:22a39e902f8ac4324e60d0",
-    measurementId: "G-3VHGK0DTQY"
-  };
-  firebase.initializeApp(firebaseConfig);
+  // Firebase配置已在firebase-config.js中设置
+
+  // 测试Firebase连接
+  function testFirebaseConnection() {
+    console.log('测试Firebase连接...');
+    
+    // 检查Firebase是否已初始化
+    if (!firebase.apps || firebase.apps.length === 0) {
+      console.error('Firebase未初始化');
+      return false;
+    }
+    
+    // 检查数据库连接
+    try {
+      const testRef = firebase.database().ref('test');
+      console.log('Firebase数据库连接正常');
+      return true;
+    } catch (error) {
+      console.error('Firebase数据库连接失败:', error);
+      return false;
+    }
+  }
 
   // 初始化设置
   window.onload = function() {
     // 设置默认入职日期为今天
     document.getElementById('registerJoinDate').valueAsDate = new Date();
+    
+    // 测试Firebase连接
+    testFirebaseConnection();
   };
 
   // 切换Tab
@@ -318,6 +333,12 @@
     const bio = document.getElementById('registerBio').value.trim();
     
     hideAllMessages();
+    
+    // 测试Firebase连接
+    if (!testFirebaseConnection()) {
+      showError('registerError', 'Firebase连接失败，请检查网络连接');
+      return;
+    }
     
     // 验证必填字段
     if (!name || !email || !password || !confirmPassword || !mobile) {
