@@ -1,0 +1,36 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        ".validate": "auth != null",
+        "employees": {
+          "$employeeId": {
+            ".validate": "newData.hasChildren(['id', 'name', 'position'])"
+          }
+        },
+        "salons": {
+          "$salonId": {
+            ".validate": "newData.hasChildren(['id', 'name', 'address'])"
+          }
+        },
+        "products": {
+          "$productId": {
+            ".validate": "newData.hasChildren(['id', 'name', 'price'])"
+          }
+        },
+        "productCategories": {
+          "$categoryId": {
+            ".validate": "newData.hasChildren(['id', 'nameCN', 'nameKO'])"
+          }
+        },
+        "settings": {
+          "language": {
+            ".validate": "newData.isString() && (newData.val() === 'zh' || newData.val() === 'ko')"
+          }
+        }
+      }
+    }
+  }
+} 
