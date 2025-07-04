@@ -366,30 +366,37 @@
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
         const user = userCredential.user;
+        console.log('Firebase账户创建成功:', user.uid);
         
-        // 更新用户显示名称
-        return user.updateProfile({
-          displayName: name
-        }).then(() => {
-          // 创建员工记录
-          const employeeId = Date.now(); // 使用时间戳作为ID
-          const employeeData = {
-            id: employeeId,
-            name: name,
-            email: email,
-            mobile: mobile,
-            position: 'salesperson', // 默认职位为业务员
-            joinDate: joinDate || new Date().toISOString().split('T')[0],
-            bio: bio || '',
-            firebaseUid: user.uid, // 关联Firebase用户ID
-            addTime: new Date().toISOString(),
-            addedBy: 'self-register', // 标记为自主注册
-            status: 'active' // 默认状态为活跃
-          };
+        // 创建员工记录
+        const employeeId = Date.now(); // 使用时间戳作为ID
+        const employeeData = {
+          id: employeeId,
+          name: name,
+          email: email,
+          mobile: mobile,
+          position: 'salesperson', // 默认职位为业务员
+          joinDate: joinDate || new Date().toISOString().split('T')[0],
+          bio: bio || '',
+          firebaseUid: user.uid, // 关联Firebase用户ID
+          addTime: new Date().toISOString(),
+          addedBy: 'self-register', // 标记为自主注册
+          status: 'active' // 默认状态为活跃
+        };
+        
+        console.log('准备保存员工信息:', employeeData);
+        
+        // 保存员工信息到Firebase数据库
+        return firebase.database().ref('employees').push(employeeData).then(() => {
+          console.log('员工信息保存成功');
           
-          // 保存员工信息到Firebase数据库
-          // 注意：这里我们不能直接保存到用户自己的数据空间，需要保存到公共员工列表
-          return firebase.database().ref('employees').push(employeeData);
+          // 尝试更新用户显示名称（如果失败不影响整个流程）
+          return user.updateProfile({
+            displayName: name
+          }).catch(profileError => {
+            console.warn('更新显示名称失败，但不影响注册流程:', profileError);
+            // 不抛出错误，继续执行
+          });
         });
       })
       .then(() => {
@@ -429,7 +436,18 @@
           errorMessage = '邮箱格式不正确';
         } else if (error.code === 'auth/weak-password') {
           errorMessage = '密码强度太弱，请设置更复杂的密码';
+        } else if (error.code === 'PERMISSION_DENIED') {
+          errorMessage = '数据库权限不足，请检查Firebase配置';
+        } else if (error.message && error.message.includes('displayName')) {
+          errorMessage = '账号创建成功，但用户名设置失败，请联系管理员';
         }
+        
+        // 记录详细错误信息
+        console.error('详细错误信息:', {
+          code: error.code,
+          message: error.message,
+          stack: error.stack
+        });
         
         showError('registerError', errorMessage);
       });
