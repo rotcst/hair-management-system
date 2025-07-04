@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <title>设置管理员权限</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
+    <script src="firebase-data-manager.js"></script>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -58,8 +60,15 @@
         </div>
 
         <div>
+            <h3>当前登录状态：</h3>
+            <div id="loginStatus">正在检查登录状态...</div>
+            <button id="loginBtn" onclick="redirectToLogin()" style="display:none;">前往登录</button>
+        </div>
+
+        <div>
             <h3>数据迁移（仅管理员）：</h3>
-            <button onclick="migrateData()">迁移现有数据到公司级别</button>
+            <button id="migrateBtn" onclick="migrateData()" disabled>迁移现有数据到公司级别</button>
+            <p style="font-size: 0.9em; color: #666;">注意：迁移前请先设置管理员权限并确保已登录</p>
         </div>
 
         <div id="message"></div>
@@ -126,23 +135,129 @@
 
         // 迁移数据
         async function migrateData() {
-            if (!firebaseDataManager) {
-                showMessage('数据管理器未加载', true);
-                return;
-            }
-
             try {
-                await firebaseDataManager.migrateUserDataToCompany();
-                showMessage('数据迁移完成！');
+                // 检查用户是否登录
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) {
+                    showMessage('请先登录系统再进行数据迁移', true);
+                    return;
+                }
+
+                showMessage('正在检查管理员权限...');
+
+                // 检查管理员权限
+                const emailKey = currentUser.email.replace(/\./g, '_');
+                const adminSnapshot = await firebase.database().ref(`admins/${emailKey}`).once('value');
+                
+                if (!adminSnapshot.exists()) {
+                    showMessage('当前用户不是管理员，无法进行数据迁移', true);
+                    return;
+                }
+
+                showMessage('开始迁移数据...');
+
+                // 直接从用户的旧数据路径迁移到公司路径
+                const userPath = currentUser.uid;
+                let migrationCount = 0;
+
+                // 迁移员工数据
+                const employeesSnapshot = await firebase.database().ref(`users/${userPath}/employees`).once('value');
+                if (employeesSnapshot.exists()) {
+                    const employees = employeesSnapshot.val();
+                    await firebase.database().ref('company/employees').set(employees);
+                    migrationCount++;
+                    console.log('员工数据迁移完成');
+                }
+
+                // 迁移沙龙数据
+                const salonsSnapshot = await firebase.database().ref(`users/${userPath}/salons`).once('value');
+                if (salonsSnapshot.exists()) {
+                    const salons = salonsSnapshot.val();
+                    await firebase.database().ref('company/salons').set(salons);
+                    migrationCount++;
+                    console.log('沙龙数据迁移完成');
+                }
+
+                // 迁移产品数据
+                const productsSnapshot = await firebase.database().ref(`users/${userPath}/products`).once('value');
+                if (productsSnapshot.exists()) {
+                    const products = productsSnapshot.val();
+                    await firebase.database().ref('company/products').set(products);
+                    migrationCount++;
+                    console.log('产品数据迁移完成');
+                }
+
+                // 迁移产品分类数据
+                const categoriesSnapshot = await firebase.database().ref(`users/${userPath}/productCategories`).once('value');
+                if (categoriesSnapshot.exists()) {
+                    const categories = categoriesSnapshot.val();
+                    await firebase.database().ref('company/productCategories').set(categories);
+                    migrationCount++;
+                    console.log('产品分类数据迁移完成');
+                }
+
+                if (migrationCount > 0) {
+                    showMessage(`数据迁移完成！共迁移 ${migrationCount} 类数据`);
+                } else {
+                    showMessage('没有找到需要迁移的数据');
+                }
+
             } catch (error) {
                 console.error('数据迁移失败:', error);
                 showMessage('数据迁移失败: ' + error.message, true);
             }
         }
 
+        // 跳转到登录页面
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            firebase.auth().onAuthStateChanged(user => {
+                const loginStatus = document.getElementById('loginStatus');
+                const loginBtn = document.getElementById('loginBtn');
+                const migrateBtn = document.getElementById('migrateBtn');
+
+                if (user) {
+                    loginStatus.innerHTML = `
+                        <p style="color: green;">✅ 已登录: ${user.email}</p>
+                        <button onclick="logout()" style="background: #dc3545; margin-top: 10px;">退出登录</button>
+                    `;
+                    loginBtn.style.display = 'none';
+                    migrateBtn.disabled = false;
+                    
+                    // 检查是否为管理员
+                    const emailKey = user.email.replace(/\./g, '_');
+                    firebase.database().ref(`admins/${emailKey}`).once('value').then(snapshot => {
+                        if (snapshot.exists()) {
+                            loginStatus.innerHTML += '<p style="color: gold;">👑 管理员权限已确认</p>';
+                        } else {
+                            loginStatus.innerHTML += '<p style="color: orange;">⚠️ 当前用户不是管理员</p>';
+                        }
+                    });
+                } else {
+                    loginStatus.innerHTML = '<p style="color: red;">❌ 未登录</p>';
+                    loginBtn.style.display = 'block';
+                    migrateBtn.disabled = true;
+                }
+            });
+        }
+
+        // 退出登录
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                showMessage('已退出登录');
+            }).catch(error => {
+                showMessage('退出登录失败: ' + error.message, true);
+            });
+        }
+
         // 页面加载时执行
         window.onload = function() {
             loadAdmins();
+            checkLoginStatus();
         };
     </script>
 </body>
