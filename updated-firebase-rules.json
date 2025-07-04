@@ -1,0 +1,48 @@
+{
+  "rules": {
+    "company": {
+      "employees": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()"
+      },
+      "salons": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()"
+      },
+      "products": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()"
+      },
+      "productCategories": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()"
+      },
+      "customDistricts": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()"
+      }
+    },
+    "admins": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()"
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "employees": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "logs": {
+      ".read": "auth != null && root.child('admins').child(auth.token.email.replace('.', '_')).exists()",
+      ".write": "auth != null"
+    },
+    "test": {
+      ".read": true,
+      ".write": true
+    }
+  }
+} 

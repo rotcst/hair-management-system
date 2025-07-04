@@ -3584,101 +3584,172 @@
             }, 1000);
         }
         
-        // 安全的初始化测试数据 - 防止覆盖现有数据
+        // 安全的初始化测试数据 - 防止覆盖现有数据（公司数据架构）
         function initializeTestDataSafely() {
-            console.log('开始安全检查测试数据初始化...');
+            console.log('开始安全检查测试数据初始化（公司数据架构）...');
             
-            // 直接从Firebase检查数据，而不是从缓存
-            const userPath = firebase.auth().currentUser?.uid;
-            if (!userPath) {
+            const currentUser = firebase.auth().currentUser;
+            if (!currentUser) {
                 console.log('用户未登录，跳过测试数据初始化');
                 return;
             }
             
-            // 检查Firebase中是否真的有数据
-            firebase.database().ref(`users/${userPath}`).once('value')
+            // 检查公司级别的数据是否存在
+            firebase.database().ref('company').once('value')
                 .then((snapshot) => {
-                    const userData = snapshot.val();
-                    console.log('Firebase用户数据:', userData);
+                    const companyData = snapshot.val();
+                    console.log('Firebase公司数据:', companyData);
                     
-                    // 只有当Firebase中完全没有数据时才创建测试数据
-                    if (!userData || Object.keys(userData).length === 0) {
-                        console.log('Firebase中没有用户数据，创建测试数据');
-                        createInitialTestData();
+                    // 只有当公司数据完全为空时才创建测试数据
+                    if (!companyData || Object.keys(companyData).length === 0) {
+                        console.log('公司数据为空，检查管理员权限后创建测试数据');
+                        checkAdminAndCreateTestData();
                     } else {
-                        console.log('Firebase中已有用户数据，跳过测试数据创建');
-                        // 检查各个数据类型
-                        if (userData.employees) {
-                            console.log('已有员工数据:', Object.keys(userData.employees).length, '条');
+                        console.log('公司数据已存在，跳过测试数据创建');
+                        // 显示数据统计
+                        if (companyData.employees) {
+                            console.log('已有员工数据:', Object.keys(companyData.employees).length, '条');
                         }
-                        if (userData.salons) {
-                            console.log('已有沙龙数据:', Object.keys(userData.salons).length, '条');
+                        if (companyData.salons) {
+                            console.log('已有沙龙数据:', Object.keys(companyData.salons).length, '条');
                         }
-                        if (userData.products) {
-                            console.log('已有产品数据:', Object.keys(userData.products).length, '条');
+                        if (companyData.products) {
+                            console.log('已有产品数据:', Object.keys(companyData.products).length, '条');
                         }
                     }
                 })
                 .catch((error) => {
-                    console.error('检查Firebase数据时出错:', error);
+                    console.error('检查Firebase公司数据时出错:', error);
                 });
         }
+
+        // 检查管理员权限并创建测试数据
+        function checkAdminAndCreateTestData() {
+            if (!firebaseDataManager) {
+                console.log('数据管理器未初始化，稍后重试');
+                setTimeout(checkAdminAndCreateTestData, 2000);
+                return;
+            }
+
+            if (firebaseDataManager.hasAdminPermission()) {
+                console.log('当前用户是管理员，创建测试数据');
+                createInitialCompanyTestData();
+            } else {
+                console.log('当前用户不是管理员，跳过测试数据创建');
+            }
+        }
         
-        // 创建初始测试数据（只在完全没有数据时调用）
-        function createInitialTestData() {
-            console.log('正在创建初始测试数据...');
+        // 创建公司级别的初始测试数据（只在完全没有数据时调用）
+        function createInitialCompanyTestData() {
+            console.log('正在创建公司级别的初始测试数据...');
             
             const testEmployees = [
-                { id: 1, name: '张经理', position: 'manager', username: 'manager', password: '123456', mobile: '13800138001' },
-                { id: 2, name: '李业务', position: 'salesperson', username: 'sales1', password: '123456', mobile: '13800138002' },
-                { id: 3, name: '王业务', position: 'salesperson', username: 'sales2', password: '123456', mobile: '13800138003' },
-                { id: 4, name: '刘管理员', position: 'admin', username: 'admin', password: '123456', mobile: '13800138004' }
+                { 
+                    id: 'emp_' + Date.now() + '_1', 
+                    name: '张经理', 
+                    position: 'manager', 
+                    mobile: '13800138001',
+                    email: 'manager@company.com',
+                    joinDate: new Date().toISOString().split('T')[0],
+                    bio: '经验丰富的管理人员',
+                    addTime: new Date().toISOString(),
+                    addedBy: 'system',
+                    status: 'active'
+                },
+                { 
+                    id: 'emp_' + Date.now() + '_2', 
+                    name: '李业务', 
+                    position: 'salesperson', 
+                    mobile: '13800138002',
+                    email: 'sales1@company.com',
+                    joinDate: new Date().toISOString().split('T')[0],
+                    bio: '优秀的业务代表',
+                    addTime: new Date().toISOString(),
+                    addedBy: 'system',
+                    status: 'active'
+                },
+                { 
+                    id: 'emp_' + Date.now() + '_3', 
+                    name: '王业务', 
+                    position: 'salesperson', 
+                    mobile: '13800138003',
+                    email: 'sales2@company.com',
+                    joinDate: new Date().toISOString().split('T')[0],
+                    bio: '专业的客户服务专员',
+                    addTime: new Date().toISOString(),
+                    addedBy: 'system',
+                    status: 'active'
+                }
             ];
             
             const testSalons = [
                 { 
-                    id: 1, 
+                    id: 'salon_' + Date.now() + '_1', 
                     name: '华丽美容室', 
                     address: '서울특별시 구로구 구로중앙로 123', 
                     businessLicense: '123-45-67890',
-                    responsibleEmployeeId: 2,
+                    responsibleEmployeeId: testEmployees[1].id,
                     directorName: '김원장',
                     directorMobile: '010-1234-5678',
                     phone: '02-1234-5678',
                     email: 'salon1@example.com',
-                    addTime: new Date().toISOString()
+                    addTime: new Date().toISOString(),
+                    addedBy: 'system',
+                    status: 'active'
                 },
                 { 
-                    id: 2, 
+                    id: 'salon_' + Date.now() + '_2', 
                     name: '지오헤어', 
                     address: '서울특별시 영등포구 영등포로 456', 
                     businessLicense: '234-56-78901',
-                    responsibleEmployeeId: 3,
+                    responsibleEmployeeId: testEmployees[2].id,
                     directorName: '이사장',
                     directorMobile: '010-2345-6789',
                     phone: '02-2345-6789',
                     email: 'salon2@example.com',
-                    addTime: new Date().toISOString()
+                    addTime: new Date().toISOString(),
+                    addedBy: 'system',
+                    status: 'active'
                 },
                 { 
-                    id: 3, 
+                    id: 'salon_' + Date.now() + '_3', 
                     name: '드보라', 
                     address: '서울특별시 금천구 금천로 789', 
                     businessLicense: '345-67-89012',
-                    responsibleEmployeeId: 2,
+                    responsibleEmployeeId: testEmployees[1].id,
                     directorName: '박원장',
                     directorMobile: '010-3456-7890',
                     phone: '02-3456-7890',
                     email: 'salon3@example.com',
-                    addTime: new Date().toISOString()
+                    addTime: new Date().toISOString(),
+                    addedBy: 'system',
+                    status: 'active'
                 }
             ];
             
-            // 保存测试数据
-            saveEmployees(testEmployees);
-            saveSalons(testSalons);
-            
-            console.log('测试数据创建完成');
+            // 使用Firebase数据管理器保存测试数据
+            if (firebaseDataManager) {
+                firebaseDataManager.saveEmployees(testEmployees)
+                    .then(() => {
+                        console.log('员工测试数据保存成功');
+                        return firebaseDataManager.saveSalons(testSalons);
+                    })
+                    .then(() => {
+                        console.log('沙龙测试数据保存成功');
+                        console.log('公司级别测试数据创建完成');
+                    })
+                    .catch((error) => {
+                        console.error('保存测试数据失败:', error);
+                    });
+            } else {
+                console.error('Firebase数据管理器未初始化');
+            }
+        }
+
+        // 保留原始函数用于兼容性
+        function createInitialTestData() {
+            console.log('createInitialTestData被调用，转到公司级别测试数据创建');
+            createInitialCompanyTestData();
         }
         
         // 原始的初始化测试数据函数（保留用于兼容性，但不再使用）

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>设置管理员权限</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>设置管理员权限</h2>
+        <p>这个页面用于设置系统管理员权限。管理员可以管理所有公司数据。</p>
+        
+        <div>
+            <label>管理员邮箱：</label>
+            <input type="email" id="adminEmail" value="robot8866@gmail.com" placeholder="输入管理员邮箱">
+            <button onclick="setAdmin()">设置为管理员</button>
+        </div>
+
+        <div>
+            <h3>当前管理员列表：</h3>
+            <div id="adminList"></div>
+        </div>
+
+        <div>
+            <h3>数据迁移（仅管理员）：</h3>
+            <button onclick="migrateData()">迁移现有数据到公司级别</button>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // 显示消息
+        function showMessage(text, isError = false) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<p class="${isError ? 'error' : 'success'}">${text}</p>`;
+            setTimeout(() => messageDiv.innerHTML = '', 5000);
+        }
+
+        // 设置管理员
+        async function setAdmin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            if (!email) {
+                showMessage('请输入邮箱地址', true);
+                return;
+            }
+
+            try {
+                // 将邮箱中的点号替换为下划线（Firebase key不能包含点号）
+                const emailKey = email.replace(/\./g, '_');
+                await firebase.database().ref(`admins/${emailKey}`).set(true);
+                showMessage(`已设置 ${email} 为管理员`);
+                loadAdmins();
+            } catch (error) {
+                console.error('设置管理员失败:', error);
+                showMessage('设置管理员失败: ' + error.message, true);
+            }
+        }
+
+        // 加载管理员列表
+        async function loadAdmins() {
+            try {
+                const snapshot = await firebase.database().ref('admins').once('value');
+                const admins = snapshot.val() || {};
+                
+                let html = '<ul>';
+                Object.keys(admins).forEach(emailKey => {
+                    const email = emailKey.replace(/_/g, '.');
+                    html += `<li>${email} <button onclick="removeAdmin('${emailKey}')">删除</button></li>`;
+                });
+                html += '</ul>';
+                
+                document.getElementById('adminList').innerHTML = html;
+            } catch (error) {
+                console.error('加载管理员列表失败:', error);
+            }
+        }
+
+        // 删除管理员
+        async function removeAdmin(emailKey) {
+            try {
+                await firebase.database().ref(`admins/${emailKey}`).remove();
+                showMessage('管理员已删除');
+                loadAdmins();
+            } catch (error) {
+                console.error('删除管理员失败:', error);
+                showMessage('删除管理员失败: ' + error.message, true);
+            }
+        }
+
+        // 迁移数据
+        async function migrateData() {
+            if (!firebaseDataManager) {
+                showMessage('数据管理器未加载', true);
+                return;
+            }
+
+            try {
+                await firebaseDataManager.migrateUserDataToCompany();
+                showMessage('数据迁移完成！');
+            } catch (error) {
+                console.error('数据迁移失败:', error);
+                showMessage('数据迁移失败: ' + error.message, true);
+            }
+        }
+
+        // 页面加载时执行
+        window.onload = function() {
+            loadAdmins();
+        };
+    </script>
+</body>
+</html> 
