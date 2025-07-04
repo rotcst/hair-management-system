@@ -1136,12 +1136,13 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="employeeUsername" style="display: block; color: var(--gold); margin-bottom: 4px; font-size: 0.9em;" data-i18n="login-account">登录账号：</label>
-                                        <input type="text" id="employeeUsername" required style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.9em;">
+                                        <label for="employeeEmail" style="display: block; color: var(--gold); margin-bottom: 4px; font-size: 0.9em;" data-i18n="work-email">工作邮箱：</label>
+                                        <input type="email" id="employeeEmail" style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.9em;">
+                                        <div style="font-size: 0.8em; color: #999; margin-top: 2px;">员工可使用此邮箱在登录页面自主注册</div>
                                     </div>
                                     <div>
-                                        <label for="employeePassword" style="display: block; color: var(--gold); margin-bottom: 4px; font-size: 0.9em;" data-i18n="password">密码：</label>
-                                        <input type="password" id="employeePassword" required style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.9em;">
+                                        <label for="employeeJoinDate" style="display: block; color: var(--gold); margin-bottom: 4px; font-size: 0.9em;" data-i18n="join-date">入职日期：</label>
+                                        <input type="date" id="employeeJoinDate" style="width: 100%; padding: 8px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.9em;">
                                     </div>
                                 </div>
                             </div>
@@ -1152,7 +1153,7 @@
                                 
                                 <div>
                                     <label for="employeeMobile" style="display: block; color: #87CEEB; margin-bottom: 4px; font-size: 0.9em;" data-i18n="mobile-number">手机号：</label>
-                                    <input type="tel" id="employeeMobile" oninput="formatPhoneNumber(this)" placeholder="000-0000-0000" style="width: 100%; padding: 8px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.9em;">
+                                    <input type="tel" id="employeeMobile" oninput="formatPhoneNumber(this)" placeholder="13812345678 或 01029968866" style="width: 100%; padding: 8px; background: transparent; border: 1px solid #87CEEB; color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-size: 0.9em;">
                                 </div>
                             </div>
                         </div>
@@ -2852,6 +2853,8 @@
                     'basic-info': '基本信息',
                     'login-account': '登录账号',
                     'password': '密码',
+                    'work-email': '工作邮箱',
+                    'join-date': '入职日期',
                     'contact-info': '联系信息',
                     'mobile-number': '手机号',
                     'bank-account-info': '银行账户信息',
@@ -3571,6 +3574,14 @@
             
             // 显示默认内容 - 改为显示概况总览
             showContent('dashboard');
+            
+            // 初始化新增职员页面的默认值
+            setTimeout(() => {
+                const joinDateInput = document.getElementById('employeeJoinDate');
+                if (joinDateInput) {
+                    joinDateInput.valueAsDate = new Date();
+                }
+            }, 1000);
         }
         
         // 安全的初始化测试数据 - 防止覆盖现有数据
@@ -4246,14 +4257,15 @@
         function addEmployee(employee) {
             const employees = getEmployees();
             
-            // 检查是否已存在相同用户名的职员
-            if (employee.username && employees.some(e => e.username === employee.username)) {
+            // 检查是否已存在相同邮箱的职员（如果有邮箱）
+            if (employee.email && employees.some(e => e.email === employee.email)) {
                 return false;
             }
             
             // 添加职员ID和创建时间
             employee.id = Date.now();
             employee.createTime = new Date().toISOString();
+            employee.status = 'active'; // 默认状态为活跃
             
             employees.push(employee);
             saveEmployees(employees);
@@ -5524,8 +5536,8 @@
             
             const employeeName = document.getElementById('employeeName').value.trim();
             const employeePosition = document.getElementById('employeePosition').value;
-            const employeeUsername = document.getElementById('employeeUsername').value.trim();
-            const employeePassword = document.getElementById('employeePassword').value;
+            const employeeEmail = document.getElementById('employeeEmail').value.trim();
+            const employeeJoinDate = document.getElementById('employeeJoinDate').value;
             const employeeMobile = document.getElementById('employeeMobile').value.trim();
             const bankName = document.getElementById('bankName').value.trim();
             const bankAccount = document.getElementById('bankAccount').value.trim();
@@ -5537,22 +5549,19 @@
                 return;
             }
             
-            if (!employeeUsername) {
-                alert(getText('username-required'));
-                return;
-            }
-            
-            if (!employeePassword) {
-                alert(getText('password-required'));
+            // 验证邮箱格式（如果填写了邮箱）
+            if (employeeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(employeeEmail)) {
+                alert('请输入正确的邮箱格式');
                 return;
             }
             
             const employee = {
                 name: employeeName,
                 position: employeePosition || 'salesperson',
-                username: employeeUsername,
-                password: employeePassword,
+                email: employeeEmail || '',
+                joinDate: employeeJoinDate || new Date().toISOString().split('T')[0],
                 mobile: employeeMobile,
+                addedBy: 'manual-add', // 标记为手动添加
                 bankInfo: {
                     bankName: bankName,
                     bankAccount: bankAccount,
@@ -5564,9 +5573,11 @@
             if (addEmployee(employee)) {
                 alert(getText('employee-added-success'));
                 this.reset();
+                // 设置默认入职日期为今天
+                document.getElementById('employeeJoinDate').valueAsDate = new Date();
                 showContent('employee-list');
             } else {
-                alert(getText('username-already-exists'));
+                alert('添加员工失败，请重试');
             }
         });
         
@@ -5858,7 +5869,7 @@
                         
                         <div style="margin-bottom: 15px;">
                             <label for="editEmployeeMobile" style="display: block; color: var(--gold); margin-bottom: 5px;" data-i18n="mobile-number">手机号：</label>
-                            <input type="tel" id="editEmployeeMobile" value="${employee.mobile || ''}" oninput="formatPhoneNumber(this)" placeholder="000-0000-0000" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            <input type="tel" id="editEmployeeMobile" value="${employee.mobile || ''}" oninput="formatPhoneNumber(this)" placeholder="13812345678 或 01029968866" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
                         </div>
                     </div>
                     
@@ -5899,7 +5910,7 @@
             updateTexts();
         }
         
-        // 手机号码格式化函数
+        // 手机号码格式化函数（支持中国和韩国格式）
         function formatPhoneNumber(input) {
             // 只保留数字
             let value = input.value.replace(/\D/g, '');
@@ -5909,14 +5920,28 @@
                 value = value.slice(0, 11);
             }
             
-            // 格式化为 000-0000-0000
-            if (value.length >= 7) {
-                value = value.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
-            } else if (value.length >= 3) {
-                value = value.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+            // 智能格式化：根据号码开头判断格式
+            if (value.startsWith('1') && value.length >= 3) {
+                // 中国手机号：1xxxxxxxxxx -> 无分隔符
+                input.value = value;
+            } else if ((value.startsWith('010') || value.startsWith('011') || value.startsWith('016') || 
+                      value.startsWith('017') || value.startsWith('018') || value.startsWith('019')) && value.length >= 3) {
+                // 韩国手机号：010-xxxx-xxxx 格式
+                if (value.length >= 7) {
+                    value = value.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
+                } else if (value.length >= 3) {
+                    value = value.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+                }
+                input.value = value;
+            } else {
+                // 其他情况：保持原样或按默认格式
+                if (value.length >= 7) {
+                    value = value.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
+                } else if (value.length >= 3) {
+                    value = value.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+                }
+                input.value = value;
             }
-            
-            input.value = value;
         }
         
         // 营业执照号码格式化函数
