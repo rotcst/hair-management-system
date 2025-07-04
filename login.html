@@ -1,401 +1,67 @@
+
+<!-- login.html 登录界面接入 Firebase Authentication + 日志记录 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>MAKE IT HAIR Professional - 登录</title>
-    <!-- 字体/粒子/动效CDN -->
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400|Poppins:400,700|Source+Han+Sans+SC:400,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --gold-light: #FFD700;
-            --black: #000000;
-            --dark-gray: #1a1a1a;
-            --text-light: #fff;
-            --shadow: 0 10px 32px 0 rgba(212,175,55,0.13), 0 2px 4px rgba(0,0,0,0.23);
-            --glass: rgba(24,24,24,0.76);
-            --glass-blur: blur(20px) saturate(180%);
-        }
-        
-        #tsparticles {
-            position: fixed; left:0; top:0; width:100vw; height:100vh;
-            pointer-events: none; z-index: 0;
-        }
-        
-        body {
-            font-family: 'Montserrat', 'Poppins', 'Source Han Sans SC', 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #191919 0%, #232323 100%);
-            color: var(--text-light);
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .login-container {
-            background: var(--glass);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            box-shadow: var(--shadow);
-            border: 1.5px solid rgba(212,175,55,0.08);
-            border-radius: 10px;
-            width: 400px;
-            max-width: 90%;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .login-logo {
-            font-size: 3em;
-            color: var(--gold);
-            font-family: 'Montserrat', cursive;
-            font-weight: 900;
-            user-select: none;
-            letter-spacing: 1px;
-            text-shadow: 0 0 22px rgba(212,175,55,0.28);
-            margin-bottom: 10px;
-        }
-        
-        .login-subtitle {
-            color: var(--gold-light);
-            font-size: 1em;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-        
-        .login-title {
-            color: var(--gold);
-            font-size: 1.5em;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-        
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .form-group {
-            text-align: left;
-        }
-        
-        .form-group label {
-            display: block;
-            color: var(--gold);
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--text-light);
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--gold-light);
-            box-shadow: 0 0 5px rgba(212,175,55,0.5);
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        
-        .remember-me input {
-            margin-right: 8px;
-        }
-        
-        .login-button {
-            background: var(--gold);
-            color: var(--black);
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .login-button:hover {
-            background: var(--gold-light);
-        }
-        
-        .language-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 5px;
-        }
-        
-        .language-btn {
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid var(--gold);
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-        
-        .language-btn:hover {
-            background: var(--gold);
-            color: var(--black);
-        }
-        
-        .language-btn.active {
-            background: var(--gold);
-            color: var(--black);
-            font-weight: bold;
-        }
-        
-        .error-message {
-            color: #ff6666;
-            font-size: 0.9em;
-            margin-top: 20px;
-            display: none;
-        }
-    </style>
-  </head>
-  <body>
-    <div id="tsparticles"></div>
-      
-      <div class="login-container">
-        <div class="language-switcher">
-            <button class="language-btn active" onclick="switchLanguage('zh')" id="btn-zh">中文</button>
-            <button class="language-btn" onclick="switchLanguage('ko')" id="btn-ko">한국어</button>
-        </div>
-        
-        <div class="login-logo">M</div>
-        <div class="login-subtitle">MAKE IT HAIR Professional</div>
-        <div class="login-title" data-i18n="login-title">管理系统登录</div>
-        
-        <form class="login-form" id="loginForm">
-            <div class="form-group">
-                <label for="username" data-i18n="username">用户名：</label>
-                <input type="text" id="username" name="username" required>
-              </div>
-            
-            <div class="form-group">
-                <label for="password" data-i18n="password">密码：</label>
-                <input type="password" id="password" name="password" required>
-              </div>
-            
-              <div class="remember-me">
-                <input type="checkbox" id="rememberLogin" name="rememberLogin">
-                <label for="rememberLogin" data-i18n="remember-login">记住登录状态</label>
-              </div>
-            
-              <button type="submit" class="login-button" data-i18n="login-button">登录</button>
-          </form>
-        
-        <div class="error-message" id="errorMessage" data-i18n="login-error">用户名或密码错误，请重试。</div>
-    </div>
-    
-          <script>
-        // 初始化粒子效果
-        window.addEventListener('DOMContentLoaded', function() {
-            if (typeof tsParticles !== 'undefined') {
-                tsParticles.load("tsparticles", {
-                    particles: {
-                        number: {
-                            value: 30,
-                            density: {
-                                enable: true,
-                                value_area: 800
-                            }
-                        },
-                        color: {
-                            value: "#D4AF37"
-                        },
-                        shape: {
-                            type: "circle",
-                        },
-                        opacity: {
-                            value: 0.3,
-                            random: true,
-                            anim: {
-                                enable: true,
-                                speed: 1,
-                                opacity_min: 0.1,
-                                sync: false
-                            }
-                        },
-                        size: {
-                            value: 3,
-                            random: true,
-                            anim: {
-                                enable: true,
-                                speed: 2,
-                                size_min: 0.1,
-                                sync: false
-                            }
-                        },
-                        line_linked: {
-                            enable: true,
-                            distance: 150,
-                            color: "#D4AF37",
-                            opacity: 0.2,
-                            width: 1
-                        },
-                        move: {
-                            enable: true,
-                            speed: 1,
-                            direction: "none",
-                            random: true,
-                            straight: false,
-                            out_mode: "out",
-                            bounce: false,
-                        }
-                    },
-                    interactivity: {
-                        detect_on: "canvas",
-                        events: {
-                            onhover: {
-                                enable: true,
-                                mode: "grab"
-                            },
-                            onclick: {
-                                enable: true,
-                                mode: "push"
-                            },
-                            resize: true
-                        },
-                        modes: {
-                            grab: {
-                                distance: 140,
-                                line_linked: {
-                                    opacity: 0.5
-                                }
-                            },
-                            push: {
-                                particles_nb: 3
-                            }
-                        }
-                    },
-                    retina_detect: true
-                });
-            }
-            
-            // 初始化语言
-            const savedLanguage = localStorage.getItem('language') || 'zh';
-            switchLanguage(savedLanguage);
-            
-            // 检查是否已登录
-            checkLoginStatus();
-        });
-        
-        // 语言切换功能
-        function switchLanguage(lang) {
-            // 更新按钮状态
-            document.querySelectorAll('.language-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById('btn-' + lang).classList.add('active');
-            
-            // 保存语言设置
-            localStorage.setItem('language', lang);
-            
-            // 更新界面文本
-            updateTexts();
-        }
-        
-        // 获取翻译文本
-        function getText(key) {
-            const currentLanguage = localStorage.getItem('language') || 'zh';
-          const translations = {
-              zh: {
-                    'login-title': '管理系统登录',
-                    'username': '用户名：',
-                    'password': '密码：',
-                    'remember-login': '记住登录状态',
-                  'login-button': '登录',
-                    'login-error': '用户名或密码错误，请重试。'
-              },
-              ko: {
-                    'login-title': '관리 시스템 로그인',
-                    'username': '사용자 이름:',
-                    'password': '비밀번호:',
-                    'remember-login': '로그인 상태 기억',
-                  'login-button': '로그인',
-                    'login-error': '사용자 이름 또는 비밀번호가 잘못되었습니다. 다시 시도하세요.'
-              }
-          };
-          
-              return translations[currentLanguage] && translations[currentLanguage][key] 
-                  ? translations[currentLanguage][key] 
-                  : key;
-          }
-          
-        // 更新界面文本
-          function updateTexts() {
-              document.querySelectorAll('[data-i18n]').forEach(element => {
-                  const key = element.getAttribute('data-i18n');
-                element.textContent = getText(key);
-            });
-        }
-        
-        // 检查登录状态
-        function checkLoginStatus() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const rememberLogin = localStorage.getItem('rememberLogin');
-            
-            // 如果已登录且选择了记住登录状态，直接跳转到首页
-            if (isLoggedIn === 'true' && rememberLogin === 'true') {
-                window.location.href = 'index.html';
-            }
-        }
-        
-        // 处理登录表单提交
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const rememberLogin = document.getElementById('rememberLogin').checked;
-            
-            // 这里应该进行实际的登录验证，这里简化为固定的用户名和密码
-            if (username === 'admin' && password === 'admin') {
-                // 保存登录状态
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('rememberLogin', rememberLogin ? 'true' : 'false');
-                
-                // 添加会话标记，表示是从登录页面来的
-                sessionStorage.setItem('fromLogin', 'true');
-                
-                // 保存用户信息
-                const user = {
-                    name: '系统管理员',
-                    position: '管理员',
-                    id: 1
-                };
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                
-                // 跳转到首页
-                  window.location.href = 'index.html';
-              } else {
-                // 显示错误信息
-                document.getElementById('errorMessage').style.display = 'block';
-              }
-          });
-    </script>
+  <meta charset="UTF-8">
+  <title>MAKE IT HAIR Professional - 登录</title>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+  <style>
+    body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .login-container { background: rgba(30,30,30,0.9); padding: 30px; border-radius: 10px; width: 300px; }
+    input { width: 100%; padding: 8px; margin-top: 10px; }
+    button { width: 100%; padding: 10px; margin-top: 20px; background: gold; color: black; border: none; }
+    .error-message { color: red; display: none; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="login-container">
+  <h2>系统登录</h2>
+  <input type="email" id="username" placeholder="电子邮箱">
+  <input type="password" id="password" placeholder="密码">
+  <button onclick="login()">登录</button>
+  <div class="error-message" id="errorMessage">邮箱或密码错误</div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDAfHsHn6jyaCDURsi-R2a0vleka36ML6Q",
+    authDomain: "mesia-ems.firebaseapp.com",
+    projectId: "mesia-ems",
+    storageBucket: "mesia-ems.firebasestorage.app",
+    messagingSenderId: "718797479793",
+    appId: "1:718797479793:web:22a39e902f8ac4324e60d0",
+    measurementId: "G-3VHGK0DTQY"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  function login() {
+    const email = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorBox = document.getElementById('errorMessage');
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        const user = userCredential.user;
+        // 登录成功后记录日志
+        const log = {
+          user: user.email,
+          timestamp: new Date().toISOString(),
+          type: 'login'
+        };
+        firebase.database().ref('logs').push(log);
+
+        sessionStorage.setItem('user', JSON.stringify({ email: user.email, uid: user.uid }));
+        window.location.href = 'index.html';
+      })
+      .catch(error => {
+        console.error('Login failed:', error);
+        errorBox.style.display = 'block';
+      });
+  }
+</script>
 </body>
-</html> 
+</html>

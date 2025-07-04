@@ -1,27 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Firebase连接测试</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase连接测试 - Mesia EMS</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #1a1a1a;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
         }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(24,24,24,0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(212,175,55,0.2);
+        }
+        
+        h1 {
+            color: #D4AF37;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #D4AF37;
+            padding-bottom: 15px;
+        }
+        
+        .test-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(212,175,55,0.1);
+            border-radius: 10px;
+            border-left: 4px solid #D4AF37;
+        }
+        
+        .test-title {
+            color: #D4AF37;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
         .status {
-            padding: 15px;
-            margin: 10px 0;
+            padding: 5px 10px;
             border-radius: 5px;
-            border: 1px solid #ccc;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 10px;
         }
-        .success { background: #4CAF50; }
-        .error { background: #f44336; }
-        .warning { background: #ff9800; }
-        .info { background: #2196F3; }
+        
+        .status.success { background: #4CAF50; color: white; }
+        .status.error { background: #f44336; color: white; }
+        .status.loading { background: #FF9800; color: white; }
+        
         button {
             background: #D4AF37;
             color: #000;
@@ -29,173 +64,300 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
             margin: 5px;
         }
-        #log {
-            background: #333;
+        
+        button:hover {
+            background: #FFD700;
+        }
+        
+        .log {
+            background: #000;
+            color: #0f0;
             padding: 15px;
             border-radius: 5px;
-            max-height: 400px;
-            overflow-y: auto;
-            white-space: pre-wrap;
             font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .user-info {
+            background: rgba(76,175,80,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>🔥 Firebase连接测试</h1>
-    
-    <div id="status" class="status info">正在初始化Firebase...</div>
-    
-    <div>
-        <button onclick="testConnection()">测试连接</button>
-        <button onclick="testEmployeeAdd()">测试添加员工</button>
-        <button onclick="testEmployeeRead()">测试读取员工</button>
-        <button onclick="clearLog()">清空日志</button>
-    </div>
-    
-    <h3>操作日志：</h3>
-    <div id="log"></div>
-
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     
-    <script>
-        // Firebase配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyAcLyCy4FIL34AUd6vKrE_EqHV69qcFDYQ",
-            authDomain: "mesiahair.firebaseapp.com",
-            projectId: "mesiahair",
-            storageBucket: "mesiahair.firebasestorage.app",
-            messagingSenderId: "538029419112",
-            appId: "1:538029419112:web:e2bb82a5fe0356e8d769dd"
-        };
-
-        let db;
+    <div class="container">
+        <h1>🔥 Firebase连接测试</h1>
         
-        function log(message, type = 'info') {
+        <!-- Firebase配置测试 -->
+        <div class="test-section">
+            <div class="test-title">1. Firebase配置</div>
+            <div id="config-status">
+                <span class="status loading">检测中...</span>
+                <span id="config-msg">正在验证Firebase配置...</span>
+            </div>
+        </div>
+        
+        <!-- 认证测试 -->
+        <div class="test-section">
+            <div class="test-title">2. 用户认证</div>
+            <div id="auth-status">
+                <span class="status loading">检测中...</span>
+                <span id="auth-msg">检查认证状态...</span>
+            </div>
+            <div id="auth-controls" style="margin-top: 10px;">
+                <button onclick="testLogin()">测试登录</button>
+                <button onclick="testLogout()">退出登录</button>
+            </div>
+            <div id="user-info"></div>
+        </div>
+        
+        <!-- 数据库连接测试 -->
+        <div class="test-section">
+            <div class="test-title">3. 实时数据库</div>
+            <div id="db-status">
+                <span class="status loading">检测中...</span>
+                <span id="db-msg">连接数据库...</span>
+            </div>
+            <div style="margin-top: 10px;">
+                <button onclick="testWrite()">写入测试数据</button>
+                <button onclick="testRead()">读取测试数据</button>
+                <button onclick="clearTestData()">清除测试数据</button>
+            </div>
+        </div>
+        
+        <!-- 实时同步测试 -->
+        <div class="test-section">
+            <div class="test-title">4. 实时同步</div>
+            <div id="sync-status">
+                <span class="status loading">检测中...</span>
+                <span id="sync-msg">设置监听器...</span>
+            </div>
+            <div id="sync-data" style="margin-top: 10px;"></div>
+        </div>
+        
+        <!-- 日志输出 -->
+        <div class="test-section">
+            <div class="test-title">5. 系统日志</div>
+            <div id="log" class="log"></div>
+            <button onclick="clearLog()">清除日志</button>
+        </div>
+    </div>
+
+    <script>
+        let database, auth;
+        let testUser = null;
+        
+        // 日志函数
+        function log(message) {
+            const logElement = document.getElementById('log');
             const timestamp = new Date().toLocaleTimeString();
-            const logDiv = document.getElementById('log');
-            logDiv.textContent += `[${timestamp}] ${message}\n`;
-            logDiv.scrollTop = logDiv.scrollHeight;
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
             console.log(message);
         }
-
-        function updateStatus(message, type = 'info') {
-            const statusDiv = document.getElementById('status');
-            statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
-        }
-
+        
         function clearLog() {
-            document.getElementById('log').textContent = '';
+            document.getElementById('log').innerHTML = '';
         }
-
-        // 初始化Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            log('✅ Firebase应用初始化成功');
-            updateStatus('Firebase已初始化，准备测试连接...', 'success');
-        } catch (error) {
-            log(`❌ Firebase初始化失败: ${error.message}`, 'error');
-            updateStatus('Firebase初始化失败', 'error');
-        }
-
-        // 测试连接
-        async function testConnection() {
-            log('🔄 开始测试Firebase连接...');
-            updateStatus('正在测试连接...', 'warning');
-            
+        
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAfHsHn6jyaCDURsi-R2a0vleka36ML6Q",
+            authDomain: "mesia-ems.firebaseapp.com",
+            projectId: "mesia-ems",
+            storageBucket: "mesia-ems.firebasestorage.app",
+            messagingSenderId: "718797479793",
+            appId: "1:718797479793:web:22a39e902f8ac4324e60d0",
+            measurementId: "G-3VHGK0DTQY",
+            databaseURL: "https://mesia-ems-default-rtdb.firebaseio.com/"
+        };
+        
+        // 初始化测试
+        window.onload = function() {
+            log('开始Firebase连接测试...');
+            testFirebaseConfig();
+        };
+        
+        // 1. 测试Firebase配置
+        function testFirebaseConfig() {
             try {
-                // 尝试写入测试数据
-                const testDoc = await db.collection('test').add({
-                    message: 'Firebase连接测试',
-                    timestamp: new Date(),
-                    browser: navigator.userAgent
-                });
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                database = firebase.database();
                 
-                log(`✅ 连接成功！文档ID: ${testDoc.id}`);
-                updateStatus('Firebase连接正常！', 'success');
+                document.getElementById('config-status').innerHTML = 
+                    '<span class="status success">成功</span><span>Firebase已初始化</span>';
+                log('✅ Firebase配置成功');
                 
-                // 立即读取刚写入的数据
-                const doc = await db.collection('test').doc(testDoc.id).get();
-                if (doc.exists) {
-                    log(`✅ 数据读取成功: ${JSON.stringify(doc.data())}`);
-                } else {
-                    log('⚠️ 数据写入成功但读取失败');
-                }
-                
+                testAuthentication();
             } catch (error) {
-                log(`❌ 连接失败: ${error.code} - ${error.message}`);
-                updateStatus('Firebase连接失败！', 'error');
-                
-                if (error.code === 'permission-denied') {
-                    log('💡 提示：这可能是Firestore安全规则问题');
-                    log('请检查Firebase控制台的Firestore安全规则设置');
-                }
+                document.getElementById('config-status').innerHTML = 
+                    '<span class="status error">失败</span><span>配置错误: ' + error.message + '</span>';
+                log('❌ Firebase配置失败: ' + error.message);
             }
         }
-
-        // 测试添加员工
-        async function testEmployeeAdd() {
-            log('🔄 测试添加员工数据...');
+        
+        // 2. 测试认证
+        function testAuthentication() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    testUser = user;
+                    document.getElementById('auth-status').innerHTML = 
+                        '<span class="status success">已登录</span><span>用户已认证</span>';
+                    
+                    document.getElementById('user-info').innerHTML = `
+                        <div class="user-info">
+                            <strong>当前用户:</strong><br>
+                            Email: ${user.email}<br>
+                            UID: ${user.uid}<br>
+                            登录时间: ${new Date(user.metadata.lastSignInTime).toLocaleString()}
+                        </div>`;
+                    
+                    log('✅ 用户已登录: ' + user.email);
+                    testDatabase();
+                } else {
+                    testUser = null;
+                    document.getElementById('auth-status').innerHTML = 
+                        '<span class="status error">未登录</span><span>需要登录才能测试数据库</span>';
+                    log('⚠️ 用户未登录');
+                }
+            });
+        }
+        
+        // 测试登录
+        function testLogin() {
+            const email = prompt('请输入测试邮箱:');
+            const password = prompt('请输入密码:');
             
-            const testEmployee = {
-                name: '测试员工',
-                position: 'salesperson',
-                username: 'test_' + Date.now(),
-                password: 'test123',
-                mobile: '010-1234-5678',
-                createTime: new Date().toLocaleString('zh-CN'),
-                id: Date.now().toString()
+            if (email && password) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        log('✅ 登录成功');
+                    })
+                    .catch(error => {
+                        log('❌ 登录失败: ' + error.message);
+                        alert('登录失败: ' + error.message);
+                    });
+            }
+        }
+        
+        // 测试退出
+        function testLogout() {
+            auth.signOut().then(() => {
+                log('✅ 已退出登录');
+                document.getElementById('user-info').innerHTML = '';
+            });
+        }
+        
+        // 3. 测试数据库
+        function testDatabase() {
+            if (!testUser) {
+                document.getElementById('db-status').innerHTML = 
+                    '<span class="status error">失败</span><span>需要先登录</span>';
+                return;
+            }
+            
+            try {
+                // 测试连接
+                const testRef = database.ref('test-connection');
+                testRef.set('connected').then(() => {
+                    document.getElementById('db-status').innerHTML = 
+                        '<span class="status success">成功</span><span>数据库连接正常</span>';
+                    log('✅ 数据库连接成功');
+                    
+                    testRealTimeSync();
+                }).catch(error => {
+                    document.getElementById('db-status').innerHTML = 
+                        '<span class="status error">失败</span><span>写入失败: ' + error.message + '</span>';
+                    log('❌ 数据库写入失败: ' + error.message);
+                });
+            } catch (error) {
+                document.getElementById('db-status').innerHTML = 
+                    '<span class="status error">失败</span><span>连接错误: ' + error.message + '</span>';
+                log('❌ 数据库连接失败: ' + error.message);
+            }
+        }
+        
+        // 4. 测试实时同步
+        function testRealTimeSync() {
+            if (!testUser) return;
+            
+            const syncRef = database.ref(`users/${testUser.uid}/test-sync`);
+            
+            syncRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                document.getElementById('sync-status').innerHTML = 
+                    '<span class="status success">监听中</span><span>实时同步正常</span>';
+                
+                document.getElementById('sync-data').innerHTML = 
+                    `<strong>实时数据:</strong> ${JSON.stringify(data, null, 2)}`;
+                
+                log('🔄 收到实时数据更新: ' + JSON.stringify(data));
+            });
+        }
+        
+        // 写入测试数据
+        function testWrite() {
+            if (!testUser) {
+                alert('请先登录');
+                return;
+            }
+            
+            const testData = {
+                timestamp: Date.now(),
+                message: 'Hello Firebase!',
+                random: Math.random()
             };
             
-            try {
-                await db.collection('employees').doc(testEmployee.id).set(testEmployee);
-                log(`✅ 员工添加成功: ${testEmployee.name} (ID: ${testEmployee.id})`);
-            } catch (error) {
-                log(`❌ 员工添加失败: ${error.code} - ${error.message}`);
-            }
+            database.ref(`users/${testUser.uid}/test-sync`).set(testData).then(() => {
+                log('✅ 写入测试数据成功');
+            }).catch(error => {
+                log('❌ 写入失败: ' + error.message);
+            });
         }
-
-        // 测试读取员工
-        async function testEmployeeRead() {
-            log('🔄 测试读取员工数据...');
+        
+        // 读取测试数据
+        function testRead() {
+            if (!testUser) {
+                alert('请先登录');
+                return;
+            }
             
-            try {
-                const snapshot = await db.collection('employees').limit(5).get();
-                
-                if (snapshot.empty) {
-                    log('📝 员工集合为空');
-                } else {
-                    log(`📋 找到 ${snapshot.size} 个员工:`);
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        log(`  - ${data.name} (${data.position}) - ID: ${doc.id}`);
-                    });
-                }
-            } catch (error) {
-                log(`❌ 读取员工失败: ${error.code} - ${error.message}`);
-            }
+            database.ref(`users/${testUser.uid}/test-sync`).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                log('📖 读取数据: ' + JSON.stringify(data));
+                alert('数据读取成功!\n' + JSON.stringify(data, null, 2));
+            }).catch(error => {
+                log('❌ 读取失败: ' + error.message);
+            });
         }
-
-        // 页面加载完成后自动测试连接
-        window.addEventListener('load', () => {
-            setTimeout(testConnection, 1000);
-        });
         
-        // 监听网络状态
-        window.addEventListener('online', () => {
-            log('🌐 网络已连接');
-            updateStatus('网络已连接，可以测试Firebase', 'success');
-        });
-        
-        window.addEventListener('offline', () => {
-            log('🚫 网络已断开');
-            updateStatus('网络已断开', 'warning');
-        });
+        // 清除测试数据
+        function clearTestData() {
+            if (!testUser) {
+                alert('请先登录');
+                return;
+            }
+            
+            database.ref(`users/${testUser.uid}/test-sync`).remove().then(() => {
+                log('🗑️ 测试数据已清除');
+                document.getElementById('sync-data').innerHTML = '<em>无数据</em>';
+            }).catch(error => {
+                log('❌ 清除失败: ' + error.message);
+            });
+        }
     </script>
 </body>
 </html> 

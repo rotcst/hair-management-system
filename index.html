@@ -11,6 +11,329 @@
     <!-- SheetJS库用于处理Excel文件 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
+    
+    <!-- Firebase认证保护 -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+    
+    <!-- Firebase配置和数据管理器 -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-data-manager.js"></script>
+    
+    <script>
+
+        // 认证状态检查和数据初始化
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+                // 如果用户未登录，重定向到登录页面
+                window.location.href = 'login.html';
+            } else {
+                console.log("用户已登录：", user.email);
+                
+                try {
+                    // 初始化Firebase数据管理器
+                    await window.firebaseDataManager.initializeData();
+                    
+                    // 用户已登录，可以显示页面内容
+                    document.body.style.display = 'block';
+                    
+                    // 更新用户显示信息
+                    const userNameElement = document.getElementById('userName');
+                    if (userNameElement) {
+                        userNameElement.textContent = user.email;
+                        userNameElement.removeAttribute('data-i18n');
+                    }
+                    
+                    // 初始化系统
+                    initializeSystem();
+                    
+                } catch (error) {
+                    console.error('初始化数据失败:', error);
+                    alert('数据初始化失败，请刷新页面重试');
+                }
+            }
+        });
+
+        // ==================== Firebase数据库操作封装 ====================
+        
+        // 获取当前用户的数据路径前缀
+        function getUserDataPath() {
+            const user = firebase.auth().currentUser;
+            if (!user) return null;
+            // 将邮箱中的特殊字符替换为下划线，作为数据库路径
+            return user.uid || user.email.replace(/[.@]/g, '_');
+        }
+        
+        // 初始化Firebase数据连接
+        function initializeFirebaseData() {
+            const userPath = getUserDataPath();
+            if (!userPath) return;
+            
+            // 设置全局变量，用于存储实时数据
+            window.firebaseData = {
+                employees: [],
+                salons: [],
+                products: [],
+                productCategories: [],
+                customDistricts: [],
+                userSettings: {}
+            };
+            
+            // 监听各种数据的变化
+            setupFirebaseListeners(userPath);
+        }
+        
+        // 设置Firebase数据监听器
+        function setupFirebaseListeners(userPath) {
+            // 监听员工数据
+            database.ref(`users/${userPath}/employees`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.firebaseData.employees = data ? Object.values(data) : [];
+                // 如果当前页面显示员工列表，刷新显示
+                if (document.getElementById('employee-list').style.display !== 'none') {
+                    displayEmployeeList();
+                }
+            });
+            
+            // 监听沙龙数据
+            database.ref(`users/${userPath}/salons`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.firebaseData.salons = data ? Object.values(data) : [];
+                // 如果当前页面显示沙龙信息，刷新显示
+                if (document.getElementById('salon-info').style.display !== 'none') {
+                    displaySalonList();
+                }
+            });
+            
+            // 监听产品数据
+            database.ref(`users/${userPath}/products`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.firebaseData.products = data ? Object.values(data) : [];
+                // 如果当前页面显示产品列表，刷新显示
+                if (document.getElementById('product-list').style.display !== 'none') {
+                    displayProductList();
+                }
+            });
+            
+            // 监听产品分类数据
+            database.ref(`users/${userPath}/productCategories`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.firebaseData.productCategories = data ? Object.values(data) : [];
+                // 如果当前页面显示产品分类，刷新显示
+                if (document.getElementById('product-category').style.display !== 'none') {
+                    displayProductCategories();
+                }
+            });
+            
+            // 监听区域数据
+            database.ref(`users/${userPath}/customDistricts`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.firebaseData.customDistricts = data ? Object.values(data) : [];
+            });
+            
+            // 监听用户设置
+            database.ref(`users/${userPath}/settings`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.firebaseData.userSettings = data || {};
+                // 应用语言设置
+                if (data && data.language) {
+                    switchLanguage(data.language);
+                }
+            });
+        }
+        
+        // Firebase数据操作函数
+        
+        // 保存员工数据
+        async function saveEmployeesToFirebase(employees) {
+            const userPath = getUserDataPath();
+            if (!userPath) return false;
+            
+            try {
+                const employeesRef = database.ref(`users/${userPath}/employees`);
+                await employeesRef.set(employees.reduce((acc, emp) => {
+                    acc[emp.id] = emp;
+                    return acc;
+                }, {}));
+                return true;
+            } catch (error) {
+                console.error('保存员工数据失败:', error);
+                return false;
+            }
+        }
+        
+        // 保存沙龙数据
+        async function saveSalonsToFirebase(salons) {
+            const userPath = getUserDataPath();
+            if (!userPath) return false;
+            
+            try {
+                const salonsRef = database.ref(`users/${userPath}/salons`);
+                await salonsRef.set(salons.reduce((acc, salon) => {
+                    acc[salon.id] = salon;
+                    return acc;
+                }, {}));
+                return true;
+            } catch (error) {
+                console.error('保存沙龙数据失败:', error);
+                return false;
+            }
+        }
+        
+        // 保存产品数据
+        async function saveProductsToFirebase(products) {
+            const userPath = getUserDataPath();
+            if (!userPath) return false;
+            
+            try {
+                const productsRef = database.ref(`users/${userPath}/products`);
+                await productsRef.set(products.reduce((acc, product) => {
+                    acc[product.id] = product;
+                    return acc;
+                }, {}));
+                return true;
+            } catch (error) {
+                console.error('保存产品数据失败:', error);
+                return false;
+            }
+        }
+        
+        // 保存产品分类数据
+        async function saveProductCategoriesToFirebase(categories) {
+            const userPath = getUserDataPath();
+            if (!userPath) return false;
+            
+            try {
+                const categoriesRef = database.ref(`users/${userPath}/productCategories`);
+                await categoriesRef.set(categories.reduce((acc, category) => {
+                    acc[category.id] = category;
+                    return acc;
+                }, {}));
+                return true;
+            } catch (error) {
+                console.error('保存产品分类数据失败:', error);
+                return false;
+            }
+        }
+        
+        // 保存区域数据
+        async function saveDistrictsToFirebase(districts) {
+            const userPath = getUserDataPath();
+            if (!userPath) return false;
+            
+            try {
+                const districtsRef = database.ref(`users/${userPath}/customDistricts`);
+                await districtsRef.set(districts.reduce((acc, district, index) => {
+                    acc[index] = district;
+                    return acc;
+                }, {}));
+                return true;
+            } catch (error) {
+                console.error('保存区域数据失败:', error);
+                return false;
+            }
+        }
+        
+        // 保存用户设置
+        async function saveUserSettingsToFirebase(settings) {
+            const userPath = getUserDataPath();
+            if (!userPath) return false;
+            
+            try {
+                const settingsRef = database.ref(`users/${userPath}/settings`);
+                await settingsRef.update(settings);
+                return true;
+            } catch (error) {
+                console.error('保存用户设置失败:', error);
+                return false;
+            }
+        }
+        
+        // 数据操作函数 - 使用FirebaseDataManager
+        function getEmployees() {
+            return window.firebaseDataManager.getEmployees();
+        }
+        
+        function getSalons() {
+            return window.firebaseDataManager.getSalons();
+        }
+        
+        function getProducts() {
+            return window.firebaseDataManager.getProducts();
+        }
+        
+        function getProductCategories() {
+            return window.firebaseDataManager.getProductCategories();
+        }
+        
+        function getCustomDistricts() {
+            return window.firebaseDataManager.getCustomDistricts();
+        }
+        
+        // 保存数据的函数
+        async function saveEmployees(employees) {
+            try {
+                await window.firebaseDataManager.saveEmployees(employees);
+                return true;
+            } catch (error) {
+                console.error('保存员工数据失败:', error);
+                return false;
+            }
+        }
+        
+        async function saveSalons(salons) {
+            try {
+                await window.firebaseDataManager.saveSalons(salons);
+                return true;
+            } catch (error) {
+                console.error('保存沙龙数据失败:', error);
+                return false;
+            }
+        }
+        
+        async function saveProducts(products) {
+            try {
+                await window.firebaseDataManager.saveProducts(products);
+                return true;
+            } catch (error) {
+                console.error('保存产品数据失败:', error);
+                return false;
+            }
+        }
+        
+        async function saveProductCategories(categories) {
+            try {
+                await window.firebaseDataManager.saveProductCategories(categories);
+                return true;
+            } catch (error) {
+                console.error('保存产品分类失败:', error);
+                return false;
+            }
+        }
+        
+        // ==================== Firebase数据库操作封装结束 ====================
+        
+        // ==================== 语言设置Firebase化 ====================
+        
+        // 获取当前语言设置
+        function getCurrentLanguage() {
+            return window.firebaseDataManager.getCurrentLanguage();
+        }
+        
+        // 设置语言并保存到Firebase
+        async function setLanguageToFirebase(language) {
+            try {
+                await window.firebaseDataManager.setLanguage(language);
+                return true;
+            } catch (error) {
+                console.error('保存语言设置失败:', error);
+                return false;
+            }
+        }
+        
+        // ==================== 语言设置Firebase化结束 ====================
+    </script>
     <style>
         :root {
             --gold: #D4AF37;
@@ -37,6 +360,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             overflow: hidden; /* 防止整体页面滚动 */
+            display: none; /* 初始隐藏，等待认证完成后显示 */
         }
         
         /* 新增布局样式 */
@@ -75,11 +399,11 @@
             color: var(--gold);
             font-family: 'Montserrat', cursive;
             font-weight: 900;
-            -webkit-user-select: none;
             user-select: none;
             letter-spacing: 1px;
             text-shadow: 0 0 22px rgba(212,175,55,0.28);
         }
+        
         .sidebar-subtitle {
             color: var(--gold-light);
             font-size: 0.9em;
@@ -568,6 +892,9 @@
                         </div>
                         <div class="sidebar-submenu-item" onclick="showContent('delete-salon', event)" id="delete-salon-menu">
                             <span data-i18n="delete-salon">删除沙龙</span>
+                        </div>
+                        <div class="sidebar-submenu-item" onclick="showContent('district-management', event)" id="district-management-menu">
+                            <span data-i18n="district-management">区域管理</span>
                         </div>
                     </div>
                 </div>
@@ -1282,7 +1609,7 @@
                                     <button type="button" onclick="assignResponsible()" style="background: var(--gold); color: var(--black); border: none; padding: 4px 12px; border-radius: 3px; cursor: pointer; font-size: 0.8em;" data-i18n="assign-responsible-btn">分配负责人</button>
                                 </div>
                                 
-                                <div id="dataPreviewTable" style="flex: 1; overflow: hidden; border: 1px solid #87CEEB; border-radius: 5px; min-height: 0;">
+                                <div id="dataPreviewTable" style="flex: 1; overflow-y: auto; border: 1px solid #87CEEB; border-radius: 5px; min-height: 0;">
                                     <!-- 数据预览表格将在这里动态生成 -->
                                 </div>
                             </div>
@@ -1309,6 +1636,7 @@
                             <option value="guro" data-i18n="district-guro">九老区</option>
                             <option value="geumcheon" data-i18n="district-geumcheon">衿川区</option>
                             <option value="yangcheon" data-i18n="district-yangcheon">阳川区</option>
+                            <option value="gangso" data-i18n="district-gangso">江西区</option>
                             <option value="others" data-i18n="district-others">其他地区</option>
                             <option value="overseas" data-i18n="district-overseas">海外区域</option>
                         </select>
@@ -1414,12 +1742,13 @@
                                 </select>
                                 <select id="deleteDistrictFilter" onchange="filterSalonsForDelete()" style="padding: 8px 12px; background: rgba(24,24,24,0.8); border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; font-size: 0.9em;">
                                     <option value="" data-i18n="all-districts">全部区域</option>
-                                    <option value="yeongdeungpo" data-i18n="district-yeongdeungpo">永登浦区</option>
-                                    <option value="guro" data-i18n="district-guro">九老区</option>
-                                    <option value="geumcheon" data-i18n="district-geumcheon">衿川区</option>
-                                    <option value="yangcheon" data-i18n="district-yangcheon">阳川区</option>
-                                    <option value="others" data-i18n="district-others">其他地区</option>
-                                    <option value="overseas" data-i18n="district-overseas">海外区域</option>
+                                                                <option value="yeongdeungpo" data-i18n="district-yeongdeungpo">永登浦区</option>
+                            <option value="guro" data-i18n="district-guro">九老区</option>
+                            <option value="geumcheon" data-i18n="district-geumcheon">衿川区</option>
+                            <option value="yangcheon" data-i18n="district-yangcheon">阳川区</option>
+                            <option value="gangso" data-i18n="district-gangso">江西区</option>
+                            <option value="others" data-i18n="district-others">其他地区</option>
+                            <option value="overseas" data-i18n="district-overseas">海外区域</option>
                                 </select>
                                 <button onclick="clearDeleteFilters()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="clear-filters">清空筛选</button>
                             </div>
@@ -1485,6 +1814,75 @@
                         </div>
                     </div>
 
+                </div>
+                
+                <!-- 区域管理页面 -->
+                <div id="district-management" class="content-area">
+                    <h1 style="margin-bottom: 15px;" data-i18n="district-management">区域管理</h1>
+                    
+                    <!-- 区域管理功能区 -->
+                    <div style="margin: 10px 0; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <h3 style="color: var(--gold); margin: 0;" data-i18n="district-operations">区域操作</h3>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button onclick="showAddDistrictDialog()" style="background: var(--gold); color: var(--black); border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="add-district">添加区域</button>
+                                <button onclick="resetToDefaultDistricts()" style="background: #ff6b6b; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="reset-to-default">重置为默认</button>
+                                <button onclick="exportDistrictConfig()" style="background: #4dabf7; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="export-config">导出配置</button>
+                                <button onclick="importDistrictConfig()" style="background: #51cf66; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 0.9em;" data-i18n="import-config">导入配置</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 区域列表 -->
+                    <div style="background: rgba(24,24,24,0.5); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); height: calc(100vh - 320px); min-height: 400px; display: flex; flex-direction: column;">
+                        <div style="padding: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;">
+                            <h3 style="color: var(--gold); margin: 0;" data-i18n="district-list">区域列表</h3>
+                            <span id="district-count" style="color: var(--gold); font-size: 0.9em;" data-i18n="total-districts">共 0 个区域</span>
+                        </div>
+                        <div id="district-list-content" style="padding: 15px; flex: 1; overflow-y: auto; box-sizing: border-box;">
+                            <!-- 区域列表将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 添加/编辑区域对话框 -->
+                <div id="district-dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+                    <div style="background: var(--dark-gray); border: 2px solid var(--gold); border-radius: 10px; padding: 30px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+                        <h2 id="district-dialog-title" style="color: var(--gold); margin: 0 0 20px 0; text-align: center;" data-i18n="add-district">添加区域</h2>
+                        
+                        <form id="district-form" onsubmit="saveDistrict(event)">
+                            <!-- 区域代码 -->
+                            <div style="margin-bottom: 15px;">
+                                <label for="districtCode" style="display: block; color: var(--gold); margin-bottom: 5px; font-size: 0.9em;" data-i18n="district-code">区域代码：</label>
+                                <input type="text" id="districtCode" required maxlength="20" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                                <small style="color: #aaa; font-size: 0.8em;" data-i18n="district-code-hint">英文代码，如: gangnam, seoul-center</small>
+                            </div>
+                            
+                            <!-- 中文名称 -->
+                            <div style="margin-bottom: 15px;">
+                                <label for="districtNameCn" style="display: block; color: var(--gold); margin-bottom: 5px; font-size: 0.9em;" data-i18n="district-name-cn">中文名称：</label>
+                                <input type="text" id="districtNameCn" required maxlength="50" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            </div>
+                            
+                            <!-- 韩文名称 -->
+                            <div style="margin-bottom: 15px;">
+                                <label for="districtNameKr" style="display: block; color: var(--gold); margin-bottom: 5px; font-size: 0.9em;" data-i18n="district-name-kr">韩文名称：</label>
+                                <input type="text" id="districtNameKr" required maxlength="50" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box;">
+                            </div>
+                            
+                            <!-- 地址识别关键词 -->
+                            <div style="margin-bottom: 20px;">
+                                <label for="districtKeywords" style="display: block; color: var(--gold); margin-bottom: 5px; font-size: 0.9em;" data-i18n="district-keywords">地址识别关键词：</label>
+                                <textarea id="districtKeywords" rows="3" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: var(--text-light); border-radius: 5px; box-sizing: border-box; font-family: inherit; resize: vertical;"></textarea>
+                                <small style="color: #aaa; font-size: 0.8em;" data-i18n="district-keywords-hint">用逗号分隔，如: 강남구,江南区,gangnam</small>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <button type="button" onclick="closeDistrictDialog()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="cancel">取消</button>
+                                <button type="submit" style="background: var(--gold); color: var(--black); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" data-i18n="save">保存</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 
                 <!-- 业绩目标页面 -->
@@ -1996,6 +2394,11 @@
                     initDeleteSalonPage();
                 }
                 
+                // 如果是区域管理页面，初始化页面
+                if (contentId === 'district-management') {
+                    initDistrictManagementPage();
+                }
+                
                 // 如果是职员列表页面，刷新列表
                 if (contentId === 'employee-list') {
                     displayEmployeeList();
@@ -2352,8 +2755,8 @@
             });
             document.getElementById('btn-' + lang).classList.add('active');
             
-            // 保存语言设置
-            localStorage.setItem('language', lang);
+            // 保存语言设置到Firebase
+            setLanguageToFirebase(lang);
             
             // 更新界面文本
             updateTexts();
@@ -2370,11 +2773,11 @@
         }
         
         // 用户主动设置语言偏好（类似您提供的方案）
-        function setUserLanguage(lang) {
+        async function setUserLanguage(lang) {
             console.log('用户主动设置语言偏好:', lang);
             
-            // 保存用户偏好（这会覆盖系统自动检测）
-            localStorage.setItem('language', lang);
+            // 保存用户偏好到Firebase
+            const success = await setLanguageToFirebase(lang);
             
             // 立即切换语言
             switchLanguage(lang);
@@ -2385,7 +2788,7 @@
         
         // 获取翻译文本
         function getText(key) {
-            const currentLanguage = localStorage.getItem('language') || 'zh';
+            const currentLanguage = getCurrentLanguage();
             const translations = {
                 zh: {
                     'employee-management': '职员管理',
@@ -2397,8 +2800,9 @@
                     'single-add-salon': '单个新增沙龙',
                     'batch-add-salon': '批量新增沙龙',
                     'salon-info': '沙龙信息',
-                    'delete-salon': '删除沙龙',
-                    'product-management': '产品管理',
+                                    'delete-salon': '删除沙龙',
+                'district-management': '区域管理',
+                'product-management': '产品管理',
                     'add-product': '新增产品',
                     'product-list': '产品列表',
                     'product-category': '产品分类',
@@ -2469,9 +2873,10 @@
                     'create': '创建',
                     'confirm-delete': '确认删除',
                     'all-districts': '全部区域',
-                    'district-guro': '九老区',
-                    'district-yeongdeungpo': '永登浦区',
-                    'district-geumcheon': '衿川区',
+                                'district-guro': '九老区',
+            'district-yeongdeungpo': '永登浦区',
+            'district-geumcheon': '衿川区',
+            'district-gangso': '江西区',
                     'district-overseas': '海外区域',
                     'sort-by': '排序方式',
             'first-page': '首页',
@@ -2590,6 +2995,31 @@
         'delete-responsible-salons': '删除该负责人的所有沙龙',
         'district-yangcheon': '阳川区',
         'district-others': '其他地区',
+        'district-operations': '区域操作',
+        'add-district': '添加区域',
+        'edit-district': '编辑区域',
+        'delete-district': '删除区域',
+        'reset-to-default': '重置为默认',
+        'export-config': '导出配置',
+        'import-config': '导入配置',
+        'district-list': '区域列表',
+        'total-districts': '共 {count} 个区域',
+        'district-code': '区域代码',
+        'district-name-cn': '中文名称',
+        'district-name-kr': '韩文名称',
+        'district-keywords': '地址识别关键词',
+        'district-code-hint': '英文代码，如: gangnam, seoul-center',
+        'district-keywords-hint': '用逗号分隔，如: 강남구,江南区,gangnam',
+        'district-salon-count': '沙龙数量',
+        'confirm-delete-district': '确认删除区域',
+        'delete-district-warning': '删除区域后，该区域下的所有沙龙将被归类为"其他地区"。',
+        'district-added-success': '区域添加成功',
+        'district-updated-success': '区域更新成功',
+        'district-deleted-success': '区域删除成功',
+        'district-code-exists': '区域代码已存在',
+        'invalid-district-config': '无效的区域配置文件',
+        'config-imported-success': '配置导入成功',
+        'no-districts': '暂无区域数据',
                     'clear-filters': '清空筛选',
                     'select': '选择',
                     // 产品管理相关翻译
@@ -2699,6 +3129,7 @@
                     'batch-add-salon': '일괄 살롱 추가',
                     'salon-info': '살롱 정보',
                     'delete-salon': '살롱 삭제',
+                    'district-management': '지역 관리',
                     'product-management': '제품 관리',
                     'add-product': '제품 추가',
                     'product-list': '제품 목록',
@@ -2770,9 +3201,10 @@
                     'create': '생성',
                     'confirm-delete': '삭제 확인',
                     'all-districts': '전체 지역',
-                    'district-guro': '구로구',
-                    'district-yeongdeungpo': '영등포구',
-                    'district-geumcheon': '금천구',
+                                'district-guro': '구로구',
+            'district-yeongdeungpo': '영등포구',
+            'district-geumcheon': '금천구',
+            'district-gangso': '강서구',
                     'district-overseas': '해외 지역',
                     'sort-by': '정렬 방식',
             'first-page': '첫 페이지',
@@ -2874,15 +3306,36 @@
         'selected-count': '선택됨: 0개 살롱',
         'delete-selected': '선택 항목 삭제',
         'delete-all': '전체 삭제',
-        'please-select-district': '지역을 선택하세요...',
-        'district-salon-count-info': '해당 지역 살롱 수: 0',
-        'delete-district-salons': '해당 지역 모든 살롱 삭제',
-        'responsible-delete': '담당자별 삭제',
         'please-select-responsible': '담당자를 선택하세요...',
         'responsible-salon-count-info': '해당 담당자 관리 살롱 수: 0',
         'delete-responsible-salons': '해당 담당자의 모든 살롱 삭제',
         'district-yangcheon': '양천구',
         'district-others': '기타 지역',
+        'district-operations': '지역 작업',
+        'add-district': '지역 추가',
+        'edit-district': '지역 편집',
+        'delete-district': '지역 삭제',
+        'reset-to-default': '기본값으로 재설정',
+        'export-config': '설정 내보내기',
+        'import-config': '설정 가져오기',
+        'district-list': '지역 목록',
+        'total-districts': '총 {count}개 지역',
+        'district-code': '지역 코드',
+        'district-name-cn': '중국어 이름',
+        'district-name-kr': '한국어 이름',
+        'district-keywords': '주소 인식 키워드',
+        'district-code-hint': '영문 코드, 예: gangnam, seoul-center',
+        'district-keywords-hint': '쉼표로 구분, 예: 강남구,江南区,gangnam',
+        'district-salon-count': '살롱 수',
+        'confirm-delete-district': '지역 삭제 확인',
+        'delete-district-warning': '지역을 삭제하면 해당 지역의 모든 살롱이 "기타 지역"으로 분류됩니다.',
+        'district-added-success': '지역 추가 성공',
+        'district-updated-success': '지역 업데이트 성공',
+        'district-deleted-success': '지역 삭제 성공',
+        'district-code-exists': '지역 코드가 이미 존재합니다',
+        'invalid-district-config': '유효하지 않은 지역 설정 파일',
+        'config-imported-success': '설정 가져오기 성공',
+        'no-districts': '지역 데이터가 없습니다',
                     'clear-filters': '필터 지우기',
                     'select': '선택',
                     // 제품 관리 관련 번역
@@ -3050,10 +3503,18 @@
         
         // 退出登录功能
         function logout() {
-            // 清除登录状态
-            localStorage.removeItem('isLoggedIn');
-            // 跳转到登录页面
-            window.location.href = 'login.html';
+            // Firebase认证退出
+            firebase.auth().signOut().then(() => {
+                // 清除登录状态
+                sessionStorage.removeItem('user');
+                // 跳转到登录页面
+                window.location.href = 'login.html';
+            }).catch(error => {
+                console.error('退出登录失败:', error);
+                // 即使Firebase退出失败，也清除本地状态
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            });
         }
         
         // 检查权限
@@ -3074,8 +3535,7 @@
         
         // 初始化系统
         function initializeSystem() {
-            // 检查登录状态
-            checkLoginStatus();
+            // Firebase认证已经处理登录状态检查
             
             // 初始化测试数据
             initializeTestData();
@@ -3213,8 +3673,8 @@
                 updatedBy: currentUser?.name || '系统管理员'
             };
             
-            // 保存到本地存储
-            localStorage.setItem('productCategories', JSON.stringify(productCategories));
+            // 保存到Firebase数据库
+            saveProductCategories(productCategories);
             
             // 记录操作历史
             if (typeof recordOperation === 'function') {
@@ -3253,8 +3713,8 @@
             // 从数组中删除
             productCategories = productCategories.filter(category => category.id !== categoryId);
             
-            // 更新本地存储
-            localStorage.setItem('productCategories', JSON.stringify(productCategories));
+            // 更新Firebase数据库
+            saveProductCategories(productCategories);
             
             // 记录操作历史
             if (typeof recordOperation === 'function') {
@@ -3376,14 +3836,11 @@
         // ==================== 产品管理功能 ====================
         
         // 获取产品列表
-        function getProducts() {
-            return JSON.parse(localStorage.getItem('products') || '[]');
-        }
+        // 获取产品数据（已在Firebase封装中重新定义）
+        // function getProducts() 已在Firebase封装中实现
         
-        // 保存产品列表
-        function saveProducts(products) {
-            localStorage.setItem('products', JSON.stringify(products));
-        }
+        // 保存产品列表（已在Firebase封装中重新定义）
+        // function saveProducts(products) 已在Firebase封装中实现
         
         // 添加产品
         function addProduct(product) {
@@ -3522,7 +3979,7 @@
             
             container.innerHTML = html;
             
-            // 更新分类筛选选项
+            // 更新产品分类筛选选项
             updateProductCategoryFilterOptions();
             
             // 更新翻译
@@ -3734,14 +4191,11 @@
         // ==================== 职员管理功能 ====================
         
         // 获取职员列表
-        function getEmployees() {
-            return JSON.parse(localStorage.getItem('employees') || '[]');
-        }
+        // 获取职员数据（已在Firebase封装中重新定义）
+        // function getEmployees() 已在Firebase封装中实现
         
-        // 保存职员列表
-        function saveEmployees(employees) {
-            localStorage.setItem('employees', JSON.stringify(employees));
-        }
+        // 保存职员列表（已在Firebase封装中重新定义）
+        // function saveEmployees(employees) 已在Firebase封装中实现
         
         // 添加职员
         function addEmployee(employee) {
@@ -3973,14 +4427,6 @@
             }, 1);
         }
         
-        // 移除旧的删除选定沙龙函数，已被新的删除页面功能替代
-        
-        // 移除旧的批量删除沙龙列表函数，已被新的删除页面功能替代
-        
-        // 移除多个旧的删除相关函数，已被新的删除页面功能替代
-        
-        // 移除更多旧的删除相关函数，已被新的删除页面功能替代
-        
         // 更新负责职员选项
         function updateResponsibleEmployeeOptions() {
             const responsibleSelect = document.getElementById('responsibleEmployee');
@@ -4088,24 +4534,45 @@
             reader.readAsBinaryString(file);
         }
         
-        // 自动识别地址中的区域
+        // 自动识别地址中的区域（使用动态区域数据）
         function autoDetectDistrict(address) {
             if (!address) return 'others'; // 没有地址的默认为其他地区
             
             const addressStr = address.toString().toLowerCase();
             
-            // 匹配区域模式：韩文和中文都支持
-            if (addressStr.includes('영등포구') || addressStr.includes('永登浦区')) {
-                return 'yeongdeungpo';
-            } else if (addressStr.includes('구로구') || addressStr.includes('九老区')) {
-                return 'guro';
-            } else if (addressStr.includes('금천구') || addressStr.includes('衿川区')) {
-                return 'geumcheon';
-            } else if (addressStr.includes('양천구') || addressStr.includes('阳川区')) {
-                return 'yangcheon';
-            } else if (!addressStr.includes('서울') && !addressStr.includes('seoul') && !addressStr.includes('首尔') && 
-                      !addressStr.includes('대한민국') && !addressStr.includes('한국') && !addressStr.includes('中国') && 
-                      !addressStr.includes('부산') && !addressStr.includes('대구') && !addressStr.includes('인천')) {
+            // 获取动态区域数据
+            let districts = [];
+            try {
+                districts = getDistricts();
+            } catch (e) {
+                console.error('获取区域数据失败:', e);
+                // 如果获取失败，使用默认的硬编码匹配
+                if (addressStr.includes('영등포구') || addressStr.includes('永登浦区')) {
+                    return 'yeongdeungpo';
+                } else if (addressStr.includes('구로구') || addressStr.includes('九老区')) {
+                    return 'guro';
+                } else if (addressStr.includes('금천구') || addressStr.includes('衿川区')) {
+                    return 'geumcheon';
+                } else if (addressStr.includes('양천구') || addressStr.includes('阳川区')) {
+                    return 'yangcheon';
+                } else if (addressStr.includes('강서구') || addressStr.includes('江西区')) {
+                    return 'gangso';
+                }
+            }
+            
+            // 使用动态区域数据进行匹配
+            for (const district of districts) {
+                for (const keyword of district.keywords) {
+                    if (addressStr.includes(keyword.toLowerCase())) {
+                        return district.code;
+                    }
+                }
+            }
+            
+            // 海外区域判断
+            if (!addressStr.includes('서울') && !addressStr.includes('seoul') && !addressStr.includes('首尔') && 
+                !addressStr.includes('대한민국') && !addressStr.includes('한국') && !addressStr.includes('中国') && 
+                !addressStr.includes('부산') && !addressStr.includes('대구') && !addressStr.includes('인천')) {
                 // 如果地址中不包含韩国主要城市相关字样，可能是海外区域
                 return 'overseas';
             }
@@ -4113,26 +4580,60 @@
             return 'others'; // 无法识别的区域自动归类为其他地区
         }
         
-        // 获取区域显示文本
+        // 获取区域显示文本（使用动态区域数据）
         function getDistrictDisplayText(district) {
             if (!district) return getText('district-others');
             
-            switch (district) {
-                case 'yeongdeungpo':
-                    return getText('district-yeongdeungpo'); // '永登浦区'
-                case 'guro':
-                    return getText('district-guro'); // '九老区'
-                case 'geumcheon':
-                    return getText('district-geumcheon'); // '衿川区'
-                case 'yangcheon':
-                    return getText('district-yangcheon'); // '阳川区'
-                case 'others':
-                    return getText('district-others'); // '其他地区'
-                case 'overseas':
-                    return getText('district-overseas'); // '海外区域'
-                default:
-                    return getText('district-others');
+            // 特殊区域处理
+            if (district === 'others') return getText('district-others');
+            if (district === 'overseas') return getText('district-overseas');
+            
+            // 尝试从动态区域数据获取
+            try {
+                const districts = getDistricts();
+                const districtData = districts.find(d => d.code === district);
+                if (districtData) {
+                    const currentLanguage = localStorage.getItem('language') || 'zh';
+                    return currentLanguage === 'ko' ? districtData.nameKr : districtData.nameCn;
+                }
+            } catch (e) {
+                console.error('获取区域显示文本失败:', e);
             }
+            
+            // 回退到多语言文本系统
+            const textKey = `district-${district}`;
+            const displayText = getText(textKey);
+            
+            // 如果多语言系统中没有对应的文本，返回默认值
+            if (displayText === textKey) {
+                return getText('district-others');
+            }
+            
+            return displayText;
+        }
+        
+        // 检查是否为需要排除的业务类型（皮肤管理店、美甲店等）
+        function isExcludedBusinessType(name, address) {
+            const excludeKeywords = [
+                // 皮肤管理相关韩文关键词
+                '피부관리', '피부', '스킨케어', '에스테틱', '관리실',
+                // 美甲相关韩文关键词
+                '네일', '네일아트', '네일샵', '매니큐어', '페디큐어',
+                // 其他非美发业务韩文关键词
+                '마사지', '왁싱', '문신', '타투', '반영구', '아이라시',
+                '속눈썹', '눈썹', '메이크업', '화장', '뷰티샵', '성형',
+                // 中文关键词
+                '皮肤管理', '美甲', '纹身', '按摩', '美容院', '化妆',
+                '眉毛', '睫毛', '半永久', '美睫', '美甲店', '护肤',
+                // 英文关键词
+                'nail', 'skincare', 'massage', 'tattoo', 'makeup', 'beauty'
+            ];
+            
+            const combinedText = (name + ' ' + address).toLowerCase();
+            
+            return excludeKeywords.some(keyword => {
+                return combinedText.includes(keyword.toLowerCase());
+            });
         }
         
         // 解析Excel文件
@@ -4195,6 +4696,59 @@
                        headerStr.includes('location');
             });
             
+            // 查找店铺电话列
+            const phoneIndex = headers.findIndex(h => {
+                if (!h) return false;
+                const headerStr = h.toString().toLowerCase();
+                return headerStr.includes('전화번호') ||
+                       headerStr.includes('전화') ||
+                       headerStr.includes('매장전화') ||
+                       headerStr.includes('업소전화') ||
+                       headerStr.includes('연락처') ||
+                       (headerStr.includes('phone') && !headerStr.includes('mobile')) ||
+                       headerStr.includes('tel');
+            });
+            
+            // 查找院长姓名列
+            const directorNameIndex = headers.findIndex(h => {
+                if (!h) return false;
+                const headerStr = h.toString().toLowerCase();
+                return headerStr.includes('대표자명') ||
+                       headerStr.includes('대표자') ||
+                       headerStr.includes('원장명') ||
+                       headerStr.includes('원장') ||
+                       headerStr.includes('사장') ||
+                       headerStr.includes('사장님') ||
+                       headerStr.includes('대표') ||
+                       (headerStr.includes('이름') && (headerStr.includes('대표') || headerStr.includes('원장'))) ||
+                       headerStr.includes('director') ||
+                       headerStr.includes('owner');
+            });
+            
+            // 查找院长手机号列
+            const directorMobileIndex = headers.findIndex(h => {
+                if (!h) return false;
+                const headerStr = h.toString().toLowerCase();
+                return headerStr.includes('휴대폰') ||
+                       headerStr.includes('핸드폰') ||
+                       headerStr.includes('모바일') ||
+                       headerStr.includes('원장휴대폰') ||
+                       headerStr.includes('대표휴대폰') ||
+                       headerStr.includes('mobile') ||
+                       (headerStr.includes('phone') && headerStr.includes('mobile')) ||
+                       headerStr.includes('cell');
+            });
+            
+            // 查找邮箱列
+            const emailIndex = headers.findIndex(h => {
+                if (!h) return false;
+                const headerStr = h.toString().toLowerCase();
+                return headerStr.includes('이메일') ||
+                       headerStr.includes('메일') ||
+                       headerStr.includes('email') ||
+                       headerStr.includes('e-mail');
+            });
+            
             if (nameIndex === -1 || addressIndex === -1) {
                 const missingColumns = [];
                 const foundColumns = headers.filter(h => h).join('、');
@@ -4215,18 +4769,30 @@
                 const address = row[addressIndex] ? row[addressIndex].toString().trim() : '';
                 
                 if (name && address) {
+                    // 检查是否为需要排除的店铺类型（皮肤管理店、美甲店等）
+                    if (isExcludedBusinessType(name, address)) {
+                        console.log('排除非美发沙龙:', name);
+                        continue;
+                    }
+                    
                     // 自动识别区域
                     const detectedDistrict = autoDetectDistrict(address);
+                    
+                    // 解析其他字段
+                    const phone = phoneIndex !== -1 && row[phoneIndex] ? row[phoneIndex].toString().trim() : '';
+                    const directorName = directorNameIndex !== -1 && row[directorNameIndex] ? row[directorNameIndex].toString().trim() : '未指定';
+                    const directorMobile = directorMobileIndex !== -1 && row[directorMobileIndex] ? row[directorMobileIndex].toString().trim() : '';
+                    const email = emailIndex !== -1 && row[emailIndex] ? row[emailIndex].toString().trim() : '';
                     
                     salons.push({
                         name: name,
                         address: address,
                         district: detectedDistrict, // 添加自动识别的区域
                         businessLicense: '', // 可以后续添加列解析
-                        directorName: '未指定', // 默认值
-                        directorMobile: '', // 可以后续添加列解析
-                        phone: '', // 可以后续添加列解析
-                        email: '', // 可以后续添加列解析
+                        directorName: directorName, // 解析的院长姓名
+                        directorMobile: directorMobile, // 解析的院长手机号
+                        phone: phone, // 解析的店铺电话
+                        email: email, // 解析的邮箱
                         responsibleEmployeeId: null
                     });
                 }
@@ -4249,23 +4815,27 @@
             let tableHtml = `
                 <table style="width: 100%; border-collapse: collapse; background: var(--dark-gray); table-layout: fixed; font-size: 0.75em;">
                     <colgroup>
-                        <col style="width: 6%;">  <!-- 选择列 -->
-                        <col style="width: 16%;">  <!-- 沙龙名称 -->
-                        <col style="width: 38%;">  <!-- 地址 -->
-                        <col style="width: 12%;">  <!-- 营业执照 -->
-                        <col style="width: 8%;">  <!-- 区域 -->
-                        <col style="width: 12%;">  <!-- 院长姓名 -->
-                        <col style="width: 8%;">   <!-- 负责人 -->
+                        <col style="width: 5%;">  <!-- 选择列 -->
+                        <col style="width: 12%;">  <!-- 沙龙名称 -->
+                        <col style="width: 28%;">  <!-- 地址 -->
+                        <col style="width: 7%;">  <!-- 区域 -->
+                        <col style="width: 10%;">  <!-- 院长姓名 -->
+                        <col style="width: 12%;">  <!-- 院长手机 -->
+                        <col style="width: 12%;">  <!-- 店铺电话 -->
+                        <col style="width: 8%;">  <!-- 邮箱 -->
+                        <col style="width: 6%;">   <!-- 负责人 -->
                     </colgroup>
                     <thead>
                         <tr style="background: rgba(135, 206, 235, 0.2);">
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; text-align: center; font-size: 0.85em;" data-i18n="select">选择</th>
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="salon-name">沙龙名称</th>
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="salon-address">地址</th>
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="business-license">营业执照</th>
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="salon-region">区域</th>
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="director-name">院长姓名</th>
-                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.85em;" data-i18n="responsible-person">负责人</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; text-align: center; font-size: 0.8em;" data-i18n="select">选择</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="salon-name">沙龙名称</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="salon-address">地址</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="salon-region">区域</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="director-name">院长姓名</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="director-mobile">院长手机</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="salon-phone">店铺电话</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="salon-email">邮箱</th>
+                            <th style="padding: 4px; border: 1px solid #87CEEB; color: #87CEEB; font-size: 0.8em;" data-i18n="responsible-person">负责人</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -4282,12 +4852,14 @@
                         <td style="padding: 3px; border: 1px solid #444; text-align: center;">
                             <input type="checkbox" data-index="${index}" onchange="updateSelectedCount()" style="transform: scale(0.9);">
                         </td>
-                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.8em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.name}">${salon.name}</td>
-                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.75em; line-height: 1.2; word-wrap: break-word; max-height: 32px; overflow: hidden;" title="${salon.address}">${salon.address}</td>
-                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.businessLicense || '-'}">${salon.businessLicense || '-'}</td>
-                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${region}">${region}</td>
-                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.directorName}">${salon.directorName}</td>
-                        <td class="responsible-cell" style="padding: 3px 4px; border: 1px solid #444; color: #aaa; font-size: 0.7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${responsibleText}">${responsibleText}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.name}">${salon.name}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.7em; line-height: 1.2; word-wrap: break-word; max-height: 32px; overflow: hidden;" title="${salon.address}">${salon.address}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${region}">${region}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--gold); font-size: 0.7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.directorName}">${salon.directorName}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.directorMobile || '-'}">${salon.directorMobile || '-'}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.phone || '-'}">${salon.phone || '-'}</td>
+                        <td style="padding: 3px 4px; border: 1px solid #444; color: var(--text-light); font-size: 0.65em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${salon.email || '-'}">${salon.email || '-'}</td>
+                        <td class="responsible-cell" style="padding: 3px 4px; border: 1px solid #444; color: #aaa; font-size: 0.65em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${responsibleText}">${responsibleText}</td>
                     </tr>
                 `;
             });
@@ -4309,15 +4881,10 @@
         // 批量数据存储
         let batchSalonData = [];
         
-        // 沙龙数据管理函数
-        function getSalons() {
-            const salons = localStorage.getItem('salons');
-            return salons ? JSON.parse(salons) : [];
-        }
+        // 沙龙数据管理函数（已在Firebase封装中重新定义）
+        // function getSalons() 已在Firebase封装中实现
         
-        function saveSalons(salons) {
-            localStorage.setItem('salons', JSON.stringify(salons));
-        }
+        // function saveSalons(salons) 已在Firebase封装中实现
         
         function addSalon(salon) {
             const salons = getSalons();
@@ -5762,32 +6329,49 @@
                         // 如果没有district字段，回退到地址匹配
                         if (!salon.address) return districtFilter === 'others';
                         
-                        switch (districtFilter) {
-                            case 'yeongdeungpo':
-                                return salon.address.includes('영등포구') || salon.address.includes('永登浦区');
-                            case 'guro':
-                                return salon.address.includes('구로구') || salon.address.includes('九老区');
-                            case 'geumcheon':
-                                return salon.address.includes('금천구') || salon.address.includes('衿川구') || 
-                                       salon.address.includes('衿川区') || salon.address.includes('금천') || 
-                                       salon.address.includes('衿川') || salon.address.includes('Geumcheon') ||
-                                       salon.address.toLowerCase().includes('geumcheon');
-                            case 'yangcheon':
-                                return salon.address.includes('양천구') || salon.address.includes('阳川区');
-                            case 'others':
-                                return !salon.address.includes('구로구') && !salon.address.includes('영등포구') && 
-                                       !salon.address.includes('금천구') && !salon.address.includes('양천구') &&
-                                       !salon.address.includes('九老区') && !salon.address.includes('永登浦区') && 
-                                       !salon.address.includes('衿川区') && !salon.address.includes('阳川区') &&
-                                       (salon.address.includes('서울') || salon.address.includes('seoul') || salon.address.includes('首尔') ||
-                                        salon.address.includes('대한민국') || salon.address.includes('한국') || 
-                                        salon.address.includes('부산') || salon.address.includes('대구') || salon.address.includes('인천'));
-                            case 'overseas':
-                                return !salon.address.includes('서울') && !salon.address.includes('seoul') && !salon.address.includes('首尔') && 
-                                       !salon.address.includes('대한민국') && !salon.address.includes('한국') && 
-                                       !salon.address.includes('부산') && !salon.address.includes('대구') && !salon.address.includes('인천');
-                            default:
-                                return true;
+                        // 使用动态区域数据匹配
+                        try {
+                            const districts = getDistricts();
+                            const districtData = districts.find(d => d.code === districtFilter);
+                            if (districtData) {
+                                for (const keyword of districtData.keywords) {
+                                    if (salon.address.toLowerCase().includes(keyword.toLowerCase())) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.error('获取区域数据失败:', e);
+                            // 回退到硬编码匹配
+                            switch (districtFilter) {
+                                case 'yeongdeungpo':
+                                    return salon.address.includes('영등포구') || salon.address.includes('永登浦区');
+                                case 'guro':
+                                    return salon.address.includes('구로구') || salon.address.includes('九老区');
+                                case 'geumcheon':
+                                    return salon.address.includes('금천구') || salon.address.includes('衿川구') || 
+                                           salon.address.includes('衿川区') || salon.address.includes('금천') || 
+                                           salon.address.includes('衿川') || salon.address.includes('Geumcheon') ||
+                                           salon.address.toLowerCase().includes('geumcheon');
+                                case 'yangcheon':
+                                    return salon.address.includes('양천구') || salon.address.includes('阳川区');
+                                case 'gangso':
+                                    return salon.address.includes('강서구') || salon.address.includes('江西区');
+                                case 'others':
+                                    return !salon.address.includes('구로구') && !salon.address.includes('영등포구') && 
+                                           !salon.address.includes('금천구') && !salon.address.includes('양천구') && !salon.address.includes('강서구') &&
+                                           !salon.address.includes('九老区') && !salon.address.includes('永登浦区') && 
+                                           !salon.address.includes('衿川区') && !salon.address.includes('阳川区') && !salon.address.includes('江西区') &&
+                                           (salon.address.includes('서울') || salon.address.includes('seoul') || salon.address.includes('首尔') ||
+                                            salon.address.includes('대한민국') || salon.address.includes('한국') || 
+                                            salon.address.includes('부산') || salon.address.includes('대구') || salon.address.includes('인천'));
+                                case 'overseas':
+                                    return !salon.address.includes('서울') && !salon.address.includes('seoul') && !salon.address.includes('首尔') && 
+                                           !salon.address.includes('대한민국') && !salon.address.includes('한국') && 
+                                           !salon.address.includes('부산') && !salon.address.includes('대구') && !salon.address.includes('인천');
+                                default:
+                                    return true;
+                            }
                         }
                     }
                 });
@@ -5877,309 +6461,6 @@
             salonListContainer.innerHTML = html;
         }
         
-        // 应用沙龙排序
-        function applySalonSort(salons) {
-            if (currentSortField === 'default' || !currentSortField) {
-                return salons;
-            }
-            
-            return salons.sort((a, b) => {
-                let aValue, bValue;
-                
-                switch (currentSortField) {
-                    case 'name':
-                        aValue = a.name || '';
-                        bValue = b.name || '';
-                        break;
-                    case 'address':
-                        aValue = a.address || '';
-                        bValue = b.address || '';
-                        break;
-                    case 'addTime':
-                        aValue = new Date(a.addTime || 0);
-                        bValue = new Date(b.addTime || 0);
-                        break;
-                    case 'lastTransaction':
-                        aValue = new Date(a.lastTransactionDate || 0);
-                        bValue = new Date(b.lastTransactionDate || 0);
-                        break;
-                    case 'overdueDays':
-                        aValue = calculateOverdueDays(a);
-                        bValue = calculateOverdueDays(b);
-                        break;
-                    case 'overdueAmount':
-                        aValue = calculateOverdueAmount(a);
-                        bValue = calculateOverdueAmount(b);
-                        break;
-                    default:
-                        return 0;
-                }
-                
-                if (currentSortOrder === 'desc') {
-                    return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-                } else {
-                    return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-                }
-            });
-        }
-        
-        // 计算欠款天数
-        function calculateOverdueDays(salon) {
-            if (!salon.lastTransactionDate) return 0;
-            const lastDate = new Date(salon.lastTransactionDate);
-            const today = new Date();
-            const diffTime = today - lastDate;
-            return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        }
-        
-        // 计算欠款金额
-        function calculateOverdueAmount(salon) {
-            if (!salon.transactions) return 0;
-            return salon.transactions.reduce((total, transaction) => {
-                return total + (transaction.outstandingAmount || 0);
-            }, 0);
-        }
-        
-        // ===== 删除沙龙页面功能 =====
-        
-        // 删除页面的全局变量
-        let deleteFilteredSalons = []; // 当前筛选的沙龙列表
-        let deleteSelectedSalonIds = new Set(); // 当前选择的沙龙ID集合
-        let deleteCurrentPage = 1;
-        let deleteItemsPerPage = 20;
-        
-        // 初始化删除页面
-        function initDeleteSalonPage() {
-            console.log('=== 开始初始化删除沙龙页面 ===');
-            
-            // 重置所有状态
-            deleteSelectedSalonIds.clear();
-            deleteCurrentPage = 1;
-            
-            // 获取所有沙龙
-            const allSalons = getSalons();
-            deleteFilteredSalons = [...allSalons];
-            
-            console.log('获取到沙龙数量:', allSalons.length);
-            
-            // 先加载筛选选项
-            loadDeleteFilters();
-            
-            // 清空并重置所有输入框
-            resetDeleteFilters();
-            
-            // 显示列表
-            displayDeleteSalonList(1);
-            
-            console.log('=== 删除沙龙页面初始化完成，显示', deleteFilteredSalons.length, '个沙龙 ===');
-        }
-        
-        // 加载所有筛选选项
-        function loadDeleteFilters() {
-            loadDeleteResponsibleFilter();
-            loadDeleteDistrictFilter();
-        }
-        
-        // 重置所有筛选条件
-        function resetDeleteFilters() {
-            const searchInput = document.getElementById('deleteSalonSearchInput');
-            const responsibleFilter = document.getElementById('deleteResponsibleFilter');
-            const districtFilter = document.getElementById('deleteDistrictFilter');
-            
-            if (searchInput) {
-                searchInput.value = '';
-                console.log('重置搜索框');
-            }
-            if (responsibleFilter) {
-                responsibleFilter.selectedIndex = 0;
-                console.log('重置负责人筛选');
-            }
-            if (districtFilter) {
-                districtFilter.selectedIndex = 0;
-                console.log('重置区域筛选');
-            }
-        }
-        
-        // 加载负责人筛选选项
-        function loadDeleteResponsibleFilter() {
-            const employees = getEmployees();
-            const responsibleFilter = document.getElementById('deleteResponsibleFilter');
-            
-            if (!responsibleFilter) {
-                console.error('找不到负责人筛选下拉框 (deleteResponsibleFilter)');
-                return;
-            }
-            
-            console.log('开始加载负责人选项，职员数量:', employees.length);
-            
-            // 完全重建选项，确保第一个选项是默认选项
-            responsibleFilter.innerHTML = '';
-            
-            // 添加默认选项
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = getText('all-employees');
-            defaultOption.setAttribute('data-i18n', 'all-employees');
-            responsibleFilter.appendChild(defaultOption);
-            
-            // 添加职员选项
-            employees.forEach(employee => {
-                const option = document.createElement('option');
-                option.value = employee.id;
-                option.textContent = `${employee.name} - ${getPositionText(employee.position)}`;
-                responsibleFilter.appendChild(option);
-                console.log('添加职员选项:', employee.name, employee.position);
-            });
-            
-            // 确保选中第一个选项
-            responsibleFilter.selectedIndex = 0;
-            
-            console.log('负责人筛选选项加载完成，共', responsibleFilter.options.length, '个选项');
-        }
-        
-        // 加载区域筛选选项
-        function loadDeleteDistrictFilter() {
-            const districtFilter = document.getElementById('deleteDistrictFilter');
-            
-            if (!districtFilter) {
-                console.error('找不到区域筛选下拉框 (deleteDistrictFilter)');
-                return;
-            }
-            
-            // 确保区域选项完整
-            const expectedOptions = [
-                { value: '', textKey: 'all-districts' },
-                { value: 'yeongdeungpo', textKey: 'district-yeongdeungpo' },
-                { value: 'guro', textKey: 'district-guro' },
-                { value: 'geumcheon', textKey: 'district-geumcheon' },
-                { value: 'yangcheon', textKey: 'district-yangcheon' },
-                { value: 'others', textKey: 'district-others' },
-                { value: 'overseas', textKey: 'district-overseas' }
-            ];
-            
-            // 重建选项
-            districtFilter.innerHTML = '';
-            
-            expectedOptions.forEach(optionData => {
-                const option = document.createElement('option');
-                option.value = optionData.value;
-                option.textContent = getText(optionData.textKey);
-                option.setAttribute('data-i18n', optionData.textKey);
-                districtFilter.appendChild(option);
-            });
-            
-            // 确保选中第一个选项
-            districtFilter.selectedIndex = 0;
-            
-            console.log('区域筛选选项加载完成，共', districtFilter.options.length, '个选项');
-        }
-        
-        // 删除页面筛选函数 - 重新设计
-        function filterSalonsForDelete() {
-            console.log('=== 执行删除页面筛选 ===');
-            
-            // 安全获取筛选条件
-            const searchElement = document.getElementById('deleteSalonSearchInput');
-            const responsibleElement = document.getElementById('deleteResponsibleFilter');
-            const districtElement = document.getElementById('deleteDistrictFilter');
-            
-            if (!searchElement || !responsibleElement || !districtElement) {
-                console.error('筛选元素未找到');
-                return;
-            }
-            
-            const searchText = searchElement.value.trim().toLowerCase();
-            const responsibleId = responsibleElement.value.trim();
-            const district = districtElement.value.trim();
-            
-            console.log('筛选条件:', { searchText, responsibleId, district });
-            
-            const allSalons = getSalons();
-            let filteredSalons = [...allSalons];
-            let filterCount = 0;
-            
-            // 1. 文本搜索筛选
-            if (searchText.length > 0) {
-                console.log('应用文本搜索:', searchText);
-                filteredSalons = filteredSalons.filter(salon => {
-                    const matchName = salon.name && salon.name.toLowerCase().includes(searchText);
-                    const matchDirector = salon.directorName && salon.directorName.toLowerCase().includes(searchText);
-                    const matchMobile = salon.directorMobile && salon.directorMobile.replace(/\D/g, '').includes(searchText.replace(/\D/g, ''));
-                    const matchPhone = salon.phone && salon.phone.replace(/\D/g, '').includes(searchText.replace(/\D/g, ''));
-                    const matchAddress = salon.address && salon.address.toLowerCase().includes(searchText);
-                    
-                    return matchName || matchDirector || matchMobile || matchPhone || matchAddress;
-                });
-                filterCount++;
-                console.log('文本搜索后剩余:', filteredSalons.length, '个沙龙');
-            }
-            
-            // 2. 负责人筛选
-            if (responsibleId.length > 0) {
-                console.log('应用负责人筛选:', responsibleId);
-                filteredSalons = filteredSalons.filter(salon => {
-                    return salon.responsibleEmployeeId && salon.responsibleEmployeeId.toString() === responsibleId;
-                });
-                filterCount++;
-                console.log('负责人筛选后剩余:', filteredSalons.length, '个沙龙');
-            }
-            
-            // 3. 区域筛选
-            if (district.length > 0) {
-                console.log('应用区域筛选:', district);
-                filteredSalons = filteredSalons.filter(salon => {
-                    return matchSalonDistrict(salon, district);
-                });
-                filterCount++;
-                console.log('区域筛选后剩余:', filteredSalons.length, '个沙龙');
-            }
-            
-            console.log('筛选完成 - 应用了', filterCount, '个筛选条件，最终结果:', filteredSalons.length, '个沙龙');
-            
-            deleteFilteredSalons = filteredSalons;
-            deleteCurrentPage = 1;
-            displayDeleteSalonList(1);
-        }
-        
-        // 区域匹配辅助函数
-        function matchSalonDistrict(salon, district) {
-            if (salon.district) {
-                return salon.district === district;
-            }
-            
-            if (!salon.address) {
-                return district === 'others';
-            }
-            
-            const address = salon.address.toLowerCase();
-            
-            switch (district) {
-                case 'yeongdeungpo':
-                    return address.includes('영등포구') || address.includes('永登浦区');
-                case 'guro':
-                    return address.includes('구로구') || address.includes('九老区');
-                case 'geumcheon':
-                    return address.includes('금천구') || address.includes('衿川구') || 
-                           address.includes('衿川区') || address.includes('금천') || 
-                           address.includes('衿川') || address.includes('geumcheon');
-                case 'yangcheon':
-                    return address.includes('양천구') || address.includes('阳川区');
-                case 'others':
-                    const isSeoul = address.includes('서울') || address.includes('seoul') || address.includes('首尔');
-                    const isKorea = isSeoul || address.includes('대한민국') || address.includes('한국');
-                    const isSpecialDistrict = address.includes('구로구') || address.includes('영등포구') || 
-                                             address.includes('금천구') || address.includes('양천구') ||
-                                             address.includes('九老区') || address.includes('永登浦区') || 
-                                             address.includes('衿川区') || address.includes('阳川区');
-                    return isKorea && !isSpecialDistrict;
-                case 'overseas':
-                    return !address.includes('서울') && !address.includes('seoul') && !address.includes('首尔') && 
-                           !address.includes('대한민국') && !address.includes('한국');
-                default:
-                    return true;
-            }
-        }
-        
         // 显示删除页面的沙龙列表
         function displayDeleteSalonList(page = 1) {
             const listContainer = document.getElementById('delete-salon-list-content');
@@ -6258,13 +6539,13 @@
                         <div style="flex: 1; display: flex; align-items: center; gap: 15px; font-size: 0.85em;">
                             <div style="color: var(--gold); font-weight: bold; min-width: 120px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     ${salon.name}
-                                </div>
+                            </div>
                             <div style="color: #cccccc; min-width: 80px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 ${salon.directorName || '未设置'}
-                                </div>
+                            </div>
                             <div style="color: #cccccc; min-width: 100px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 ${salon.directorMobile || '无手机号'}
-                            </div>
+                        </div>
                             <div style="color: #aaa; flex: 1; min-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 ${salon.address || '无地址信息'}
                             </div>
@@ -6394,23 +6675,23 @@
             const statisticsElement = document.getElementById('delete-salon-statistics');
             
             if (totalElement) {
-                totalElement.textContent = `总沙龙数：${total}`;
+                totalElement.textContent = `총 살롱 수: ${total}`;
             }
             
             if (filteredElement) {
-                filteredElement.textContent = `筛选结果：${filtered}`;
+                filteredElement.textContent = `필터 결과: ${filtered}`;
             }
             
             if (selectedElement) {
-                selectedElement.textContent = `已选择：${selected}`;
+                selectedElement.textContent = `선택됨: ${selected}`;
             }
             
             if (selectedCountElement) {
-                selectedCountElement.textContent = `已选择：${selected} 个沙龙`;
+                selectedCountElement.textContent = `${selected} 개 살롱 선택됨`;
             }
             
             if (statisticsElement) {
-                statisticsElement.textContent = `筛选结果：显示 ${filtered} 个沙龙`;
+                statisticsElement.textContent = `필터 결과: ${filtered} 개 살롱 표시`;
             }
         }
         
@@ -6424,12 +6705,7 @@
             const jumpInput = document.getElementById('delete-page-jump-input');
             
             if (pageInfo) {
-                const currentLanguage = localStorage.getItem('language') || 'zh';
-                if (currentLanguage === 'ko') {
-                    pageInfo.textContent = `${currentPage} 페이지 / 총 ${totalPages} 페이지 (${totalItems} 개 항목)`;
-                } else {
-                    pageInfo.textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页 (${totalItems} 个项目)`;
-                }
+                pageInfo.textContent = `${currentPage} 페이지 / 총 ${totalPages} 페이지 (${totalItems} 개 항목)`;
             }
             
             if (jumpInput) {
@@ -6486,14 +6762,14 @@
             const pageNumber = parseInt(input.value);
             
             if (!pageNumber || pageNumber < 1) {
-                alert('请输入有效的页码');
+                alert('유효한 페이지 번호를 입력하세요');
                 return;
             }
             
             const totalPages = Math.ceil(deleteFilteredSalons.length / deleteItemsPerPage);
             
             if (pageNumber > totalPages) {
-                alert(`页码不能超过总页数 ${totalPages}`);
+                alert(`페이지 번호는 총 페이지 수 ${totalPages}를 초과할 수 없습니다`);
                 return;
             }
             
@@ -6510,12 +6786,12 @@
         // 删除选中的沙龙（高级版本）
         function deleteSelectedSalonsAdvanced() {
             if (deleteSelectedSalonIds.size === 0) {
-                alert('请先选择要删除的沙龙');
+                alert('삭제할 살롱을 선택하세요');
                 return;
             }
             
             const selectedCount = deleteSelectedSalonIds.size;
-            const confirmMessage = `确定要删除 ${selectedCount} 个选中的沙龙吗？此操作不可撤销！`;
+            const confirmMessage = `${selectedCount} 개의 선택된 살롱을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다!`;
             
             if (!confirm(confirmMessage)) {
                 return;
@@ -6532,18 +6808,18 @@
             // 刷新筛选和显示
             filterSalonsForDelete();
             
-            alert(`成功删除 ${selectedCount} 个沙龙`);
+            alert(`${selectedCount} 개의 살롱이 성공적으로 삭제되었습니다`);
         }
         
         // 删除所有筛选结果
         function deleteAllFilteredSalons() {
             if (deleteFilteredSalons.length === 0) {
-                alert('没有可删除的筛选结果');
+                alert('삭제할 필터 결과가 없습니다');
                 return;
             }
             
             const filteredCount = deleteFilteredSalons.length;
-            const confirmMessage = `确定要删除当前筛选出的所有 ${filteredCount} 个沙龙吗？此操作不可撤销！`;
+            const confirmMessage = `현재 필터링된 ${filteredCount} 개의 살롱을 모두 삭제하시겠습니까? 이 작업은 취소할 수 없습니다!`;
             
             if (!confirm(confirmMessage)) {
                 return;
@@ -6559,7 +6835,7 @@
             deleteSelectedSalonIds.clear();
             clearDeleteFilters();
             
-            alert(`成功删除 ${filteredCount} 个沙龙`);
+            alert(`${filteredCount} 개의 살롱이 성공적으로 삭제되었습니다`);
         }
         
         // 删除全部沙龙（危险操作）
@@ -6568,14 +6844,14 @@
             const totalCount = allSalons.length;
             
             if (totalCount === 0) {
-                alert('没有可删除的沙龙');
+                alert('삭제할 살롱이 없습니다');
                 return;
             }
             
-            const firstConfirm = confirm(`警告：此操作将删除系统中的全部 ${totalCount} 个沙龙！\n\n确定要继续吗？`);
+            const firstConfirm = confirm(`경고: 이 작업은 시스템에서 모든 ${totalCount} 개의 살롱을 삭제합니다!\n\n계속하시겠습니까?`);
             if (!firstConfirm) return;
             
-            const secondConfirm = confirm(`再次确认：真的要删除全部 ${totalCount} 个沙龙吗？\n\n此操作不可撤销！`);
+            const secondConfirm = confirm(`다시 확인: 정말로 모든 ${totalCount} 개의 살롱을 삭제하시겠습니까?\n\n이 작업은 취소할 수 없습니다!`);
             if (!secondConfirm) return;
             
             saveSalons([]);
@@ -6584,7 +6860,7 @@
             deleteSelectedSalonIds.clear();
             clearDeleteFilters();
             
-            alert(`已删除全部 ${totalCount} 个沙龙`);
+            alert(`모든 ${totalCount} 개의 살롱이 삭제되었습니다`);
         }
         
         // 添加调试日志以便排查问题
@@ -7219,6 +7495,187 @@
                 const successMessage = currentLanguage === 'ko' ? '분류가 성공적으로 삭제되었습니다.' : '分类删除成功！';
                 alert(successMessage);
             }
+        }
+        
+        // 删除区域
+        function deleteDistrict(districtCode, districtName, salonCount) {
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            
+            let confirmMessage = getText('confirm-delete-district') + '\n' + getText('delete-district-warning');
+            if (salonCount > 0) {
+                const salonWarning = currentLanguage === 'ko' ? 
+                    `\n\n경고: 이 지역에는 ${salonCount}개의 살롱이 있습니다.` :
+                    `\n\n警告：此区域下有 ${salonCount} 个沙龙。`;
+                confirmMessage += salonWarning;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            const districts = getDistricts();
+            const updatedDistricts = districts.filter(d => d.code !== districtCode);
+            
+            // 更新所有使用该区域的沙龙为"其他地区"
+            if (salonCount > 0) {
+                const salons = getSalons();
+                const updatedSalons = salons.map(salon => {
+                    if (salon.district === districtCode) {
+                        return { ...salon, district: 'others' };
+                    }
+                    return salon;
+                });
+                localStorage.setItem('salons', JSON.stringify(updatedSalons));
+            }
+            
+            saveDistricts(updatedDistricts);
+            loadDistrictList();
+            
+            alert(getText('district-deleted-success'));
+        }
+        
+        // 关闭区域对话框
+        function closeDistrictDialog() {
+            const dialog = document.getElementById('district-dialog');
+            if (dialog) {
+                dialog.style.display = 'none';
+            }
+        }
+        
+        // 保存区域
+        function saveDistrict(event) {
+            event.preventDefault();
+            
+            const code = document.getElementById('districtCode').value.trim();
+            const nameCn = document.getElementById('districtNameCn').value.trim();
+            const nameKr = document.getElementById('districtNameKr').value.trim();
+            const keywordsText = document.getElementById('districtKeywords').value.trim();
+            
+            if (!code || !nameCn || !nameKr) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            // 解析关键词
+            const keywords = keywordsText ? keywordsText.split(',').map(k => k.trim()).filter(k => k) : [];
+            
+            const districts = getDistricts();
+            const isEditing = document.getElementById('districtCode').hasAttribute('readonly');
+            
+            // 检查代码是否已存在（新增时）
+            if (!isEditing && districts.find(d => d.code === code)) {
+                alert(getText('district-code-exists'));
+                return;
+            }
+            
+            const newDistrict = {
+                code: code,
+                nameCn: nameCn,
+                nameKr: nameKr,
+                keywords: keywords
+            };
+            
+            let updatedDistricts;
+            if (isEditing) {
+                // 编辑模式
+                updatedDistricts = districts.map(d => d.code === code ? newDistrict : d);
+                alert(getText('district-updated-success'));
+            } else {
+                // 新增模式
+                updatedDistricts = [...districts, newDistrict];
+                alert(getText('district-added-success'));
+            }
+            
+            saveDistricts(updatedDistricts);
+            loadDistrictList();
+            closeDistrictDialog();
+        }
+        
+        // 重置为默认区域
+        function resetToDefaultDistricts() {
+            const currentLanguage = localStorage.getItem('language') || 'zh';
+            const confirmMessage = currentLanguage === 'ko' ? 
+                '모든 사용자 정의 지역을 삭제하고 기본 지역으로 재설정하시겠습니까?' :
+                '确定要删除所有自定义区域并重置为默认区域吗？';
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            localStorage.removeItem('customDistricts');
+            getDistricts(); // 这会重新保存默认区域
+            loadDistrictList();
+            
+            const successMessage = currentLanguage === 'ko' ? 
+                '기본 지역으로 성공적으로 재설정되었습니다.' :
+                '已成功重置为默认区域';
+            alert(successMessage);
+        }
+        
+        // 导出区域配置
+        function exportDistrictConfig() {
+            const districts = getDistricts();
+            const configData = {
+                version: '1.0',
+                exportTime: new Date().toISOString(),
+                districts: districts
+            };
+            
+            const dataStr = JSON.stringify(configData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `district-config-${new Date().toISOString().slice(0, 10)}.json`;
+            link.click();
+        }
+        
+        // 导入区域配置
+        function importDistrictConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const configData = JSON.parse(e.target.result);
+                        
+                        if (!configData.districts || !Array.isArray(configData.districts)) {
+                            throw new Error('Invalid configuration format');
+                        }
+                        
+                        // 验证每个区域的数据结构
+                        for (const district of configData.districts) {
+                            if (!district.code || !district.nameCn || !district.nameKr) {
+                                throw new Error('Missing required fields in district data');
+                            }
+                        }
+                        
+                        const currentLanguage = localStorage.getItem('language') || 'zh';
+                        const confirmMessage = currentLanguage === 'ko' ? 
+                            `${configData.districts.length}개의 지역을 가져오시겠습니까? 기존 지역이 대체됩니다.` :
+                            `确定要导入 ${configData.districts.length} 个区域吗？这将替换现有区域。`;
+                        
+                        if (confirm(confirmMessage)) {
+                            saveDistricts(configData.districts);
+                            loadDistrictList();
+                            alert(getText('config-imported-success'));
+                        }
+                        
+                    } catch (error) {
+                        console.error('导入配置失败:', error);
+                        alert(getText('invalid-district-config'));
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
         }
         
     </script>
