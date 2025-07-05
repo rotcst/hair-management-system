@@ -19,6 +19,16 @@
       align-items: center; 
       height: 100vh; 
       margin: 0; 
+      position: relative;
+    }
+    
+    #tsparticles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
     }
     .auth-container { 
       background: rgba(30,30,30,0.9); 
@@ -26,6 +36,8 @@
       border-radius: 10px; 
       width: 400px; 
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
     }
     .tab-container {
       display: flex;
@@ -43,8 +55,8 @@
       transition: all 0.3s ease;
     }
     .tab-button.active {
-      color: gold;
-      border-bottom: 2px solid gold;
+      color: var(--gold);
+      border-bottom: 2px solid var(--gold);
     }
     .tab-content {
       display: none;
@@ -86,8 +98,8 @@
       width: 100%; 
       padding: 12px; 
       margin-top: 20px; 
-      background: gold; 
-      color: black; 
+      background: var(--gold); 
+      color: var(--black); 
       border: none; 
       border-radius: 5px;
       font-size: 16px;
@@ -125,77 +137,164 @@
     .title {
       text-align: center;
       margin-bottom: 20px;
-      color: gold;
+      color: var(--gold);
+    }
+    
+    /* CSS变量定义 - 与首页保持一致 */
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #FFD700;
+      --black: #000000;
+      --text-light: #fff;
+    }
+    
+    /* 语言切换器样式 - 完全匹配首页样式 */
+    .language-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 5px;
+      padding: 8px 15px;
+      border-radius: 8px;
+      height: 40px;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(212,175,55,0.06);
+      border: 1px solid rgba(212,175,55,0.12);
+      background: rgba(25,25,25,0.70);
+    }
+    
+    .language-btn {
+      background: transparent;
+      color: var(--text-light);
+      border: 1px solid var(--gold);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      font-family: 'Montserrat', 'Source Han Sans SC', Arial, sans-serif;
+      min-width: 50px;
+      white-space: nowrap;
+    }
+    
+    .language-btn:hover {
+      background: var(--gold);
+      color: var(--black);
+    }
+    
+    .language-btn.active {
+      background: var(--gold);
+      color: var(--black);
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
+<!-- 粒子效果容器 -->
+<div id="tsparticles"></div>
+
+<!-- 语言切换器 -->
+<div class="language-switcher">
+  <button class="language-btn active" onclick="setLanguage('zh')" id="btn-zh" data-i18n="zh">中文</button>
+  <button class="language-btn" onclick="setLanguage('ko')" id="btn-ko" data-i18n="ko">한국어</button>
+</div>
+
 <div class="auth-container">
-  <h2 class="title">MAKE IT HAIR Professional</h2>
+  <h2 class="title" data-i18n="main-title">Mesia Professional</h2>
   
   <div class="tab-container">
-    <button class="tab-button active" onclick="switchTab('login')">登录</button>
-    <button class="tab-button" onclick="switchTab('register')">员工注册</button>
+    <button class="tab-button active" onclick="switchTab('login')" data-i18n="login-tab">登录</button>
+    <button class="tab-button" onclick="switchTab('register')" data-i18n="register-tab">员工注册</button>
   </div>
 
   <!-- 登录表单 -->
   <div id="loginTab" class="tab-content active">
     <div class="form-group">
-      <label>电子邮箱</label>
+      <label data-i18n="email-label">电子邮箱</label>
       <input type="email" id="loginEmail" placeholder="请输入您的工作邮箱">
     </div>
     <div class="form-group">
-      <label>密码</label>
+      <label data-i18n="password-label">密码</label>
       <input type="password" id="loginPassword" placeholder="请输入密码">
     </div>
-    <button onclick="login()">登录</button>
+    <button onclick="login()" data-i18n="login-btn">登录</button>
     <div class="message error-message" id="loginError"></div>
   </div>
 
   <!-- 注册表单 -->
   <div id="registerTab" class="tab-content">
     <div class="form-group">
-      <label>员工姓名 *</label>
+      <label data-i18n="employee-name">员工姓名 *</label>
       <input type="text" id="registerName" placeholder="请输入您的真实姓名">
     </div>
     
     <div class="form-group">
-      <label>工作邮箱 *</label>
+      <label data-i18n="work-email">工作邮箱 *</label>
       <input type="email" id="registerEmail" placeholder="这将作为您的登录账号">
-      <div class="info-text">此邮箱将用于登录系统</div>
+      <div class="info-text" data-i18n="email-info">此邮箱将用于登录系统</div>
     </div>
     
     <div class="form-group">
-      <label>登录密码 *</label>
+      <label data-i18n="login-password">登录密码 *</label>
       <input type="password" id="registerPassword" placeholder="请设置登录密码（至少6位）">
     </div>
     
     <div class="form-group">
-      <label>确认密码 *</label>
+      <label data-i18n="confirm-password">确认密码 *</label>
       <input type="password" id="registerConfirmPassword" placeholder="请再次输入密码">
     </div>
     
     <div class="form-row">
       <div class="form-group">
-        <label>手机号码 *</label>
+        <label data-i18n="mobile-number">手机号码 *</label>
         <input type="tel" id="registerMobile" placeholder="请输入手机号">
       </div>
       <div class="form-group">
-        <label>入职日期</label>
+        <label data-i18n="join-date">入职日期</label>
         <input type="date" id="registerJoinDate">
       </div>
     </div>
     
     <div class="form-group">
-      <label>个人简介</label>
+      <label data-i18n="personal-bio">个人简介</label>
       <input type="text" id="registerBio" placeholder="简单介绍一下自己（可选）">
     </div>
     
-    <div class="info-text">
+    <!-- 银行账户信息 -->
+    <div class="form-group">
+      <label style="color: #90EE90; font-weight: bold;" data-i18n="bank-info">银行账户信息</label>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="bank-name">银行名称</label>
+        <input type="text" id="registerBankName" placeholder="例：中国银行">
+      </div>
+      <div class="form-group">
+        <label data-i18n="bank-account">银行账号</label>
+        <input type="text" id="registerBankAccount" placeholder="请输入银行账号">
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="account-holder">账户持有人</label>
+        <input type="text" id="registerAccountHolder" placeholder="默认使用员工姓名">
+      </div>
+      <div class="form-group">
+        <label data-i18n="bank-branch">备注</label>
+        <input type="text" id="registerBankBranch" placeholder="支行或其他信息">
+      </div>
+    </div>
+    
+    <div class="info-text" data-i18n="required-fields">
       * 必填项目 | 默认职位：业务员 | 管理员可后续调整权限
     </div>
     
-    <button onclick="register()">注册为员工</button>
+    <button onclick="register()" data-i18n="register-btn">注册为员工</button>
     <div class="message error-message" id="registerError"></div>
     <div class="message success-message" id="registerSuccess"></div>
   </div>
@@ -225,6 +324,136 @@
     }
   }
 
+  // 语言切换功能
+  let currentLanguage = 'zh';
+  
+  // 翻译文本
+  const translations = {
+    zh: {
+      'page-title': 'Mesia Professional - 登录/注册',
+      'main-title': 'Mesia Professional',
+      'login-tab': '登录',
+      'register-tab': '员工注册',
+      'email-label': '电子邮箱',
+      'password-label': '密码',
+      'login-btn': '登录',
+      'employee-name': '员工姓名',
+      'work-email': '工作邮箱',
+      'login-password': '登录密码',
+      'confirm-password': '确认密码',
+      'mobile-number': '手机号码',
+      'join-date': '入职日期',
+      'personal-bio': '个人简介',
+      'bank-info': '银行账户信息',
+      'bank-name': '银行名称',
+      'bank-account': '银行账号',
+      'account-holder': '账户持有人',
+      'bank-branch': '备注',
+      'register-btn': '注册为员工',
+      'required-fields': '* 必填项目 | 默认职位：业务员 | 管理员可后续调整权限',
+      'email-info': '此邮箱将用于登录系统',
+      'placeholder-email': '请输入您的工作邮箱',
+      'placeholder-password': '请输入密码',
+      'placeholder-name': '请输入您的真实姓名',
+      'placeholder-reg-email': '这将作为您的登录账号',
+      'placeholder-reg-password': '请设置登录密码（至少6位）',
+      'placeholder-confirm-password': '请再次输入密码',
+      'placeholder-mobile': '13812345678 或 01029968866',
+      'placeholder-bio': '简单介绍一下自己（可选）',
+      'placeholder-bank-name': '例：中国银行',
+      'placeholder-bank-account': '请输入银行账号',
+      'placeholder-account-holder': '默认使用员工姓名',
+      'placeholder-bank-branch': '支行或其他信息'
+    },
+    ko: {
+      'page-title': 'Mesia Professional - 로그인/가입',
+      'main-title': 'Mesia Professional',
+      'login-tab': '로그인',
+      'register-tab': '직원 가입',
+      'email-label': '이메일',
+      'password-label': '비밀번호',
+      'login-btn': '로그인',
+      'employee-name': '직원명',
+      'work-email': '업무 이메일',
+      'login-password': '로그인 비밀번호',
+      'confirm-password': '비밀번호 확인',
+      'mobile-number': '휴대폰 번호',
+      'join-date': '입사일',
+      'personal-bio': '개인 소개',
+      'bank-info': '은행 계좌 정보',
+      'bank-name': '은행명',
+      'bank-account': '계좌번호',
+      'account-holder': '계좌 소유자',
+      'bank-branch': '비고',
+      'register-btn': '직원으로 가입',
+      'required-fields': '* 필수 항목 | 기본 직위: 영업사원 | 관리자가 나중에 권한 조정',
+      'email-info': '이 이메일은 시스템 로그인에 사용됩니다',
+      'placeholder-email': '업무 이메일을 입력하세요',
+      'placeholder-password': '비밀번호를 입력하세요',
+      'placeholder-name': '실명을 입력하세요',
+      'placeholder-reg-email': '로그인 계정으로 사용됩니다',
+      'placeholder-reg-password': '로그인 비밀번호 설정(최소 6자)',
+      'placeholder-confirm-password': '비밀번호를 다시 입력하세요',
+      'placeholder-mobile': '13812345678 또는 01029968866',
+      'placeholder-bio': '간단한 자기소개(선택사항)',
+      'placeholder-bank-name': '예: 중국은행',
+      'placeholder-bank-account': '계좌번호를 입력하세요',
+      'placeholder-account-holder': '기본값: 직원명',
+      'placeholder-bank-branch': '지점 또는 기타 정보'
+    }
+  };
+
+  // 设置语言
+  function setLanguage(lang) {
+    currentLanguage = lang;
+    
+    // 更新按钮状态
+    document.querySelectorAll('.language-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.getElementById('btn-' + lang).classList.add('active');
+    
+    // 更新页面标题
+    document.title = translations[lang]['page-title'];
+    
+    // 更新界面文本
+    updateTexts();
+  }
+
+  // 更新界面文本
+  function updateTexts() {
+    // 更新所有带有data-i18n属性的元素
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+      const key = element.getAttribute('data-i18n');
+      if (translations[currentLanguage][key]) {
+        element.textContent = translations[currentLanguage][key];
+      }
+    });
+    
+    // 更新输入框placeholder
+    document.getElementById('loginEmail').placeholder = translations[currentLanguage]['placeholder-email'];
+    document.getElementById('loginPassword').placeholder = translations[currentLanguage]['placeholder-password'];
+    
+    // 更新注册表单placeholder
+    document.getElementById('registerName').placeholder = translations[currentLanguage]['placeholder-name'];
+    document.getElementById('registerEmail').placeholder = translations[currentLanguage]['placeholder-reg-email'];
+    document.getElementById('registerPassword').placeholder = translations[currentLanguage]['placeholder-reg-password'];
+    document.getElementById('registerConfirmPassword').placeholder = translations[currentLanguage]['placeholder-confirm-password'];
+    document.getElementById('registerMobile').placeholder = translations[currentLanguage]['placeholder-mobile'];
+    document.getElementById('registerBio').placeholder = translations[currentLanguage]['placeholder-bio'];
+    document.getElementById('registerBankName').placeholder = translations[currentLanguage]['placeholder-bank-name'];
+    document.getElementById('registerBankAccount').placeholder = translations[currentLanguage]['placeholder-bank-account'];
+    document.getElementById('registerAccountHolder').placeholder = translations[currentLanguage]['placeholder-account-holder'];
+    document.getElementById('registerBankBranch').placeholder = translations[currentLanguage]['placeholder-bank-branch'];
+    
+    // 特殊处理带*号的必填字段
+    document.querySelector('[data-i18n="employee-name"]').textContent = translations[currentLanguage]['employee-name'] + ' *';
+    document.querySelector('[data-i18n="work-email"]').textContent = translations[currentLanguage]['work-email'] + ' *';
+    document.querySelector('[data-i18n="login-password"]').textContent = translations[currentLanguage]['login-password'] + ' *';
+    document.querySelector('[data-i18n="confirm-password"]').textContent = translations[currentLanguage]['confirm-password'] + ' *';
+    document.querySelector('[data-i18n="mobile-number"]').textContent = translations[currentLanguage]['mobile-number'] + ' *';
+  }
+
   // 初始化设置
   window.onload = function() {
     // 设置默认入职日期为今天
@@ -232,7 +461,54 @@
     
     // 测试Firebase连接
     testFirebaseConnection();
+    
+    // 初始化语言
+    setLanguage('zh');
+    
+    // 自动同步账户持有人姓名
+    document.getElementById('registerName').addEventListener('input', function() {
+      const accountHolderField = document.getElementById('registerAccountHolder');
+      if (!accountHolderField.value.trim()) {
+        accountHolderField.value = this.value;
+      }
+    });
+    
+    // 初始化粒子效果
+    initParticles();
   };
+  
+  // 粒子效果配置
+  function initParticles() {
+    tsParticles.load('tsparticles', {
+      particles: {
+        color: { value: '#d4af37' },
+        links: {
+          color: '#d4af37',
+          distance: 150,
+          enable: true,
+          opacity: 0.5,
+          width: 1
+        },
+        move: {
+          direction: 'none',
+          enable: true,
+          outModes: { default: 'bounce' },
+          random: false,
+          speed: 2,
+          straight: false
+        },
+        number: {
+          density: { enable: true, area: 800 },
+          value: 80
+        },
+        opacity: { value: 0.5 },
+        shape: { type: 'circle' },
+        size: { value: { min: 1, max: 5 } }
+      },
+      detectRetina: true,
+      background: { color: '#000000' }
+    });
+  }
 
   // 切换Tab
   function switchTab(tabName) {
@@ -332,6 +608,12 @@
     const joinDate = document.getElementById('registerJoinDate').value;
     const bio = document.getElementById('registerBio').value.trim();
     
+    // 银行账户信息
+    const bankName = document.getElementById('registerBankName').value.trim();
+    const bankAccount = document.getElementById('registerBankAccount').value.trim();
+    const accountHolder = document.getElementById('registerAccountHolder').value.trim() || name;
+    const bankBranch = document.getElementById('registerBankBranch').value.trim();
+    
     hideAllMessages();
     
     // 测试Firebase连接
@@ -402,7 +684,12 @@
           firebaseUid: user.uid, // 关联Firebase用户ID
           addTime: new Date().toISOString(),
           addedBy: 'self-register', // 标记为自主注册
-          status: 'active' // 默认状态为活跃
+          status: 'active', // 默认状态为活跃
+          // 银行账户信息
+          bankName: bankName,
+          bankAccount: bankAccount,
+          accountHolder: accountHolder,
+          bankBranch: bankBranch
         };
         
         console.log('准备保存员工信息:', employeeData);
@@ -440,6 +727,10 @@
         document.getElementById('registerConfirmPassword').value = '';
         document.getElementById('registerMobile').value = '';
         document.getElementById('registerBio').value = '';
+        document.getElementById('registerBankName').value = '';
+        document.getElementById('registerBankAccount').value = '';
+        document.getElementById('registerAccountHolder').value = '';
+        document.getElementById('registerBankBranch').value = '';
         
         // 3秒后自动切换到登录页面
         setTimeout(() => {
