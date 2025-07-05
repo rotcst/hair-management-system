@@ -581,6 +581,358 @@
             }
         }
         
+        /* 平板设备适配 */
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 220px;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            }
+            
+            .sidebar-header {
+                padding: 15px;
+            }
+            
+            .sidebar-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8em;
+            }
+            
+            .sidebar-title {
+                font-size: 0.9em;
+            }
+            
+            .sidebar-menu-header {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+            
+            .sidebar-submenu-item {
+                padding: 8px 15px 8px 40px;
+                font-size: 0.85em;
+            }
+            
+            .content-area {
+                padding: 20px;
+                margin-top: 15px;
+                height: calc(100vh - 160px);
+                max-height: calc(100vh - 160px);
+            }
+            
+            .content-area h1 {
+                font-size: 2.2em;
+                margin-bottom: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .form-row .form-group {
+                margin-bottom: 15px;
+            }
+            
+            input, select, textarea {
+                padding: 12px;
+                font-size: 16px; /* 防止iOS自动缩放 */
+                border-radius: 6px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 16px;
+                border-radius: 6px;
+                margin: 10px 5px;
+            }
+            
+            .top-nav {
+                padding: 0 15px;
+                height: 50px;
+            }
+            
+            .store-info, .user-info, .language-switcher {
+                height: 36px;
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+            
+            .language-btn {
+                padding: 4px 8px;
+                font-size: 0.8em;
+                min-width: 45px;
+            }
+            
+            .hamburger-menu {
+                top: 12px;
+                left: 12px;
+            }
+            
+            .hamburger-line {
+                width: 22px;
+                height: 2px;
+                margin: 4px;
+            }
+        }
+        
+        /* 手机设备适配 */
+        @media screen and (max-width: 480px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .sidebar-header {
+                padding: 12px;
+            }
+            
+            .sidebar-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
+            }
+            
+            .sidebar-subtitle {
+                font-size: 0.8em;
+            }
+            
+            .sidebar-title {
+                font-size: 0.8em;
+            }
+            
+            .sidebar-menu-header {
+                padding: 8px 12px;
+                font-size: 0.85em;
+            }
+            
+            .sidebar-menu-icon {
+                font-size: 1em;
+                margin-right: 8px;
+            }
+            
+            .sidebar-submenu-item {
+                padding: 6px 12px 6px 35px;
+                font-size: 0.8em;
+            }
+            
+            .content-area {
+                padding: 15px;
+                margin-top: 10px;
+                height: calc(100vh - 150px);
+                max-height: calc(100vh - 150px);
+            }
+            
+            .content-area h1 {
+                font-size: 1.8em;
+                margin-bottom: 12px;
+            }
+            
+            .form-group {
+                margin-bottom: 12px;
+            }
+            
+            input, select, textarea {
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 15px;
+                margin: 8px 3px;
+            }
+            
+            .top-nav {
+                padding: 0 10px;
+                height: 45px;
+            }
+            
+            .store-info, .user-info, .language-switcher {
+                height: 32px;
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            
+            .language-btn {
+                padding: 3px 6px;
+                font-size: 0.75em;
+                min-width: 40px;
+            }
+            
+            .hamburger-menu {
+                top: 10px;
+                left: 10px;
+                padding: 4px;
+            }
+            
+            .hamburger-line {
+                width: 20px;
+                height: 2px;
+                margin: 3px;
+            }
+            
+            .footer {
+                font-size: 0.75em;
+                padding: 3px 10px;
+            }
+            
+            /* 表格和列表在移动端的适配 */
+            .employee-table, .salon-table, .product-table {
+                font-size: 0.85em;
+            }
+            
+            .employee-table th, .employee-table td,
+            .salon-table th, .salon-table td,
+            .product-table th, .product-table td {
+                padding: 8px 4px;
+            }
+            
+            /* 搜索和筛选控件适配 */
+            .search-controls, .filter-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .search-controls input, .filter-controls select {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+        }
+        
+        /* 横屏模式适配 */
+        @media screen and (max-height: 600px) and (orientation: landscape) {
+            .content-area {
+                height: calc(100vh - 120px);
+                max-height: calc(100vh - 120px);
+                padding: 10px;
+            }
+            
+            .content-area h1 {
+                font-size: 1.5em;
+                margin-bottom: 8px;
+            }
+            
+            .form-group {
+                margin-bottom: 8px;
+            }
+            
+            .sidebar {
+                width: 180px;
+            }
+            
+            .sidebar-header {
+                padding: 8px;
+            }
+            
+            .sidebar-logo {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2em;
+            }
+            
+            .sidebar-menu-header {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+            
+            .top-nav {
+                height: 40px;
+                padding: 0 8px;
+            }
+            
+            .store-info, .user-info, .language-switcher {
+                height: 28px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+            
+            .language-btn {
+                padding: 2px 4px;
+                font-size: 0.7em;
+                min-width: 35px;
+            }
+        }
+        
+        /* 移动端触摸优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 移动设备特定样式 */
+            button, .sidebar-menu-header, .sidebar-submenu-item, .language-btn {
+                -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            input, select, textarea {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
+            
+            /* 防止移动端页面缩放 */
+            html {
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+            }
+            
+            /* 优化移动端滚动 */
+            body, .content-area, .sidebar-menu {
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+            
+            /* 移动端输入框样式优化 */
+            input[type="email"], input[type="password"], input[type="text"], 
+            input[type="tel"], input[type="number"], input[type="date"] {
+                -webkit-appearance: none;
+                border-radius: 6px;
+                box-shadow: none;
+            }
+            
+            /* 移动端按钮触摸反馈 */
+            button:active, .sidebar-menu-header:active, .sidebar-submenu-item:active, .language-btn:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+            
+            /* 汉堡菜单按钮触摸反馈 */
+            .hamburger-menu:active {
+                transform: scale(0.9);
+                transition: transform 0.1s ease;
+            }
+            
+            /* 优化触摸滚动区域 */
+            .content-area, .sidebar-menu {
+                touch-action: pan-y;
+            }
+        }
+        
+        /* 特定iOS设备优化 */
+        @supports (-webkit-appearance: none) {
+            .sidebar, .content-area, .top-nav {
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+            }
+            
+            input, select, textarea {
+                -webkit-appearance: none;
+                border-radius: 6px;
+            }
+            
+            /* iOS Safari地址栏隐藏时的高度适配 */
+            @media screen and (max-height: 500px) {
+                .content-area {
+                    height: calc(100vh - 100px);
+                    max-height: calc(100vh - 100px);
+                }
+            }
+        }
+        
         /* 保留原有样式 */
         .container, .content-area, .top-nav, .footer {
             background: var(--glass);
@@ -7820,6 +8172,339 @@
             
             input.click();
         }
+        
+        // ==================== 移动端优化功能 ====================
+        
+        // 移动端优化初始化
+        function initMobileOptimization() {
+            // 检测是否为移动设备
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                console.log('检测到移动设备，启用移动端优化');
+                
+                // 禁用双击缩放
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', function(event) {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // 处理软键盘弹出时的界面调整
+                let originalViewportHeight = window.innerHeight;
+                
+                window.addEventListener('resize', function() {
+                    const currentViewportHeight = window.innerHeight;
+                    const sidebar = document.querySelector('.sidebar');
+                    const mainContent = document.querySelector('.main-content');
+                    
+                    if (currentViewportHeight < originalViewportHeight * 0.75) {
+                        // 软键盘弹出时
+                        if (sidebar && sidebar.classList.contains('active')) {
+                            toggleMobileMenu(); // 关闭侧边栏
+                        }
+                    }
+                });
+                
+                // 处理输入框焦点，防止页面跳动
+                const inputs = document.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', function() {
+                        setTimeout(() => {
+                            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    });
+                    
+                    // 移动端输入框失焦时收起键盘
+                    input.addEventListener('blur', function() {
+                        setTimeout(() => {
+                            window.scrollTo(0, 0);
+                        }, 100);
+                    });
+                });
+                
+                // 优化触摸反馈
+                document.addEventListener('touchstart', function() {}, { passive: true });
+                
+                // 处理屏幕旋转
+                window.addEventListener('orientationchange', function() {
+                    setTimeout(() => {
+                        originalViewportHeight = window.innerHeight;
+                        
+                        // 如果侧边栏是打开的，重新调整
+                        const sidebar = document.querySelector('.sidebar');
+                        if (sidebar && sidebar.classList.contains('active')) {
+                            sidebar.style.height = window.innerHeight + 'px';
+                        }
+                        
+                        // 重新初始化粒子效果（如果存在）
+                        if (window.tsParticles) {
+                            window.tsParticles.load('tsparticles', {
+                                particles: {
+                                    number: { value: window.innerWidth < 768 ? 50 : 100 },
+                                    color: { value: '#D4AF37' },
+                                    shape: { type: 'circle' },
+                                    opacity: { value: window.innerWidth < 768 ? 0.3 : 0.5 },
+                                    size: { value: { min: 1, max: 3 } },
+                                    move: {
+                                        enable: true,
+                                        speed: 1,
+                                        direction: 'none',
+                                        random: true,
+                                        straight: false,
+                                        out_mode: 'out',
+                                        bounce: false,
+                                    }
+                                },
+                                interactivity: {
+                                    detect_on: 'canvas',
+                                    events: {
+                                        onhover: { enable: !isMobile, mode: 'repulse' },
+                                        onclick: { enable: true, mode: 'push' },
+                                        resize: true
+                                    },
+                                    modes: {
+                                        repulse: { distance: 100, duration: 0.4 },
+                                        push: { particles_nb: 4 }
+                                    }
+                                },
+                                retina_detect: true
+                            });
+                        }
+                    }, 500);
+                });
+                
+                // 优化侧边栏在移动端的行为
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    // 添加遮罩层
+                    const overlay = document.createElement('div');
+                    overlay.className = 'mobile-overlay';
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.5);
+                        z-index: 999;
+                        display: none;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    `;
+                    
+                    overlay.addEventListener('click', function() {
+                        toggleMobileMenu();
+                    });
+                    
+                    document.body.appendChild(overlay);
+                    
+                    // 修改toggleMobileMenu函数以支持遮罩层
+                    const originalToggleMobileMenu = window.toggleMobileMenu;
+                    window.toggleMobileMenu = function() {
+                        const sidebar = document.querySelector('.sidebar');
+                        const overlay = document.querySelector('.mobile-overlay');
+                        
+                        if (sidebar) {
+                            const isActive = sidebar.classList.contains('active');
+                            
+                            if (isActive) {
+                                // 关闭侧边栏
+                                sidebar.classList.remove('active');
+                                if (overlay) {
+                                    overlay.style.opacity = '0';
+                                    setTimeout(() => {
+                                        overlay.style.display = 'none';
+                                    }, 300);
+                                }
+                            } else {
+                                // 打开侧边栏
+                                sidebar.classList.add('active');
+                                if (overlay) {
+                                    overlay.style.display = 'block';
+                                    setTimeout(() => {
+                                        overlay.style.opacity = '1';
+                                    }, 10);
+                                }
+                            }
+                        }
+                    };
+                }
+                
+                // 移动端表格优化
+                const tables = document.querySelectorAll('table');
+                tables.forEach(table => {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.cssText = `
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;
+                        border-radius: 8px;
+                        border: 1px solid rgba(212,175,55,0.2);
+                    `;
+                    
+                    table.parentNode.insertBefore(wrapper, table);
+                    wrapper.appendChild(table);
+                });
+                
+                // 移动端性能优化
+                document.addEventListener('scroll', function() {
+                    // 节流滚动事件
+                    clearTimeout(window.scrollTimeout);
+                    window.scrollTimeout = setTimeout(() => {
+                        // 滚动时隐藏/显示语言切换器
+                        const languageSwitcher = document.querySelector('.language-switcher');
+                        if (languageSwitcher) {
+                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            if (scrollTop > 100) {
+                                languageSwitcher.style.opacity = '0.7';
+                            } else {
+                                languageSwitcher.style.opacity = '1';
+                            }
+                        }
+                    }, 100);
+                }, { passive: true });
+                
+                // 移动端手势支持
+                let startX, startY, distX, distY;
+                
+                document.addEventListener('touchstart', function(e) {
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                }, { passive: true });
+                
+                document.addEventListener('touchmove', function(e) {
+                    if (!startX || !startY) return;
+                    
+                    const touch = e.touches[0];
+                    distX = touch.clientX - startX;
+                    distY = touch.clientY - startY;
+                }, { passive: true });
+                
+                document.addEventListener('touchend', function(e) {
+                    if (!startX || !startY) return;
+                    
+                    // 右滑手势打开侧边栏
+                    if (distX > 50 && Math.abs(distY) < 100 && startX < 50) {
+                        const sidebar = document.querySelector('.sidebar');
+                        if (sidebar && !sidebar.classList.contains('active')) {
+                            toggleMobileMenu();
+                        }
+                    }
+                    
+                    // 左滑手势关闭侧边栏
+                    if (distX < -50 && Math.abs(distY) < 100) {
+                        const sidebar = document.querySelector('.sidebar');
+                        if (sidebar && sidebar.classList.contains('active')) {
+                            toggleMobileMenu();
+                        }
+                    }
+                    
+                    // 重置变量
+                    startX = startY = distX = distY = null;
+                }, { passive: true });
+            }
+        }
+        
+        // 添加移动端特定的样式处理
+        function addMobileStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                /* 移动端特定样式补充 */
+                @media screen and (max-width: 768px) {
+                    /* 优化粒子效果性能 */
+                    #tsparticles {
+                        opacity: 0.3;
+                    }
+                    
+                    /* 优化动画性能 */
+                    * {
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                    }
+                    
+                    /* 移动端遮罩层 */
+                    .mobile-overlay {
+                        backdrop-filter: blur(2px);
+                        -webkit-backdrop-filter: blur(2px);
+                    }
+                }
+                
+                @media screen and (max-width: 480px) {
+                    /* 进一步优化小屏幕 */
+                    #tsparticles {
+                        opacity: 0.2;
+                    }
+                    
+                    /* 优化表格显示 */
+                    .employee-table, .salon-table, .product-table {
+                        min-width: 100%;
+                        white-space: nowrap;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 检查是否需要重新初始化移动端优化
+        function reinitializeMobileFeatures() {
+            // 重新绑定动态添加的元素的触摸事件
+            const newButtons = document.querySelectorAll('button:not([data-mobile-optimized])');
+            newButtons.forEach(button => {
+                button.setAttribute('data-mobile-optimized', 'true');
+                button.addEventListener('touchstart', function() {}, { passive: true });
+            });
+            
+            // 重新绑定新输入框的事件
+            const newInputs = document.querySelectorAll('input:not([data-mobile-optimized]), select:not([data-mobile-optimized]), textarea:not([data-mobile-optimized])');
+            newInputs.forEach(input => {
+                input.setAttribute('data-mobile-optimized', 'true');
+                input.addEventListener('focus', function() {
+                    setTimeout(() => {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
+            });
+        }
+        
+        // 页面加载完成后执行移动端优化
+        document.addEventListener('DOMContentLoaded', function() {
+            initMobileOptimization();
+            addMobileStyles();
+        });
+        
+        // 如果DOM已经加载完成，立即执行
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                initMobileOptimization();
+                addMobileStyles();
+            });
+        } else {
+            initMobileOptimization();
+            addMobileStyles();
+        }
+        
+        // 监听内容变化，重新初始化移动端特性
+        const observer = new MutationObserver(function(mutations) {
+            let shouldReinitialize = false;
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldReinitialize = true;
+                }
+            });
+            
+            if (shouldReinitialize) {
+                setTimeout(reinitializeMobileFeatures, 100);
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
         
     </script>
 </body>
