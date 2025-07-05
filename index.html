@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Mesia首尔西部地区管理系统</title>
     
@@ -912,8 +912,300 @@
             }
         }
         
+        /* iPhone 16 Pro Max特殊适配 */
+        @media screen and (min-width: 430px) and (max-width: 500px) and (min-height: 900px) {
+            /* iPhone 16 Pro Max: 430x932 viewport */
+            
+            .sidebar {
+                width: 250px;
+                height: 100vh;
+                height: 100dvh; /* 动态视口高度 */
+                z-index: 1000;
+                top: 0;
+                left: 0;
+                position: fixed;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                box-shadow: none;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.4);
+            }
+            
+            .sidebar-header {
+                padding: max(20px, env(safe-area-inset-top, 20px)) 20px 20px 20px;
+                border-bottom: 1px solid rgba(212,175,55,0.2);
+            }
+            
+            .sidebar-logo {
+                width: 70px;
+                height: 70px;
+                font-size: 2em;
+            }
+            
+            .sidebar-subtitle {
+                font-size: 0.9em;
+                margin-top: 8px;
+            }
+            
+            .sidebar-title {
+                font-size: 1em;
+                margin-top: 12px;
+            }
+            
+            .sidebar-menu {
+                padding: 20px 0;
+                max-height: calc(100vh - 200px);
+                max-height: calc(100dvh - 200px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .sidebar-menu-header {
+                padding: 14px 20px;
+                font-size: 1em;
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .sidebar-submenu-item {
+                padding: 12px 20px 12px 50px;
+                font-size: 0.9em;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .top-nav {
+                left: 0;
+                right: 0;
+                padding: 0 max(20px, env(safe-area-inset-right, 20px)) 0 20px;
+                padding-top: max(10px, env(safe-area-inset-top, 10px));
+                height: calc(54px + max(10px, env(safe-area-inset-top, 10px)));
+                z-index: 999;
+            }
+            
+            .hamburger-menu {
+                display: block;
+                top: max(15px, calc(env(safe-area-inset-top, 0px) + 15px));
+                left: 15px;
+                z-index: 1001;
+                padding: 8px;
+                border-radius: 8px;
+            }
+            
+            .hamburger-line {
+                width: 24px;
+                height: 3px;
+                margin: 5px;
+            }
+            
+            .content-container {
+                padding: 20px;
+                margin-top: calc(54px + max(10px, env(safe-area-inset-top, 10px)));
+                height: calc(100vh - calc(54px + max(10px, env(safe-area-inset-top, 10px))));
+                height: calc(100dvh - calc(54px + max(10px, env(safe-area-inset-top, 10px))));
+                padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+            }
+            
+            .content-area {
+                height: calc(100vh - calc(170px + max(10px, env(safe-area-inset-top, 10px)) + max(20px, env(safe-area-inset-bottom, 20px))));
+                height: calc(100dvh - calc(170px + max(10px, env(safe-area-inset-top, 10px)) + max(20px, env(safe-area-inset-bottom, 20px))));
+                max-height: calc(100vh - calc(170px + max(10px, env(safe-area-inset-top, 10px)) + max(20px, env(safe-area-inset-bottom, 20px))));
+                max-height: calc(100dvh - calc(170px + max(10px, env(safe-area-inset-top, 10px)) + max(20px, env(safe-area-inset-bottom, 20px))));
+                padding: 25px;
+                margin-top: 15px;
+                border-radius: 12px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .content-area h1 {
+                font-size: 2.2em;
+                margin-bottom: 20px;
+            }
+            
+            .footer {
+                left: 0;
+                right: 0;
+                bottom: max(5px, env(safe-area-inset-bottom, 5px));
+                padding: 8px max(20px, env(safe-area-inset-right, 20px)) 8px 20px;
+                font-size: 0.8em;
+            }
+            
+            .language-switcher {
+                height: 36px;
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+            
+            .language-btn {
+                padding: 4px 10px;
+                font-size: 0.85em;
+                min-width: 48px;
+            }
+            
+            .store-info, .user-info {
+                height: 36px;
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+            
+            /* 表单优化 */
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            input, select, textarea {
+                padding: 14px;
+                font-size: 16px;
+                min-height: 44px;
+                border-radius: 8px;
+            }
+            
+            button {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 50px;
+                border-radius: 8px;
+                margin: 8px 5px;
+            }
+            
+            /* 移动端遮罩层优化 */
+            .mobile-overlay {
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+                background: rgba(0,0,0,0.6);
+            }
+            
+            /* 表格优化 */
+            .employee-table, .salon-table, .product-table {
+                font-size: 0.9em;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            .employee-table th, .employee-table td,
+            .salon-table th, .salon-table td,
+            .product-table th, .product-table td {
+                padding: 12px 8px;
+                min-height: 44px;
+            }
+        }
+        
+        /* 大屏iPhone通用优化 (iPhone 14 Pro Max, iPhone 15 Pro Max, iPhone 16 Pro Max) */
+        @media screen and (min-width: 414px) and (min-height: 800px) {
+            .sidebar {
+                box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            }
+            
+            .sidebar-header {
+                padding-top: max(20px, env(safe-area-inset-top, 20px));
+            }
+            
+            .top-nav {
+                padding-top: max(10px, env(safe-area-inset-top, 10px));
+                height: calc(54px + max(10px, env(safe-area-inset-top, 10px)));
+            }
+            
+            .hamburger-menu {
+                top: max(15px, calc(env(safe-area-inset-top, 0px) + 15px));
+            }
+            
+            .content-container {
+                margin-top: calc(54px + max(10px, env(safe-area-inset-top, 10px)));
+                padding-bottom: max(74px, env(safe-area-inset-bottom, 74px));
+            }
+            
+            .footer {
+                bottom: max(5px, env(safe-area-inset-bottom, 5px));
+                padding-left: max(20px, env(safe-area-inset-left, 20px));
+                padding-right: max(20px, env(safe-area-inset-right, 20px));
+            }
+            
+            /* 搜索和筛选控件优化 */
+            .search-controls, .filter-controls {
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .search-controls input, .filter-controls select {
+                padding: 12px;
+                min-height: 44px;
+                border-radius: 8px;
+            }
+        }
+        
+        /* 横屏模式下的iPhone Pro Max优化 */
+        @media screen and (min-width: 800px) and (max-height: 500px) and (orientation: landscape) {
+            .sidebar {
+                width: 200px;
+                height: 100vh;
+            }
+            
+            .sidebar-header {
+                padding: 15px;
+            }
+            
+            .sidebar-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
+            }
+            
+            .sidebar-menu-header {
+                padding: 8px 15px;
+                font-size: 0.9em;
+                min-height: 40px;
+            }
+            
+            .sidebar-submenu-item {
+                padding: 6px 15px 6px 40px;
+                font-size: 0.85em;
+                min-height: 36px;
+            }
+            
+            .top-nav {
+                height: 45px;
+                padding: 0 15px;
+            }
+            
+            .content-container {
+                margin-top: 45px;
+                height: calc(100vh - 45px);
+                padding: 15px;
+            }
+            
+            .content-area {
+                height: calc(100vh - 120px);
+                max-height: calc(100vh - 120px);
+                padding: 15px;
+            }
+            
+            .hamburger-menu {
+                top: 8px;
+                left: 8px;
+            }
+        }
+        
         /* 特定iOS设备优化 */
         @supports (-webkit-appearance: none) {
+            /* iOS安全区域支持 */
+            :root {
+                --safe-area-inset-top: env(safe-area-inset-top, 0);
+                --safe-area-inset-right: env(safe-area-inset-right, 0);
+                --safe-area-inset-bottom: env(safe-area-inset-bottom, 0);
+                --safe-area-inset-left: env(safe-area-inset-left, 0);
+            }
+            
             .sidebar, .content-area, .top-nav {
                 -webkit-backdrop-filter: blur(10px);
                 backdrop-filter: blur(10px);
@@ -921,7 +1213,30 @@
             
             input, select, textarea {
                 -webkit-appearance: none;
-                border-radius: 6px;
+                border-radius: 8px;
+            }
+            
+            /* 防止iOS zoom */
+            input[type="email"], input[type="password"], input[type="text"], 
+            input[type="tel"], input[type="number"], input[type="date"], select, textarea {
+                font-size: 16px !important;
+                -webkit-text-size-adjust: 100%;
+            }
+            
+            /* iOS Safari特殊处理 */
+            body {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            input, textarea, .content-area {
+                -webkit-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
             }
             
             /* iOS Safari地址栏隐藏时的高度适配 */
@@ -929,6 +1244,17 @@
                 .content-area {
                     height: calc(100vh - 100px);
                     max-height: calc(100vh - 100px);
+                }
+            }
+            
+            /* Dynamic Island和刘海适配 */
+            @supports (padding: max(0px)) {
+                .sidebar-header, .top-nav, .hamburger-menu {
+                    padding-top: max(env(safe-area-inset-top, 0), 10px);
+                }
+                
+                .content-container {
+                    padding-bottom: max(env(safe-area-inset-bottom, 0), 20px);
                 }
             }
         }
@@ -8242,16 +8568,21 @@
                         
                         // 重新初始化粒子效果（如果存在）
                         if (window.tsParticles) {
+                            // 检测是否为iPhone 16 Pro Max或类似大屏设备
+                            const isLargePhone = window.innerWidth >= 430 && window.innerWidth <= 500 && window.innerHeight >= 900;
+                            const particleCount = isLargePhone ? 30 : (window.innerWidth < 768 ? 50 : 100);
+                            const particleOpacity = isLargePhone ? 0.2 : (window.innerWidth < 768 ? 0.3 : 0.5);
+                            
                             window.tsParticles.load('tsparticles', {
                                 particles: {
-                                    number: { value: window.innerWidth < 768 ? 50 : 100 },
+                                    number: { value: particleCount },
                                     color: { value: '#D4AF37' },
                                     shape: { type: 'circle' },
-                                    opacity: { value: window.innerWidth < 768 ? 0.3 : 0.5 },
-                                    size: { value: { min: 1, max: 3 } },
+                                    opacity: { value: particleOpacity },
+                                    size: { value: { min: 1, max: isLargePhone ? 2 : 3 } },
                                     move: {
                                         enable: true,
-                                        speed: 1,
+                                        speed: isLargePhone ? 0.5 : 1,
                                         direction: 'none',
                                         random: true,
                                         straight: false,
@@ -8262,16 +8593,17 @@
                                 interactivity: {
                                     detect_on: 'canvas',
                                     events: {
-                                        onhover: { enable: !isMobile, mode: 'repulse' },
-                                        onclick: { enable: true, mode: 'push' },
+                                        onhover: { enable: !isMobile && !isLargePhone, mode: 'repulse' },
+                                        onclick: { enable: !isLargePhone, mode: 'push' },
                                         resize: true
                                     },
                                     modes: {
-                                        repulse: { distance: 100, duration: 0.4 },
-                                        push: { particles_nb: 4 }
+                                        repulse: { distance: 80, duration: 0.3 },
+                                        push: { particles_nb: 2 }
                                     }
                                 },
-                                retina_detect: true
+                                retina_detect: false, // 在高DPI设备上禁用以提高性能
+                                fpsLimit: isLargePhone ? 30 : 60 // 大屏设备限制帧率
                             });
                         }
                     }, 500);
