@@ -1,15 +1,15 @@
 // Firebase配置文件
-// 与您的Firebase项目设置匹配：Mesia-EMS (mesia-ems)
+// 与您的Firebase项目设置匹配：Mesia Management system
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDAfHsHn6jyaCDURsi-R2a0vleka36ML6Q",
-    authDomain: "mesia-ems.firebaseapp.com",
-    projectId: "mesia-ems",
-    storageBucket: "mesia-ems.firebasestorage.app",
-    messagingSenderId: "718797479793",
-    appId: "1:718797479793:web:22a39e902f8ac4324e60d0",
-    measurementId: "G-3VHGK0DTQY",
-    databaseURL: "https://mesia-ems-default-rtdb.firebaseio.com/"
+    apiKey: "AIzaSyDYaff6z2iqr6IMdK9OOavhv9R-0Av3JXI",
+    authDomain: "mesia-management-system.firebaseapp.com",
+    projectId: "mesia-management-system",
+    storageBucket: "mesia-management-system.firebasestorage.app",
+    messagingSenderId: "602101408546",
+    appId: "1:602101408546:web:9f3f2089a9cc53aa9efb7b",
+    measurementId: "G-B6S7C6ZRYS",
+    databaseURL: "https://mesia-management-system-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 // 初始化Firebase

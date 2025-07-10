@@ -5,13 +5,19 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "start:modular": "electron main-modular.js",
+    "start:desktop": "electron main-desktop.js",
+    "dev": "NODE_ENV=development electron main-modular.js",
+    "dev:desktop": "NODE_ENV=development electron main-desktop.js",
     "build": "electron-builder"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^3.1.10",
     "electron": "^28.2.0",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "express": "^5.1.0"
   },
   "build": {
     "appId": "com.company.ems",
@@ -33,4 +39,4 @@
       "shortcutName": "企业管理系统"
     }
   }
-} 
+}

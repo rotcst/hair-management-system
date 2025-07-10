@@ -2,8 +2,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B6S7C6ZRYS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-B6S7C6ZRYS');
+    </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mesia Professional - 登录/注册</title>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -192,414 +201,7 @@
       font-weight: bold;
     }
     
-    /* 移动端适配 */
-    @media screen and (max-width: 768px) {
-      .auth-container {
-        width: 95%;
-        max-width: 400px;
-        margin: 20px auto;
-        padding: 20px;
-      }
-      
-      .language-switcher {
-        top: 10px;
-        right: 10px;
-        padding: 6px 12px;
-        height: 36px;
-      }
-      
-      .language-btn {
-        padding: 4px 8px;
-        font-size: 0.8em;
-        min-width: 45px;
-      }
-      
-      .title {
-        font-size: 1.5em;
-        margin-bottom: 15px;
-      }
-      
-      .tab-container {
-        margin-bottom: 15px;
-      }
-      
-      .tab-button {
-        padding: 10px 15px;
-        font-size: 0.9em;
-      }
-      
-      .form-row {
-        flex-direction: column;
-        gap: 0;
-      }
-      
-      .form-group {
-        margin-bottom: 15px;
-      }
-      
-      input, select {
-        padding: 12px;
-        font-size: 16px; /* 防止iOS自动缩放 */
-        border-radius: 6px;
-      }
-      
-      button {
-        padding: 14px;
-        font-size: 16px;
-        border-radius: 6px;
-        margin-top: 15px;
-      }
-      
-      .info-text {
-        font-size: 11px;
-      }
-      
-      /* 优化粒子效果在移动端的性能 */
-      #tsparticles {
-        opacity: 0.3;
-      }
-    }
-    
-    /* 超小屏幕设备适配 */
-    @media screen and (max-width: 480px) {
-      .auth-container {
-        width: 98%;
-        margin: 10px auto;
-        padding: 15px;
-      }
-      
-      .language-switcher {
-        top: 8px;
-        right: 8px;
-        padding: 5px 10px;
-        height: 32px;
-        gap: 3px;
-      }
-      
-      .language-btn {
-        padding: 3px 6px;
-        font-size: 0.75em;
-        min-width: 40px;
-      }
-      
-      .title {
-        font-size: 1.3em;
-        margin-bottom: 12px;
-      }
-      
-      .tab-button {
-        padding: 8px 12px;
-        font-size: 0.85em;
-      }
-      
-      .form-group {
-        margin-bottom: 12px;
-      }
-      
-      input, select {
-        padding: 10px;
-        font-size: 16px;
-      }
-      
-      button {
-        padding: 12px;
-        font-size: 15px;
-      }
-      
-      .info-text {
-        font-size: 10px;
-      }
-      
-      /* 进一步优化粒子效果 */
-      #tsparticles {
-        opacity: 0.2;
-      }
-    }
-    
-    /* 横屏模式适配 */
-    @media screen and (max-height: 600px) and (orientation: landscape) {
-      .auth-container {
-        margin: 10px auto;
-        padding: 15px;
-      }
-      
-      .title {
-        font-size: 1.2em;
-        margin-bottom: 10px;
-      }
-      
-      .form-group {
-        margin-bottom: 10px;
-      }
-      
-      button {
-        margin-top: 10px;
-        padding: 10px;
-      }
-      
-      .language-switcher {
-        top: 5px;
-        right: 5px;
-        height: 28px;
-      }
-      
-      .language-btn {
-        padding: 2px 5px;
-        font-size: 0.7em;
-      }
-    }
-    
-    /* 移动端触摸优化 */
-    @media (hover: none) and (pointer: coarse) {
-      /* 移动设备特定样式 */
-      button, .tab-button, .language-btn {
-        -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-      
-      input, select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
-      
-      /* 防止移动端页面缩放 */
-      html {
-        -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%;
-      }
-      
-      /* 优化移动端滚动 */
-      body {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-      }
-      
-      /* 移动端输入框样式优化 */
-      input[type="email"], input[type="password"], input[type="text"], input[type="tel"] {
-        -webkit-appearance: none;
-        border-radius: 6px;
-        box-shadow: none;
-      }
-      
-      /* 移动端按钮触摸反馈 */
-      button:active, .tab-button:active, .language-btn:active {
-        transform: scale(0.95);
-        transition: transform 0.1s ease;
-      }
-    }
-    
-    /* iPhone 16 Pro Max特殊适配 */
-    @media screen and (min-width: 430px) and (max-width: 500px) and (min-height: 900px) {
-      /* iPhone 16 Pro Max: 430x932 viewport */
-      
-      .language-switcher {
-        top: max(20px, env(safe-area-inset-top, 20px));
-        right: max(20px, env(safe-area-inset-right, 20px));
-        padding: 8px 15px;
-        height: 40px;
-        z-index: 2000;
-      }
-      
-      .language-btn {
-        padding: 6px 12px;
-        font-size: 0.9em;
-        min-width: 50px;
-      }
-      
-      .auth-container {
-        width: 90%;
-        max-width: 380px;
-        margin: max(60px, env(safe-area-inset-top, 60px)) auto max(40px, env(safe-area-inset-bottom, 40px)) auto;
-        padding: 30px;
-        min-height: auto;
-      }
-      
-      .title {
-        font-size: 1.8em;
-        margin-bottom: 20px;
-        text-align: center;
-      }
-      
-      .tab-container {
-        margin-bottom: 20px;
-      }
-      
-      .tab-button {
-        padding: 12px 20px;
-        font-size: 1em;
-        min-height: 44px; /* iOS推荐的最小触摸目标 */
-      }
-      
-      .form-group {
-        margin-bottom: 18px;
-      }
-      
-      input, select, textarea {
-        padding: 14px;
-        font-size: 16px;
-        min-height: 44px;
-        box-sizing: border-box;
-        border-radius: 8px;
-      }
-      
-      button {
-        padding: 16px 20px;
-        font-size: 16px;
-        min-height: 50px;
-        border-radius: 8px;
-        margin-top: 20px;
-      }
-      
-      .form-row {
-        gap: 15px;
-      }
-      
-      .form-row .form-group {
-        flex: 1;
-        margin-bottom: 18px;
-      }
-      
-      /* 确保内容完全可见 */
-      body {
-        padding-top: env(safe-area-inset-top, 0);
-        padding-bottom: env(safe-area-inset-bottom, 0);
-        padding-left: env(safe-area-inset-left, 0);
-        padding-right: env(safe-area-inset-right, 0);
-      }
-      
-      /* 优化滚动体验 */
-      html, body {
-        height: 100%;
-        overflow-x: hidden;
-      }
-    }
-    
-    /* 大屏iPhone通用优化 (iPhone 14 Pro Max, iPhone 15 Pro Max, iPhone 16 Pro Max) */
-    @media screen and (min-width: 414px) and (min-height: 800px) {
-      .auth-container {
-        margin-top: max(50px, env(safe-area-inset-top, 50px));
-        margin-bottom: max(30px, env(safe-area-inset-bottom, 30px));
-      }
-      
-      /* 防止内容被刘海或Dynamic Island遮挡 */
-      .language-switcher {
-        top: max(15px, calc(env(safe-area-inset-top, 0px) + 15px));
-        right: max(15px, env(safe-area-inset-right, 15px));
-      }
-      
-      /* 优化表单布局 */
-      .form-row {
-        display: flex;
-        gap: 12px;
-      }
-      
-      .form-row .form-group {
-        flex: 1;
-        margin-bottom: 15px;
-      }
-      
-      /* 银行信息区域优化 */
-      .bank-info-section {
-        margin-top: 25px;
-        padding-top: 20px;
-        border-top: 1px solid rgba(212, 175, 55, 0.3);
-      }
-      
-      .bank-info-section h3 {
-        color: #90EE90;
-        margin-bottom: 15px;
-        font-size: 1.1em;
-      }
-    }
-    
-    /* 横屏模式下的iPhone Pro Max优化 */
-    @media screen and (min-width: 800px) and (max-height: 500px) and (orientation: landscape) {
-      .auth-container {
-        width: 80%;
-        max-width: 500px;
-        margin: 20px auto;
-        padding: 20px;
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
-      }
-      
-      .language-switcher {
-        top: 10px;
-        right: 10px;
-        height: 32px;
-      }
-      
-      .title {
-        font-size: 1.4em;
-        margin-bottom: 15px;
-      }
-      
-      .form-row {
-        display: flex;
-        gap: 15px;
-      }
-      
-      .form-group {
-        margin-bottom: 12px;
-      }
-      
-      input, select, textarea {
-        padding: 10px;
-      }
-      
-      button {
-        padding: 12px 20px;
-        margin-top: 15px;
-      }
-    }
-    
-    /* 特定iOS设备优化 */
-    @supports (-webkit-appearance: none) {
-      /* iOS安全区域支持 */
-      :root {
-        --safe-area-inset-top: env(safe-area-inset-top, 0);
-        --safe-area-inset-right: env(safe-area-inset-right, 0);
-        --safe-area-inset-bottom: env(safe-area-inset-bottom, 0);
-        --safe-area-inset-left: env(safe-area-inset-left, 0);
-      }
-      
-      .auth-container {
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-      }
-      
-      input, select, textarea {
-        -webkit-appearance: none;
-        border-radius: 8px;
-      }
-      
-      /* 防止iOS zoom */
-      input[type="email"], input[type="password"], input[type="text"], 
-      input[type="tel"], input[type="date"], select, textarea {
-        font-size: 16px !important;
-        -webkit-text-size-adjust: 100%;
-      }
-      
-      /* iOS Safari特殊处理 */
-      body {
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-      
-      input, textarea {
-        -webkit-user-select: text;
-        -moz-user-select: text;
-        -ms-user-select: text;
-        user-select: text;
-      }
-    }
+
   </style>
 </head>
 <body>
@@ -889,18 +491,14 @@
   
   // 粒子效果配置
   function initParticles() {
-    // 检测是否为iPhone 16 Pro Max或类似大屏设备
-    const isLargePhone = window.innerWidth >= 430 && window.innerWidth <= 500 && window.innerHeight >= 900;
-    const isMobile = window.innerWidth <= 768;
-    
     tsParticles.load('tsparticles', {
       particles: {
         color: { value: '#d4af37' },
         links: {
           color: '#d4af37',
-          distance: isLargePhone ? 100 : 150,
-          enable: !isLargePhone, // 大屏设备禁用连接线以提高性能
-          opacity: isLargePhone ? 0.3 : 0.5,
+          distance: 150,
+          enable: true,
+          opacity: 0.5,
           width: 1
         },
         move: {
@@ -908,31 +506,19 @@
           enable: true,
           outModes: { default: 'bounce' },
           random: false,
-          speed: isLargePhone ? 1 : 2,
+          speed: 2,
           straight: false
         },
         number: {
           density: { enable: true, area: 800 },
-          value: isLargePhone ? 40 : (isMobile ? 60 : 80)
+          value: 80
         },
-        opacity: { value: isLargePhone ? 0.3 : 0.5 },
+        opacity: { value: 0.5 },
         shape: { type: 'circle' },
-        size: { value: { min: 1, max: isLargePhone ? 3 : 5 } }
+        size: { value: { min: 1, max: 5 } }
       },
-      detectRetina: !isLargePhone, // 大屏设备禁用Retina检测以提高性能
-      background: { color: '#000000' },
-      fpsLimit: isLargePhone ? 30 : 60, // 大屏设备限制帧率
-      interactivity: {
-        events: {
-          onClick: { enable: !isLargePhone, mode: 'push' },
-          onHover: { enable: !isLargePhone, mode: 'repulse' },
-          resize: true
-        },
-        modes: {
-          push: { quantity: isLargePhone ? 2 : 4 },
-          repulse: { distance: isLargePhone ? 80 : 100, duration: 0.4 }
-        }
-      }
+      detectRetina: true,
+      background: { color: '#000000' }
     });
   }
 
